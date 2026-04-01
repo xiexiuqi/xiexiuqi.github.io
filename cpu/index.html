@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>服务器 CPU 规格库</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        /* Back Link */
+        .back-link {
+            display: inline-block;
+            margin-top: 15px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+
+        .back-link:hover {
+            color: white;
+        }
+
+        /* Navigation */
+        nav {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        nav li {
+            margin: 0;
+        }
+
+        nav a {
+            display: block;
+            padding: 15px 25px;
+            color: #555;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        nav a:hover {
+            color: #2d5a87;
+            border-bottom-color: #2d5a87;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Section */
+        section {
+            margin-bottom: 50px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .section-header h2 {
+            font-size: 1.8em;
+            color: #1e3a5f;
+            font-weight: 400;
+        }
+
+        .section-header .icon {
+            font-size: 1.5em;
+            margin-right: 12px;
+        }
+
+        /* CPU Brand Cards */
+        .brand-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        }
+
+        .card h3 {
+            color: #2d5a87;
+            font-size: 1.2em;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        .card p {
+            color: #666;
+            font-size: 0.95em;
+            margin-bottom: 15px;
+        }
+
+        .card .meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85em;
+            color: #999;
+        }
+
+        .card .tag {
+            background: #e8f0f8;
+            color: #2d5a87;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+        }
+
+        /* Citation Style */
+        .citation {
+            display: inline-block;
+            background: #2d5a87;
+            color: white;
+            font-size: 0.75em;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-left: 4px;
+            text-decoration: none;
+            vertical-align: super;
+            line-height: 1;
+        }
+
+        .citation:hover {
+            background: #1e3a5f;
+        }
+
+        /* Data Source Notice */
+        .source-info {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            padding: 20px;
+            margin-bottom: 40px;
+            border-radius: 8px;
+        }
+
+        .source-info h3 {
+            color: #1e3a5f;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .source-info p {
+            color: #555;
+            line-height: 1.8;
+        }
+
+        /* Quick Links */
+        .quick-links {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .quick-links h3 {
+            color: #2d5a87;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .quick-link-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.2s;
+            margin-bottom: 10px;
+        }
+
+        .quick-link-item:hover {
+            background: #e8f0f8;
+            transform: translateX(5px);
+        }
+
+        .quick-link-item .icon {
+            font-size: 1.5em;
+            margin-right: 15px;
+        }
+
+        .quick-link-item .text {
+            flex: 1;
+        }
+
+        .quick-link-item .title {
+            font-weight: 500;
+            margin-bottom: 3px;
+            font-size: 1.1em;
+        }
+
+        .quick-link-item .desc {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        /* References Section */
+        .references {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-top: 40px;
+        }
+
+        .references h3 {
+            color: #1e3a5f;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .references ol {
+            margin-left: 25px;
+            color: #555;
+            line-height: 2;
+        }
+
+        .references li {
+            margin: 8px 0;
+            padding-left: 10px;
+        }
+
+        .references a {
+            color: #2d5a87;
+            text-decoration: none;
+        }
+
+        .references a:hover {
+            text-decoration: underline;
+        }
+
+        /* Footer */
+        footer {
+            background: #1e3a5f;
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+            margin-top: 60px;
+        }
+
+        footer p {
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            nav a {
+                padding: 12px 15px;
+                font-size: 0.9em;
+            }
+
+            .brand-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>⚡ 服务器 CPU 规格库</h1>
+        <p>主流服务器处理器官方规格数据收集</p>
+        <a href="../index.html" class="back-link">← 返回性能知识库首页</a>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#overview">处理器概览</a></li>
+            <li><a href="#specs">规格数据</a></li>
+            <li><a href="#references">参考资料</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <!-- Data Source Notice -->
+        <div class="source-info">
+            <h3>📋 数据说明</h3>
+            <p>本库收集的 CPU 规格数据均来自各厂商官方技术文档和产品页面<sup><a href="#ref" class="citation">[1-9]</a></sup>，包括处理器规格书、技术白皮书、官方产品资料等。所有数据标注具体来源，持续更新中。</p>
+        </div>
+
+        <!-- CPU Brand Overview -->
+        <section id="overview">
+            <div class="section-header">
+                <span class="icon">🖥️</span>
+                <h2>处理器概览</h2>
+            </div>
+            
+            <div class="brand-grid">
+                <div class="card">
+                    <h3>Intel Xeon<sup><a href="#ref-intel" class="citation">[1]</a></sup></h3>
+                    <p>英特尔至强处理器，x86 架构数据中心领域的主流选择。涵盖 Scalable、Max、W 等多个产品系列。</p>
+                    <div class="meta">
+                        <span class="tag">x86 架构</span>
+                        <a href="https://www.intel.com/content/www/us/en/products/details/processors/xeon.html" target="_blank" style="color: #2d5a87; text-decoration: none;">intel.com →</a>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>AMD EPYC<sup><a href="#ref-amd" class="citation">[2]</a></sup></h3>
+                    <p>AMD 霄龙处理器，基于 Zen 架构的 x86 服务器处理器，以高核心数和大缓存设计著称。</p>
+                    <div class="meta">
+                        <span class="tag">x86 架构</span>
+                        <a href="https://www.amd.com/en/processors/epyc" target="_blank" style="color: #2d5a87; text-decoration: none;">amd.com →</a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>AWS Graviton<sup><a href="#ref-aws" class="citation">[3]</a></sup></h3>
+                    <p>亚马逊云科技自研 ARM 架构服务器处理器，专为云原生应用优化，广泛应用于 AWS 云服务。</p>
+                    <div class="meta">
+                        <span class="tag">ARM 架构</span>
+                        <a href="https://aws.amazon.com/ec2/graviton/" target="_blank" style="color: #2d5a87; text-decoration: none;">aws.amazon.com →</a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Ampere Altra<sup><a href="#ref-ampere" class="citation">[4]</a></sup></h3>
+                    <p>Ampere Computing 推出的 ARM 架构云原生处理器，专为云计算和边缘计算场景设计。</p>
+                    <div class="meta">
+                        <span class="tag">ARM 架构</span>
+                        <a href="https://amperecomputing.com/" target="_blank" style="color: #2d5a87; text-decoration: none;">amperecomputing.com →</a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>华为鲲鹏 (Kunpeng)<sup><a href="#ref-kunpeng" class="citation">[5]</a></sup></h3>
+                    <p>华为基于 ARM 架构的服务器处理器，鲲鹏 920 系列是数据中心主力产品，支持国产替代。</p>
+                    <div class="meta">
+                        <span class="tag">ARM 架构</span>
+                        <a href="https://www.hikunpeng.com/" target="_blank" style="color: #2d5a87; text-decoration: none;">hikunpeng.com →</a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>海光 (Hygon)<sup><a href="#ref-hygon" class="citation">[6]</a></sup></h3>
+                    <p>海光信息 x86 架构处理器，兼容 x86 生态，面向服务器和数据中心市场，支持国产替代。</p>
+                    <div class="meta">
+                        <span class="tag">x86 架构</span>
+                        <a href="http://www.hygon.cn/" target="_blank" style="color: #2d5a87; text-decoration: none;">hygon.cn →</a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>飞腾 (Phytium)<sup><a href="#ref-phytium" class="citation">[7]</a></sup></h3>
+                    <p>飞腾处理器基于 ARM 架构，腾云 S 系列面向服务器和数据中心应用，支持国产替代。</p>
+                    <div class="meta">
+                        <span class="tag">ARM 架构</span>
+                        <a href="https://www.phytium.com.cn/" target="_blank" style="color: #2d5a87; text-decoration: none;">phytium.com.cn →</a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>龙芯 (Loongson)<sup><a href="#ref-loongson" class="citation">[8]</a></sup></h3>
+                    <p>龙芯处理器采用自主 LoongArch 架构，3C5000、3D5000 系列面向服务器领域，完全自主可控。</p>
+                    <div class="meta">
+                        <span class="tag">LoongArch</span>
+                        <a href="http://www.loongson.cn/" target="_blank" style="color: #2d5a87; text-decoration: none;">loongson.cn →</a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>兆芯 (Zhaoxin)<sup><a href="#ref-zhaoxin" class="citation">[9]</a></sup></h3>
+                    <p>兆芯 x86 架构处理器，开胜 KH-40000 系列面向服务器和高端嵌入式应用，支持国产替代。</p>
+                    <div class="meta">
+                        <span class="tag">x86 架构</span>
+                        <a href="http://www.zhaoxin.com/" target="_blank" style="color: #2d5a87; text-decoration: none;">zhaoxin.com →</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Links -->
+        <section id="specs">
+            <div class="section-header">
+                <span class="icon">📊</span>
+                <h2>规格数据</h2>
+            </div>
+            
+            <div class="quick-links">
+                <a href="server-cpu-specifications.html" class="quick-link-item">
+                    <span class="icon">📋</span>
+                    <div class="text">
+                        <div class="title">完整规格对比表</div>
+                        <div class="desc">按型号排序的所有服务器 CPU 详细规格参数</div>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- References Section -->
+        <section id="references" class="references">
+            <h3>参考资料</h3>
+            <ol>
+                <li id="ref-intel">Intel Corporation. <strong>Intel Xeon Processors</strong>. <a href="https://www.intel.com/content/www/us/en/products/details/processors/xeon.html" target="_blank">https://www.intel.com/content/www/us/en/products/details/processors/xeon.html</a></li>
+                
+                <li id="ref-amd">AMD Inc. <strong>AMD EPYC Processors</strong>. <a href="https://www.amd.com/en/processors/epyc" target="_blank">https://www.amd.com/en/processors/epyc</a></li>
+                
+                <li id="ref-aws">Amazon Web Services. <strong>AWS Graviton Processors</strong>. <a href="https://aws.amazon.com/ec2/graviton/" target="_blank">https://aws.amazon.com/ec2/graviton/</a></li>
+                
+                <li id="ref-ampere">Ampere Computing. <strong>Ampere Altra Family</strong>. <a href="https://amperecomputing.com/" target="_blank">https://amperecomputing.com/</a></li>
+                
+                <li id="ref-kunpeng">华为技术有限公司. <strong>华为鲲鹏处理器</strong>. <a href="https://www.hikunpeng.com/" target="_blank">https://www.hikunpeng.com/</a></li>
+                
+                <li id="ref-hygon">海光信息技术股份有限公司. <strong>海光处理器产品</strong>. <a href="http://www.hygon.cn/" target="_blank">http://www.hygon.cn/</a></li>
+                
+                <li id="ref-phytium">飞腾信息技术有限公司. <strong>飞腾处理器产品</strong>. <a href="https://www.phytium.com.cn/" target="_blank">https://www.phytium.com.cn/</a></li>
+                
+                <li id="ref-loongson">龙芯中科技术股份有限公司. <strong>龙芯处理器产品</strong>. <a href="http://www.loongson.cn/" target="_blank">http://www.loongson.cn/</a></li>
+                
+                <li id="ref-zhaoxin">上海兆芯集成电路有限公司. <strong>兆芯处理器产品</strong>. <a href="http://www.zhaoxin.com/" target="_blank">http://www.zhaoxin.com/</a></li>
+            </ol>
+        </section>
+    </div>
+
+    <footer>
+        <p>服务器 CPU 规格库 | 基于官方技术文档整理 | 持续更新中</p>
+    </footer>
+</body>
+</html>

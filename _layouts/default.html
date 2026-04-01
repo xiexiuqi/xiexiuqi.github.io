@@ -17,6 +17,9 @@
       <a class="site-title" href="{{ "/" | relative_url }}">{{ site.title | escape }}</a>
       <nav class="site-nav">
         <a href="{{ "/" | relative_url }}">首页</a>
+        <a href="{{ "/reports/" | relative_url }}">性能报告</a>
+        <a href="{{ "/daily/" | relative_url }}">日报</a>
+        <a href="{{ "/features/" | relative_url }}">特性分析</a>
         <a href="{{ "/about/" | relative_url }}">关于</a>
       </nav>
     </div>
@@ -25,12 +28,20 @@
   <main class="page-content">
     <div class="wrapper">
       {{ content }}
+      
+      <!-- AI Disclaimer -->
+      <div class="ai-disclaimer">
+        <strong>⚠️ 免责声明</strong>
+        <p>本网站内容由 AI 工具辅助生成，仅供参考和学习使用。作者不对内容的准确性、完整性和适用性做任何保证。使用本站信息所造成的任何损失，作者不承担任何责任。请在生产环境使用前进行充分测试和验证。</p>
+      </div>
     </div>
   </main>
 
   <footer class="site-footer">
     <div class="wrapper">
-      <p>&copy; {{ site.time | date: "%Y" }} {{ site.author | escape }}. All rights reserved.</p>
+      <p>专注于 Linux 内核与系统性能优化技术分享</p>
+      <p>&copy; {{ site.time | date: "%Y" }} All rights reserved.</p>
+      <p><a href="{{ "/about/" | relative_url }}">查看免责声明</a></p>
     </div>
   </footer>
 </body>

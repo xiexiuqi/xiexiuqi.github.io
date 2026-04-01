@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux 性能月报 - 最近30天汇总</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        header .subtitle { font-size: 1.2em; opacity: 0.9; margin-bottom: 5px; }
+        header .date { font-size: 1em; opacity: 0.8; }
+        .summary {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .summary h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-card .number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .stat-card .label { color: #666; font-size: 0.9em; margin-top: 5px; }
+        .category-section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .category-section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        .article-list { list-style: none; }
+        .article-item {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            transition: background 0.2s;
+        }
+        .article-item:last-child { border-bottom: none; }
+        .article-item:hover { background: #f8f9fa; }
+        .article-title {
+            font-size: 1.15em;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .article-title a {
+            color: #333;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .article-title a:hover { color: #667eea; }
+        .article-meta {
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        .article-summary {
+            color: #555;
+            font-size: 0.95em;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        .tags { margin-top: 10px; }
+        .tag {
+            display: inline-block;
+            padding: 3px 10px;
+            background: #e3f2fd;
+            color: #1976d2;
+            border-radius: 15px;
+            font-size: 0.8em;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        .tag.importance-high { background: #ffebee; color: #c62828; }
+        .tag.importance-medium { background: #fff3e0; color: #ef6c00; }
+        .tag.importance-low { background: #e8f5e9; color: #2e7d32; }
+        .tag.source-git { background: #f3e5f5; color: #7b1fa2; }
+        .tag.source-lwn { background: #e0f2f1; color: #00796b; }
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            font-size: 0.9em;
+        }
+        .highlight-box {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            border-left: 4px solid #ff9800;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .highlight-box h3 {
+            color: #e65100;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+        .highlight-box ul {
+            margin-left: 25px;
+            color: #555;
+        }
+        .highlight-box li {
+            margin: 8px 0;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🐧 Linux 性能月报</h1>
+            <div class="subtitle">最近30天技术动态汇总</div>
+            <div class="date">数据周期: 2026-02-04 至 2026-03-06</div>
+        </header>
+        
+        <div class="summary">
+            <h2>📊 数据概览</h2>
+            <p>本报告汇总了最近30天内 <strong>20</strong> 篇 Linux 内核与基础设施技术相关的重要资讯，经过性能相关性筛选，确保为读者提供有价值的技术洞察。</p>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="number">20</div>
+                    <div class="label">总文章数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">10</div>
+                    <div class="label">高重要性</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">7</div>
+                    <div class="label">中重要性</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">6</div>
+                    <div class="label">技术领域</div>
+                </div>
+            </div>
+            
+            <div class="highlight-box">
+                <h3>🔥 本月重点技术趋势</h3>
+                <ul>
+                    <li><strong>sched_ext 调度器</strong> - 本月最活跃的技术领域，共有10个相关提交，主要涉及编译修复、性能优化和稳定性改进</li>
+                    <li><strong>BPF/eBPF</strong> - 持续活跃，包括验证器改进、测试用例修复和内存泄漏修复</li>
+                    <li><strong>MGLRU 内存管理</strong> - 社区正在重新审视这个算法，可能面临重大调整或移除</li>
+                    <li><strong>稳定版内核</strong> - 多个版本线持续更新，修复构建问题和安全漏洞</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <h2>调度器 (10篇)</h2>
+            <ul class="article-list">
+
+                <li class="article-item">
+                    <div class="article-title">
+                        <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=01a867c2e090cb440c8f27158e8650c8ddefec8e" target="_blank" rel="noopener">
+                            ⚡ selftests/sched_ext: Add -fms-extensions to bpf build flags
+                        </a>
+                    </div>
+                    <div class="article-meta">
+                        📰 kernel-git-local | 
+                        🕐 2026-03-03 |
+                        👤 Zhao Mengmeng
+                    </div>
+                    <div class="article-summary">
+                        这是一项关于sched_ext（可扩展调度器）的重要更新。优化调度器性能和稳定性。
+                    </div>
+                    <div class="tags">
+                        <span class="tag importance-高">高优先级</span>
+                        <span class="tag">评分: 20分</span>
+                        <span class="tag source-git">kernel-git-local</span>
+                    </div>
+                </li>
+
+                <li class="article-item">
+                    <div class="article-title">
+                        <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=9af832c0a76eedce169c4c6360e4e20d8a0c9ab1" target="_blank" rel="noopener">
+                            ⚡ tools/sched_ext: Add -fms-extensions to bpf build flags
+                        </a>
+                    </div>
+                    <div class="article-meta">
+                        📰 kernel-git-local | 
+                        🕐 2026-03-03 |
+                        👤 Zhao Mengmeng
+                    </div>
+                    <div class="article-summary">
+                        这是一项关于sched_ext（可扩展调度器）的重要更新。优化调度器性能和稳定性。
+                    </div>
+                    <div class="tags">
+                        <span class="tag importance-高">高优先级</span>
+                        <span class="tag">评分: 17分</span>
+                        <span class="tag source-git">kernel-git-local</span>
+                    </div>
+                </li>
+
+                <li class="article-item">
+                    <div class="article-title">
+                        <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=b06ccbabe2506fd70b9167a644978b049150224a" target="_blank" rel="noopener">
+                            ⚡ sched_ext: Fix starvation of scx_enable() under fair-class saturation
+                        </a>
+                    </div>
+                    <div class="article-meta">
+                        📰 kernel-git-local | 
+                        🕐 2026-03-03 |
+                        👤 Tejun Heo
+                    </div>
+                    <div class="article-summary">
+                        这是一项关于sched_ext（可扩展调度器）的重要更新。优化调度器性能和稳定性。
+                    </div>
+                    <div class="tags">
+                        <span class="tag importance-高">高优先级</span>
+                        <span class="tag">评分: 11分</span>
+                        <span class="tag source-git">kernel-git-local</span>
+                    </div>
+                </li>
+
+                <li class="article-item">
+                    <div class="article-title">
+                        <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=1336b579f6079fb8520be03624fcd9ba443c930b" target="_blank" rel="noopener">
+                            ⚡ sched_ext: Remove redundant css_put() in scx_cgroup_init()
+                        </a>
+                    </div>
+                    <div class="article-meta">
+                        📰 kernel-git-local | 
+                        🕐 2026-03-03 |
+                        👤 Cheng-Yang Chou
+                    </div>
+                    <div class="article-summary">
+                        这是一项关于sched_ext（可扩展调度器）的重要更新。优化调度器性能和稳定性。
+                    </div>
+                    <div class="tags">
+                        <span class="tag importance-中">中优先级</span>
+                        <span class="tag">评分: 8分</span>
+                        <span class="tag source-git">kernel-git-local</span>
+                    </div>
+                </li>
+
+                <li class="article-item">
+                    <div class="article-title">
+                        <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=75ad51825933575906394d0d5db04586b02db00a" target="_blank" rel="noopener">
+                            ⚡ selftests/sched_ext: Fix peek_dsq.bpf.c compile error for clang 17
+                        </a>
+                    </div>
+                    <div class="article-meta">
+                        📰 kernel-git-local | 
+                        🕐 2026-03-03 |
+                        👤 Zhao Mengmeng
+                    </div>
+                    <div class="article-summary">
+                        这是一项关于sched_ext（可扩展调度器）的重要更新。优化调度器性能和稳定性。
+                    </div>
+                    <div class="tags">
+                        <span class="tag importance-高">高优先级</span>
+                        <span class="tag">评分: 17分</span>
+                        <span class="tag source-git">kernel-git-local</span>
+                    </div>
+                </li>
+
+                <li class="article-item">
+                    <div class="article-title">
+                        <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=3f27958b729a2337336a6b50e0d9aee5fbbce816" target="_blank" rel="noopener">
+                            ⚡ sched_ext: Use READ_ONCE() for plain reads of scx_watchdog_timeout
+                        </a>
+                    </div>
+                    <div class="article-meta">
+                        📰 kernel-git-local | 
+                        🕐 2026-03-03 |
+                        👤 zhidao su
+                    </div>
+                    <div class="article-summary">
+                        这是一项关于sched_ext（可扩展调度器）的重要更新。优化调度器性能和稳定性。
+                    </div>
+                    <div class="tags">
+                        <span class="tag importance-高">高优先级</span>
+                        <span class="tag">评分: 11分</span>
+                        <span class="tag source-git">kernel-git-local</span>
+                    </div>
+                </li>
+
+                <li class="article-item">
+                    <div class="article-title">
+                        <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=494eaf4651975127d34d5ae6555c72dedba092c9" target="_blank" rel="noopener">
+                            ⚡ sched_ext: Replace naked scx_root dereferences in kobject callbacks
+                        </a>
+                    </div>
+                    <div class="article-meta">
+                        📰 kernel-git-local | 
+                        🕐 2026-03-02 |
+                        👤 zhidao su
+                    </div>
+                    <div class="article-summary">
+                        这是一项关于sched_ext（可扩展调度器）的重要更新。优化调度器性能和稳定性。
+                    </div>
+                    <div class="tags">
+                        <span class="tag importance-中">中优先级</span>
+                        <span class="tag">评分: 8分</span>
+                        <span class="tag source-git">kernel-git-local</span>
+                    </div>
+                </li>
+
+                <li class="article-item">
+                    <div class="article-title">
+                        <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=9adfcef334bf9c6ef68eaecfca5f45d18614efe0" target="_blank" rel="noopener">
+                            ⚡ sched_ext: Use READ_ONCE() for the read side of dsq->nr update
+                        </a>
+                    </div>
+                    <div class="article-meta">
+                        📰 kernel-git-local | 
+                        🕐 2026-03-02 |
+                        👤 zhidao su
+                    </div>
+                    <div class="article-summary">
+                        这是一项关于sched_ext（可扩展调度器）的重要更新。优化调度器性能和稳定性。
+                    </div>
+                    <div class="tags">
+                        <span class="tag importance-高">高优先级</span>
+                        <span class="tag">评分: 11分</span>
+                        <span class="tag source-git">kernel-git-local</span>
+                    </div>
+                </li>
+
+                <li class="article-item">
+                    <div class="article-title">
+                        <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=032e084f0d43fda78c33abfc704ac13a0891a6e7" target="_blank" rel="noopener">
+                            ⚡ tools/sched_ext: fix strtoul() misuse in scx_hotplug_seq()
+                        </a>
+                    </div>
+                    <div class="article-meta">
+                        📰 kernel-git-local | 
+                        🕐 2026-02-27 |
+                        👤 David Carlier
+                    </div>
+                    <div class="article-summary">
+                        这是一项关于sched_ext（可扩展调度器）的重要更新。优化调度器性能和稳定性。
+                    </div>
+                    <div class="tags">
+                        <span class="tag importance-高">高优先级</span>
+                        <span class="tag">评分: 11分</span>
+                        <span class="tag source-git">kernel-git-local</span>
+                    </div>
+                </li>
+
+                <li class="article-item">
+                    <div class="article-title">
+                        <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=749989b2d90ddc7dd253ad3b11a77cf882721acf" target="_blank" rel="noopener">
+                            ⚡ sched_ext: Fix SCX_EFLAG_INITIALIZED being a no-op flag
+                        </a>
+                    </div>
+                    <div class="article-meta">
+                        📰 kernel-git-local | 
+                        🕐 2026-02-26 |
+                        👤 David Carlier
+                    </div>
+                    <div class="article-summary">
+                        这是一项关于sched_ext（可扩展调度器）的重要更新。优化调度器性能和稳定性。
+                    </div>
+                    <div class="tags">
+                        <span class="tag importance-中">中优先级</span>
+                        <span class="tag">评分: 8分</span>
+                        <span class="tag source-git">kernel-git-local</span>
+                    </div>
+                </li>
+
+            </ul>
+        </div>
+
+        <div class="category-section">
+            <h2>BPF/eBPF (2篇)</h2>
+            <ul class="article-list">
+
+                <li class="article-item">
+                    <div class="article-title">
+                        <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=efc11a667878a1d655ff034a93a539debbfedb12" target="_blank" rel="noopener">
+                            🔍 bpf: Improve bounds when tnum has a single possible value
+                        </a>
+                    </div>
+                    <div class="article-meta">
+                        📰 kernel-git-local | 
+                        🕐 2026-02-27 |
+                        👤 Paul Chaignon
+                    </div>
+                    <div class="article-summary">
+                        BPF子系统更新：改进BPF验证器和工具。
+                    </div>
+                    <div class="tags">
+                        <span class="tag importance-中">中优先级</span>
+                        <span class="tag">评分: 9分</span>
+                        <span class="tag source-git">kernel-git-local</span>
+                    </div>
+                </li>
+
+                <li class="article-item">
+                    <div class="article-title">
+                        <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=60e3cbef3500ad6101bc91946e645f69b1bb9556" target="_blank" rel="noopener">
+                            🔍 selftests/bpf: Fix a memory leak in xdp_flowtable test
+                        </a>
+                    </div>
+                    <div class="article-meta">
+                        📰 kernel-git-local | 
+                        🕐 2026-02-24 |
+                        👤 Ihor Solodrai
+                    </div>
+                    <div class="article-summary">
+                        BPF子系统更新：改进BPF验证器和工具。
+                    </div>
+                    <div class="tags">
+                        <span class="tag importance-高">高优先级</span>
+                        <span class="tag">评分: 14分</span>
+                        <span class="tag source-git">kernel-git-local</span>
+                    </div>
+                </li>
+
+            </ul>
+        </div>
+
+        <div class="category-section">
+            <h2>内存管理 (2篇)</h2>
+            <ul class="article-list">
+
+                <li class="article-item">
+                    <div class="article-title">
+                        <a href="https://lwn.net/Articles/1060967/" target="_blank" rel="noopener">
+                            🧠 重新审视多代LRU（MGLRU）算法
+                        </a>
+                    </div>
+                    <div class="article-meta">
+                        📰 LWN.net | 
+                        🕐 2026-03-05 |
+                        👤 corbet
+                    </div>
+                    <div class="article-summary">
+                        多代LRU（MGLRU）内存管理算法于2022年底合并到Linux 6.1内核，承诺提供更好的性能和更简洁的代码。然而，自合并以来，MGLRU的进展已经停滞，许多系统仍未启用此功能。随着2026年LSFMM+BPF峰会的临近，内存管理开发者将讨论MGLRU的未来。
+                    </div>
+                    <div class="tags">
+                        <span class="tag importance-高">高优先级</span>
+                        <span class="tag">评分: 14分</span>
+                        <span class="tag source-lwn">LWN.net</span>
+                    </div>
+                </li>
+
+                <li class="article-item">
+                    <div class="article-title">
+                        <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=e9217ca77dc35b4978db0fe901685ddb3f1e223a" target="_blank" rel="noopener">
+                            🧠 mm/slab: initialize slab->stride early to avoid memory ordering issues
+                        </a>
+                    </div>
+                    <div class="article-meta">
+                        📰 kernel-git-local | 
+                        🕐 2026-02-23 |
+                        👤 Harry Yoo
+                    </div>
+                    <div class="article-summary">
+                        内存管理优化：改进内存分配和回收效率。
+                    </div>
+                    <div class="tags">
+                        <span class="tag importance-中">中优先级</span>
+                        <span class="tag">评分: 8分</span>
+                        <span class="tag source-git">kernel-git-local</span>
+                    </div>
+                </li>
+
+            </ul>
+        </div>
+
+        <div class="category-section">
+            <h2>开发工具 (2篇)</h2>
+            <ul class="article-list">
+
+                <li class="article-item">
+                    <div class="article-title">
+                        <a href="https://lwn.net/Articles/1061543/" target="_blank" rel="noopener">
+                            🛠️ Buildroot 2026.02 版本发布
+                        </a>
+                    </div>
+                    <div class="article-meta">
+                        📰 LWN.net | 
+                        🕐 2026-03-05 |
+                        👤 jzb
+                    </div>
+                    <div class="article-summary">
+                        Buildroot 2026.02版本发布，这是一个用于通过交叉编译生成嵌入式Linux系统的工具。主要更新包括：新增对HPPA架构的支持、默认使用6.19.x内核头文件、改进SBOM生成功能。本次开发周期非常活跃，共有97位独立贡献者提交了超过1500个更改。
+                    </div>
+                    <div class="tags">
+                        <span class="tag importance-高">高优先级</span>
+                        <span class="tag">评分: 11分</span>
+                        <span class="tag source-lwn">LWN.net</span>
+                    </div>
+                </li>
+
+                <li class="article-item">
+                    <div class="article-title">
+                        <a href="https://lwn.net/Articles/1060024/" target="_blank" rel="noopener">
+                            🛠️ Magit和Majutsu：可发现的版本控制
+                        </a>
+                    </div>
+                    <div class="article-meta">
+                        📰 LWN.net | 
+                        🕐 2026-03-04 |
+                        👤 daroc
+                    </div>
+                    <div class="article-summary">
+                        Jujutsu是一个越来越受欢迎的Git兼容版本控制系统，专注于简化Git的概念模型。现在开发者正在为Jujutsu实现一个类似Magit的Emacs界面——Majutsu，让Emacs用户也能享受到更友好的版本控制体验。
+                    </div>
+                    <div class="tags">
+                        <span class="tag importance-中">中优先级</span>
+                        <span class="tag">评分: 6分</span>
+                        <span class="tag source-lwn">LWN.net</span>
+                    </div>
+                </li>
+
+            </ul>
+        </div>
+
+        <div class="category-section">
+            <h2>内核发布 (1篇)</h2>
+            <ul class="article-list">
+
+                <li class="article-item">
+                    <div class="article-title">
+                        <a href="https://lwn.net/Articles/1061524/" target="_blank" rel="noopener">
+                            🐧 New stable kernels to address build failures
+                        </a>
+                    </div>
+                    <div class="article-meta">
+                        📰 LWN.net | 
+                        🕐 2026-03-05 |
+                        👤 jzb
+                    </div>
+                    <div class="article-summary">
+                        稳定版内核更新：<p>Sasha Levin has announced the release of the <a href="https://lwn.net/Articles/1061525/">6.12.76</a>, <a href="https://lwn.net/Articles/1061526/">6
+                    </div>
+                    <div class="tags">
+                        <span class="tag importance-中">中优先级</span>
+                        <span class="tag">评分: 9分</span>
+                        <span class="tag source-lwn">LWN.net</span>
+                    </div>
+                </li>
+
+            </ul>
+        </div>
+
+        <div class="category-section">
+            <h2>其他 (3篇)</h2>
+            <ul class="article-list">
+
+                <li class="article-item">
+                    <div class="article-title">
+                        <a href="https://lwn.net/Articles/1061209/" target="_blank" rel="noopener">
+                            📄 Seven new stable Linux kernels
+                        </a>
+                    </div>
+                    <div class="article-meta">
+                        📰 LWN.net | 
+                        🕐 2026-03-04 |
+                        👤 jzb
+                    </div>
+                    <div class="article-summary">
+                        <p>Sasha Levin has announced the release of the <a href="https://lwn.net/Articles/1061210/">6.19.6</a>, <a href="https://lwn.net/Articles/1061211/">6.18.16</a>, <a href="https://lwn.net/Articles/10612
+                    </div>
+                    <div class="tags">
+                        <span class="tag importance-低">低优先级</span>
+                        <span class="tag">评分: 5分</span>
+                        <span class="tag source-lwn">LWN.net</span>
+                    </div>
+                </li>
+
+                <li class="article-item">
+                    <div class="article-title">
+                        <a href="https://lwn.net/Articles/1060649/" target="_blank" rel="noopener">
+                            📄 [$] Free software needs free tools
+                        </a>
+                    </div>
+                    <div class="article-meta">
+                        📰 LWN.net | 
+                        🕐 2026-03-03 |
+                        👤 jzb
+                    </div>
+                    <div class="article-summary">
+                        <p>One of the contradictions of the modern open-source movement is that projects which respect user freedoms often rely on proprietary tools that do not: communities often turn to non-free software fo
+                    </div>
+                    <div class="tags">
+                        <span class="tag importance-低">低优先级</span>
+                        <span class="tag">评分: 3分</span>
+                        <span class="tag source-lwn">LWN.net</span>
+                    </div>
+                </li>
+
+                <li class="article-item">
+                    <div class="article-title">
+                        <a href="https://lwn.net/Articles/1061048/" target="_blank" rel="noopener">
+                            📄 Garrett: To update blobs or not to update blobs
+                        </a>
+                    </div>
+                    <div class="article-meta">
+                        📰 LWN.net | 
+                        🕐 2026-03-03 |
+                        👤 corbet
+                    </div>
+                    <div class="article-summary">
+                        Matthew Garrett <a href="https://codon.org.uk/~mjg59/blog/p/to-update-blobs-or-not-to-update-blobs/">examines the factors</a> that go into the decision about whether to install a firmware update or no
+                    </div>
+                    <div class="tags">
+                        <span class="tag importance-低">低优先级</span>
+                        <span class="tag">评分: 4分</span>
+                        <span class="tag source-lwn">LWN.net</span>
+                    </div>
+                </li>
+
+            </ul>
+        </div>
+
+        <footer>
+            <p><strong>Linux 性能月报</strong> - 自动收集和生成</p>
+            <p>数据来源: LWN.net, Kernel.org, Git | 生成时间: 2026-03-06 10:18:21</p>
+            <p>报告周期: 最近30天 (2026-02-04 至 2026-03-06)</p>
+        </footer>
+    </div>
+</body>
+</html>

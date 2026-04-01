@@ -1,7 +1,7 @@
-title: Xie Xiuqi's Blog
-description: 个人技术博客 - 分享 Linux 内核、性能优化等技术文章
-author: Xie Xiuqi
-email: xiexiuqi@163.com
+title: Linux 性能技术博客
+description: Linux 内核与系统性能优化技术分享
+author: ""
+email: ""
 
 # Jekyll 配置
 theme: minima
@@ -43,4 +43,3 @@ defaults:
       type: "posts"
     values:
       layout: "post"
-      author: "Xie Xiuqi"
