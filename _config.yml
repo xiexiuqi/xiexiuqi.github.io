@@ -1,0 +1,46 @@
+title: Xie Xiuqi's Blog
+description: 个人技术博客 - 分享 Linux 内核、性能优化等技术文章
+author: Xie Xiuqi
+email: xiexiuqi@163.com
+
+# Jekyll 配置
+theme: minima
+baseurl: ""
+url: "https://xiexiuqi.github.io"
+
+# 分页配置
+paginate: 10
+paginate_path: "/page:num/"
+
+# 插件
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# 构建配置
+markdown: kramdown
+highlighter: rouge
+permalink: /:year/:month/:day/:title/
+
+# 排除文件
+exclude:
+  - .sass-cache/
+  - .jekyll-cache/
+  - gemfiles/
+  - Gemfile
+  - Gemfile.lock
+  - node_modules/
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+
+# 默认配置
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+      author: "Xie Xiuqi"
