@@ -5,8 +5,8 @@ title: 首页
 
 <!-- Hero Section -->
 <div class="hero">
-  <h1>Linux 性能技术博客</h1>
-  <p>专注于 Linux 内核与系统性能优化技术分享</p>
+  <h1>Linux内核与系统性能优化</h1>
+  <p>专注 Linux 内核与系统性能优化技术</p>
   
   <!-- Tech Stack Tags -->
   <div class="tech-stack">
