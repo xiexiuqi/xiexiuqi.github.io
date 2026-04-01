@@ -7,8 +7,22 @@ title: 首页
 <div class="hero">
   <h1>Linux 性能技术博客</h1>
   <p>专注于 Linux 内核与系统性能优化技术分享</p>
-  <a href="/reports/" class="btn btn-primary">浏览性能报告</a>
-  <a href="/daily/" class="btn btn-secondary" style="margin-left: 1rem;">查看日报</a>
+  
+  <!-- Tech Stack Tags -->
+  <div class="tech-stack">
+    <a href="/features/scheduler/" class="tech-tag primary">Linux Kernel</a>
+    <a href="/features/scheduler/" class="tech-tag">Scheduler</a>
+    <a href="/features/memory/" class="tech-tag">Memory</a>
+    <a href="/features/ext4/" class="tech-tag">Filesystem</a>
+    <a href="/features/network/" class="tech-tag">Network</a>
+    <a href="/cpu/" class="tech-tag">eBPF</a>
+    <a href="/features/io/" class="tech-tag">I/O</a>
+  </div>
+  
+  <div style="margin-top: 2rem;">
+    <a href="/reports/" class="btn btn-primary">浏览性能报告</a>
+    <a href="/daily/" class="btn btn-secondary" style="margin-left: 1rem;">查看日报</a>
+  </div>
 </div>
 
 <!-- Featured Reports -->
