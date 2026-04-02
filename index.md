@@ -27,33 +27,33 @@ title: 首页
 
 <!-- Featured Reports -->
 <div class="section-header">
-  <h2>📊 性能报告</h2>
+  <h2>📚 技术报告库</h2>
   <a href="/reports/">查看全部 →</a>
 </div>
 
 <div class="grid">
   <div class="card">
-    <h3>🚀 Linux 7.x 内核分析</h3>
-    <p>最新 Linux 7.0 内核完整技术报告，深入分析调度器、内存管理等核心子系统优化。</p>
-    <a href="/reports/7.x/">查看报告 →</a>
+    <h3>🚀 Arm AGI CPU</h3>
+    <p>Arm首款自研数据中心CPU，136核Neoverse V3架构，专为AI代理编排优化。</p>
+    <a href="/reports/cpu/arm/agi-cpu/">阅读报告 →</a>
   </div>
   
   <div class="card">
-    <h3>🔧 Linux 6.x 内核分析</h3>
-    <p>Linux 6.18/6.19 等版本的性能优化与特性分析，包含详细的技术解读。</p>
-    <a href="/reports/6.x/">查看报告 →</a>
+    <h3>🖥️ CPU 架构调研</h3>
+    <p>Arm、AMD、Intel 等服务器处理器架构设计与性能特性深度分析。</p>
+    <a href="/reports/cpu/">查看全部 →</a>
   </div>
   
   <div class="card">
-    <h3>📅 性能日报</h3>
-    <p>每日性能资讯汇总，跟踪 Linux 内核开发动态与社区讨论。</p>
+    <h3>📖 论文解读</h3>
+    <p>OSDI、SOSP、EuroSys、ATC 等顶会论文深度解读与工程实践结合。</p>
+    <a href="/reports/papers/">查看全部 →</a>
+  </div>
+  
+  <div class="card">
+    <h3>📅 定期报告</h3>
+    <p>性能日报、周报，以及 Linux 6.x/7.x 内核版本完整分析报告。</p>
     <a href="/daily/">查看日报 →</a>
-  </div>
-  
-  <div class="card">
-    <h3>🎯 专题周报</h3>
-    <p>每周性能技术专题汇总，深度分析特定领域的优化方案。</p>
-    <a href="/reports/weekly/">查看周报 →</a>
   </div>
 </div>
 
