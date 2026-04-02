@@ -47,7 +47,8 @@ Linux 内核核心子系统的实现原理与优化策略。
   <div class="card">
     <h3>⚡ 调度器</h3>
     <p>CFS、RT、sched-ext、EAS 等调度算法与性能优化。</p>
-    <a href="/features/scheduler/">查看详情 →</a>
+    <span class="tag" style="background-color: var(--color-accent-green);">新增深度报告</span>
+    <a href="/features/scheduler/" style="display: block; margin-top: 1rem;">查看详情 →</a>
   </div>
   
   <div class="card">

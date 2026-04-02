@@ -66,8 +66,10 @@ title: 首页
 <div class="grid">
   <div class="card">
     <h3>⚡ 调度器优化</h3>
-    <p>CFS、sched-ext 等调度器机制与性能优化分析。</p>
+    <p>CFS、sched-ext 等调度器机制与性能优化分析。包含 Cache Aware Scheduling 深度报告。</p>
     <a href="/features/scheduler/">查看详情 →</a>
+    <br>
+    <small style="color: var(--color-accent-green);">🆕 新增: Cache Aware Scheduling 报告</small>
   </div>
   
   <div class="card">
