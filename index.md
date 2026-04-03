@@ -42,6 +42,8 @@ title: 首页
     <h3>🖥️ CPU 架构调研</h3>
     <p>Arm、AMD、Intel 等服务器处理器架构设计与性能特性深度分析。</p>
     <a href="/reports/cpu/">查看全部 →</a>
+    <br>
+    <small style="color: var(--color-accent-green);">🆕 新增: AMD Zen 5 + ZEN6 报告</small>
   </div>
   
   <div class="card">

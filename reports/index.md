@@ -23,8 +23,8 @@ permalink: /reports/
   <div class="card">
     <h3>🔥 AMD 架构</h3>
     <p>EPYC 系列 Zen 架构演进、性能优化与数据中心部署分析。</p>
-    <a href="/reports/cpu/amd/">查看目录 →</a>
-    <br><small style="color: var(--color-text-muted);">暂无报告</small>
+    <a href="/reports/cpu/amd/">查看报告 →</a>
+    <br><small style="color: var(--color-accent-green);">🆕 新增: Zen 5 + ZEN6 报告</small>
   </div>
   
   <div class="card">
