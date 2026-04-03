@@ -70,9 +70,10 @@ Linux 内核核心子系统的实现原理与优化策略。
   </div>
   
   <div class="card">
-    <h3>💿 I/O 子系统</h3>
-    <p>块设备层、io_uring、NVMe 等 I/O 性能分析。</p>
-    <a href="/features/io/">查看详情 →</a>
+    <h3>⏱️ rseq 时间片扩展</h3>
+    <p>Linux rseq 时间片扩展机制深度分析，金融与电信行业应用。</p>
+    <span class="tag" style="background-color: var(--color-accent-blue);">🆕 深度报告</span>
+    <a href="/reports/features/rseq/" style="display: block; margin-top: 1rem;">阅读报告 →</a>
   </div>
 </div>
 
