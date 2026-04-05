@@ -86,11 +86,11 @@ Linux 内核核心子系统的实现原理与优化策略。
 顶会论文深度解读与工程实践结合。
 
 <div class="grid">
-  <div class="card">
-    <h3>🎯 OSDI</h3>
-    <p>操作系统设计与实现顶会论文精选解读。</p>
-    <a href="/reports/papers/osdi/">查看目录 →</a>
-    <br><small style="color: var(--color-text-muted);">暂无报告</small>
+<div class="card">
+    <h3>📖 论文解读</h3>
+    <p>OSDI、SOSP、EuroSys、ATC、ASPLOS 等顶会论文深度解读与工程实践结合。</p>
+    <a href="/reports/papers/">查看全部 →</a>
+    <br><small style="color: var(--color-accent-orange);">🆕 新增: ASPLOS 2026 报告</small>
   </div>
   
   <div class="card">
