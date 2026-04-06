@@ -14,7 +14,13 @@ permalink: /reports/papers/
   <h3>📚 ASPLOS 2026 操作系统性能论文调研报告</h3>
   <p>深入分析两篇核心论文：LAIKA（内核态APU加速框架，推理延迟降低9.7倍、功耗降至28.9%）和 Wave（SmartNIC资源管理卸载，节省8-16主机核心）。</p>
   <span class="tag" style="background-color: var(--color-accent-orange);">🆕 深度报告</span>
-  <a href="/reports/papers/asplos/2026/" style="display: block; margin-top: 1rem;">阅读完整报告 →</a>
+  <div style="margin-top: 1rem;">
+    <a href="/reports/papers/asplos/2026/">阅读完整报告（HTML版） →</a>
+    <br>
+    <small style="color: var(--color-text-muted);">
+      <a href="/reports/papers/asplos/2026/pdf/">📄 查看PDF转换版 →</a>
+    </small>
+  </div>
 </div>
 
 ## OSDI (操作系统设计与实现)
