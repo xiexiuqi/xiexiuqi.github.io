@@ -87,9 +87,11 @@ title: 首页
   </div>
   
   <div class="card">
-    <h3>📡 网络性能</h3>
-    <p>Linux 网络栈性能优化与协议分析。</p>
-    <a href="/features/network/">查看详情 →</a>
+    <h3>🔧 特性深度分析</h3>
+    <p>Linux 核心子系统的深度技术剖析。包含 Wave SmartNIC 卸载等前沿技术。</p>
+    <a href="/features/">查看全部 →</a>
+    <br>
+    <small style="color: var(--color-accent-orange);">🆕 新增: Wave 报告</small>
   </div>
 </div>
 

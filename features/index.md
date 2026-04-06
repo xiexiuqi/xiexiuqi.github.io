@@ -56,4 +56,11 @@ Linux 核心子系统的深度技术剖析。
     <p>KVM、容器等虚拟化技术分析。</p>
     <a href="/features/virtualization/">查看 →</a>
   </div>
+  
+  <div class="card">
+    <h3>🚀 Wave - SmartNIC卸载</h3>
+    <p>将资源管理卸载到 SmartNIC 核心，节省 16-24 主机核心，性能损耗仅 1.1%-7.4%。</p>
+    <span class="tag" style="background-color: var(--color-accent-orange);">🆕 深度报告</span>
+    <a href="/reports/features/wave/" style="display: block; margin-top: 1rem;">查看详情 →</a>
+  </div>
 </div>
