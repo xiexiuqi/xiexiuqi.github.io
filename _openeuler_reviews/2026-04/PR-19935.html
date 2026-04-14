@@ -1,0 +1,98 @@
+---
+{
+  "layout": "none",
+  "title": "[Intel-SIG] new CPU topology series - 4/4: x86/apic: Rework APIC registration",
+  "pr_id": "19935",
+  "date": "2026-04-13",
+  "overall_verdict": "Request Changes",
+  "patch_series_summary": {
+    "total_patches": 20,
+    "files_changed": 62,
+    "insertions": 325,
+    "deletions": 292,
+    "primary_author": "Quanxian Wang <quanxian.wang@intel.com>",
+    "target_branch": "OLK-6.6",
+    "created_date": "2026-01-05",
+    "updated_date": "2026-04-13"
+  }
+}
+---
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>PR 19935 Review Report - [Intel-SIG] new CPU topology series - 4/4: x86/apic: Rework APIC registration</title>
+<style>
+body { font-family: 'Segoe UI', 'Microsoft YaHei', Arial, sans-serif; margin: 40px; background: #f5f5f5; color: #333; }
+.container { max-width: 1100px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+h1 { font-size: 24px; margin-bottom: 10px; }
+h2 { font-size: 20px; border-bottom: 2px solid #e0e0e0; padding-bottom: 8px; margin-top: 30px; }
+h3 { font-size: 16px; margin: 15px 0 8px; }
+.verdict { font-size: 18px; font-weight: bold; padding: 10px 15px; border-radius: 5px; display: inline-block; margin: 10px 0; }
+.nack { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+.lgtm { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+.request-changes { background: #fff3e0; color: #ef6c00; border: 1px solid #ffcc80; }
+.warning { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
+.badge { padding: 3px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px; }
+.badge.pass, .badge.ok { background: #c8e6c9; color: #256029; }
+.badge.warning { background: #ffe0b2; color: #e65100; }
+.badge.fail, .badge.n/a { background: #ffcdd2; color: #b71c1c; }
+table.findings { width: 100%; border-collapse: collapse; margin-top: 10px; }
+table.findings th, table.findings td { border: 1px solid #ddd; padding: 10px; text-align: left; vertical-align: top; }
+table.findings th { background: #f0f0f0; }
+.critical { background: #ffebee; }
+.high { background: #fff3e0; }
+.medium { background: #fffde7; }
+.low { background: #e8f5e9; }
+.section { margin: 15px 0; padding: 12px; background: #fafafa; border-radius: 6px; }
+ul { margin: 5px 0; }
+li { margin: 4px 0; }
+.footer { margin-top: 40px; font-size: 12px; color: #888; text-align: center; }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>PR 19935 Review Report</h1>
+    <p><strong>标题：</strong>[Intel-SIG] new CPU topology series - 4/4: x86/apic: Rework APIC registration</p>
+    <p><strong>审查结论：</strong><span class="verdict request-changes">Request Changes</span></p>
+    
+    <h2>详细审查结果</h2>
+    
+        <div class='section'>
+            <h3>补丁格式 <span class='badge warning'>warning</span></h3>
+            <ul><li>Intel inclusion 标签存在</li><li>category: bugfix 已标注</li><li>bugzilla 链接已提供</li><li>CVE: N/A 已标注</li><li>20个补丁组成完整系列</li><li>缺少 cherry-pick 来源标记（部分补丁标注 Fixes: 但非所有）</li><li>第20个补丁（KABI修复）缺少独立提交说明</li></ul>
+        </div>
+        
+        <div class='section'>
+            <h3>KABI/KAPI 兼容性 <span class='badge warning'>warning</span></h3>
+            <ul><li>struct cpuinfo_x86 结构体变更 - 移除 x86_max_cores 字段（Patch 09/20）</li><li>新增 KABI_DEPRECATE(u16, x86_max_cores) 保留ABI兼容性（Patch 20/20）</li><li>新增 EXPORT_SYMBOL_GPL(topology_get_logical_id) - 需确认白名单</li><li>新增 EXPORT_SYMBOL_GPL(x86_topo_system) - 需确认白名单</li><li>移除 EXPORT_SYMBOL(topology_phys_to_logical_pkg) - 可能影响外部模块</li><li>62个文件变更，影响面广</li></ul>
+        </div>
+        
+        <div class='section'>
+            <h3>安全性 <span class='badge pass'>pass</span></h3>
+            <ul><li>无直接安全漏洞修复</li><li>涉及Xen PV guest处理，需关注虚拟化安全</li><li>ACPI相关修改需确保不会被恶意表利用</li></ul>
+        </div>
+        
+        <div class='section'>
+            <h3>逻辑正确性 <span class='badge pass'>pass</span></h3>
+            <ul><li>补丁逻辑与上游commit 89b0f15f408f等系列一致</li><li>拓扑计算逻辑正确</li><li>APIC ID处理符合x86架构规范</li></ul>
+        </div>
+        
+        <div class='section'>
+            <h3>Backport 验证 <span class='badge pass'>pass</span></h3>
+            <ul><li>基于 upstream Linux 6.7+ 拓扑重构系列</li><li>主要上游commit: 89b0f15f408f (Get rid of cpuinfo::x86_max_cores)</li><li>涉及上游 commits: ~20个相关拓扑重构补丁</li><li>包含 openEuler 特定的 KABI 保护补丁</li></ul>
+        </div>
+        
+    
+    <h2>发现问题汇总</h2>
+    <table class='findings'><tr><th>严重级别</th><th>类别</th><th>问题描述</th><th>修复建议</th></tr><tr class='high'><td>high</td><td>KABI compatibility</td><td>Patch 09/20 移除 struct cpuinfo_x86 中的 x86_max_cores 字段，这会破坏KABI。虽然 Patch 20/20 添加了 KABI_DEPRECATE 保护，但补丁系列整体依赖正确的应用顺序。如果单独应用 Patch 09 会导致KABI破坏。</td><td>确保20个补丁按正确顺序原子性合入。建议将KABI保护补丁(Patch 20)与字段移除补丁(Patch 09)合并或调整顺序。</td></tr><tr class='medium'><td>medium</td><td>Export symbol changes</td><td>新增 EXPORT_SYMBOL_GPL(topology_get_logical_id) 和 EXPORT_SYMBOL_GPL(x86_topo_system)，同时移除 EXPORT_SYMBOL(topology_phys_to_logical_pkg)。这些变更影响内核导出的符号表。</td><td>确认新增符号已在KABI白名单中注册。检查移除的符号是否有外部模块依赖。</td></tr><tr class='medium'><td>medium</td><td>Patch apply order</td><td>补丁之间存在依赖关系，必须按顺序应用。Patch 20 (KABI修复)依赖于前面19个补丁的变更。</td><td>建议作为完整系列合入，不要拆分。确保CI测试覆盖整个系列。</td></tr><tr class='low'><td>low</td><td>Documentation</td><td>Patch 09 修改了 Documentation/arch/x86/topology.rst，更新了拓扑文档。</td><td>文档更新完整，无需修改。</td></tr><tr class='low'><td>low</td><td>Xen compatibility</td><td>多个补丁涉及Xen PV guest的CPU拓扑处理，包括 boot CPU marking和APIC注册。</td><td>建议在Xen环境下进行专项测试。</td></tr></table>
+    
+    <h2>修复建议</h2>
+    <ul><li>建议作为完整系列合入，共20个补丁，原子性应用</li><li>合入前在Intel平台（特别是多路服务器）进行拓扑识别测试</li><li>验证KABI兼容性：确认 struct cpuinfo_x86 大小未变</li><li>检查新增EXPORT符号是否在白名单中</li><li>建议Xen虚拟化场景专项测试</li><li>合入后监控是否有性能回归（拓扑计算路径变更）</li><li>补丁标题建议补充 upstream commit 信息以便追溯</li></ul>
+    
+    <div class="footer">
+        <p>报告由 AI 辅助生成，仅供参考。最终合入决策以人工审查为准。</p>
+    </div>
+</div>
+</body>
+</html>

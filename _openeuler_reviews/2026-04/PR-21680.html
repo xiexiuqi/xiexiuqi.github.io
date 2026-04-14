@@ -1,0 +1,88 @@
+---
+{
+  "layout": "none",
+  "title": "tools/testing: add sharepool testcase",
+  "pr_id": "21680",
+  "date": "2026-04-14",
+  "overall_verdict": "request-changes"
+}
+---
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>PR 21680 Review Report - tools/testing: add sharepool testcase</title>
+<style>
+body { font-family: 'Segoe UI', 'Microsoft YaHei', Arial, sans-serif; margin: 40px; background: #f5f5f5; color: #333; }
+.container { max-width: 1100px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+h1 { font-size: 24px; margin-bottom: 10px; }
+h2 { font-size: 20px; border-bottom: 2px solid #e0e0e0; padding-bottom: 8px; margin-top: 30px; }
+h3 { font-size: 16px; margin: 15px 0 8px; }
+.verdict { font-size: 18px; font-weight: bold; padding: 10px 15px; border-radius: 5px; display: inline-block; margin: 10px 0; }
+.nack { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+.lgtm { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+.request-changes { background: #fff3e0; color: #ef6c00; border: 1px solid #ffcc80; }
+.warning { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
+.badge { padding: 3px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px; }
+.badge.pass, .badge.ok { background: #c8e6c9; color: #256029; }
+.badge.warning { background: #ffe0b2; color: #e65100; }
+.badge.fail, .badge.n/a { background: #ffcdd2; color: #b71c1c; }
+table.findings { width: 100%; border-collapse: collapse; margin-top: 10px; }
+table.findings th, table.findings td { border: 1px solid #ddd; padding: 10px; text-align: left; vertical-align: top; }
+table.findings th { background: #f0f0f0; }
+.critical { background: #ffebee; }
+.high { background: #fff3e0; }
+.medium { background: #fffde7; }
+.low { background: #e8f5e9; }
+.section { margin: 15px 0; padding: 12px; background: #fafafa; border-radius: 6px; }
+ul { margin: 5px 0; }
+li { margin: 4px 0; }
+.footer { margin-top: 40px; font-size: 12px; color: #888; text-align: center; }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>PR 21680 Review Report</h1>
+    <p><strong>标题：</strong>tools/testing: add sharepool testcase</p>
+    <p><strong>审查结论：</strong><span class="verdict request-changes">Request Changes</span></p>
+    
+    <h2>详细审查结果</h2>
+    
+        <div class='section'>
+            <h3>补丁格式 <span class='badge fail'>fail</span></h3>
+            <ul><li>提交信息过于简略: 仅有标题 &#x27;tools/testing: add sharepool testcase&#x27;</li><li>无 inclusion-tag</li><li>无 category</li><li>无 bugzilla</li><li>无 Signed-off-by</li><li>无详细描述</li></ul>
+        </div>
+        
+        <div class='section'>
+            <h3>KABI/KAPI 兼容性 <span class='badge pass'>pass</span></h3>
+            <ul><li>仅添加测试文件,不影响内核 ABI</li></ul>
+        </div>
+        
+        <div class='section'>
+            <h3>安全性 <span class='badge pass'>pass</span></h3>
+            <ul><li>无直接安全影响</li></ul>
+        </div>
+        
+        <div class='section'>
+            <h3>逻辑正确性 <span class='badge warning'>warning</span></h3>
+            <ul><li>补丁规模巨大(188 文件, ~39k 行),无法进行逐行深度审查</li><li>需确认测试代码不包含敏感信息或硬编码凭据</li></ul>
+        </div>
+        
+        <div class='section'>
+            <h3>Backport 验证 <span class='badge n/a'>N/A</span></h3>
+            <ul><li>非 backport</li></ul>
+        </div>
+        
+    
+    <h2>发现问题汇总</h2>
+    <table class='findings'><tr><th>严重级别</th><th>类别</th><th>问题描述</th><th>修复建议</th></tr><tr class='critical'><td>critical</td><td>patch format</td><td>对于 40k 行的大型补丁,提交信息完全空白。无法了解测试范围、依赖关系、运行方式、设计意图等关键信息</td><td>必须补充完整提交信息,至少包括: 1) inclusion-tag 和 category; 2) 测试覆盖的功能范围; 3) 如何运行这些测试; 4) 依赖的内核版本/配置; 5) Signed-off-by</td></tr><tr class='high'><td>high</td><td>engineering</td><td>188 个文件的单次提交过大,不利于 review 和后续问题定位</td><td>建议拆分为多个逻辑独立的提交(如: 基础设施, 各子模块测试, 脚本工具等)</td></tr></table>
+    
+    <h2>修复建议</h2>
+    <ul><li>拒绝当前提交</li><li>要求作者拆分提交并补充完整信息</li><li>建议补充 README 说明测试运行方式</li></ul>
+    
+    <div class="footer">
+        <p>报告由 AI 辅助生成，仅供参考。最终合入决策以人工审查为准。</p>
+    </div>
+</div>
+</body>
+</html>

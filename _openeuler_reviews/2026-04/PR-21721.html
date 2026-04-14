@@ -1,0 +1,88 @@
+---
+{
+  "layout": "none",
+  "title": "urma: fix bonding udata exchange for imported seg/jetty objects.",
+  "pr_id": "21721",
+  "date": "2026-04-14",
+  "overall_verdict": "request-changes"
+}
+---
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>PR 21721 Review Report - urma: fix bonding udata exchange for imported seg/jetty objects.</title>
+<style>
+body { font-family: 'Segoe UI', 'Microsoft YaHei', Arial, sans-serif; margin: 40px; background: #f5f5f5; color: #333; }
+.container { max-width: 1100px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+h1 { font-size: 24px; margin-bottom: 10px; }
+h2 { font-size: 20px; border-bottom: 2px solid #e0e0e0; padding-bottom: 8px; margin-top: 30px; }
+h3 { font-size: 16px; margin: 15px 0 8px; }
+.verdict { font-size: 18px; font-weight: bold; padding: 10px 15px; border-radius: 5px; display: inline-block; margin: 10px 0; }
+.nack { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+.lgtm { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+.request-changes { background: #fff3e0; color: #ef6c00; border: 1px solid #ffcc80; }
+.warning { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
+.badge { padding: 3px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px; }
+.badge.pass, .badge.ok { background: #c8e6c9; color: #256029; }
+.badge.warning { background: #ffe0b2; color: #e65100; }
+.badge.fail, .badge.n/a { background: #ffcdd2; color: #b71c1c; }
+table.findings { width: 100%; border-collapse: collapse; margin-top: 10px; }
+table.findings th, table.findings td { border: 1px solid #ddd; padding: 10px; text-align: left; vertical-align: top; }
+table.findings th { background: #f0f0f0; }
+.critical { background: #ffebee; }
+.high { background: #fff3e0; }
+.medium { background: #fffde7; }
+.low { background: #e8f5e9; }
+.section { margin: 15px 0; padding: 12px; background: #fafafa; border-radius: 6px; }
+ul { margin: 5px 0; }
+li { margin: 4px 0; }
+.footer { margin-top: 40px; font-size: 12px; color: #888; text-align: center; }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>PR 21721 Review Report</h1>
+    <p><strong>标题：</strong>urma: fix bonding udata exchange for imported seg/jetty objects.</p>
+    <p><strong>审查结论：</strong><span class="verdict request-changes">Request Changes</span></p>
+    
+    <h2>详细审查结果</h2>
+    
+        <div class='section'>
+            <h3>补丁格式 <span class='badge warning'>warning</span></h3>
+            <ul><li>inclusion-tag 建议改为 driver inclusion</li><li>bugzilla 正确</li><li>Fixes 标签正确</li></ul>
+        </div>
+        
+        <div class='section'>
+            <h3>KABI/KAPI 兼容性 <span class='badge warning'>warning</span></h3>
+            <ul><li>修改 ubagg_import_jetty_udata 和 ubagg_import_seg_udata 结构体布局</li><li>BONDING_UDATA_BUF_LEN 从 1800 增至 1928</li><li>这些为 udrv_data 结构体,需同步更新用户态驱动</li></ul>
+        </div>
+        
+        <div class='section'>
+            <h3>安全性 <span class='badge pass'>pass</span></h3>
+            <ul><li>新增 udata-&gt;udrv_data-&gt;out_len 边界检查</li><li>修复 copy_to_user 数据截断问题</li></ul>
+        </div>
+        
+        <div class='section'>
+            <h3>逻辑正确性 <span class='badge pass'>pass</span></h3>
+            <ul><li>find_linked_port 改为 connectivity matrix 逻辑正确</li><li>端口索引边界检查完整</li><li>buffer size 增加匹配新 payload</li></ul>
+        </div>
+        
+        <div class='section'>
+            <h3>Backport 验证 <span class='badge n/a'>N/A</span></h3>
+            <ul><li>非 backport</li></ul>
+        </div>
+        
+    
+    <h2>发现问题汇总</h2>
+    <table class='findings'><tr><th>严重级别</th><th>类别</th><th>问题描述</th><th>修复建议</th></tr><tr class='medium'><td>medium</td><td>compatibility</td><td>ubagg_import_jetty_udata 和 ubagg_import_seg_udata 结构体字段布局发生显著变化,用户态驱动必须同步更新</td><td>确认用户态驱动已配套更新,否则会导致 udata 解析错误</td></tr><tr class='low'><td>low</td><td>patch format</td><td>inclusion-tag 不规范</td><td>改为 driver inclusion</td></tr></table>
+    
+    <h2>修复建议</h2>
+    <ul><li>确认用户态驱动兼容性</li><li>修正 inclusion-tag</li><li>建议合入前进行端到端 bonding 测试</li></ul>
+    
+    <div class="footer">
+        <p>报告由 AI 辅助生成，仅供参考。最终合入决策以人工审查为准。</p>
+    </div>
+</div>
+</body>
+</html>

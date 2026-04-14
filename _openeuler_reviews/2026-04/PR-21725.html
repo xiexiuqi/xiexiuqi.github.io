@@ -1,0 +1,88 @@
+---
+{
+  "layout": "none",
+  "title": "urma: fix Clos networking and add a new interface get_path_set.",
+  "pr_id": "21725",
+  "date": "2026-04-14",
+  "overall_verdict": "request-changes"
+}
+---
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>PR 21725 Review Report - urma: fix Clos networking and add a new interface get_path_set.</title>
+<style>
+body { font-family: 'Segoe UI', 'Microsoft YaHei', Arial, sans-serif; margin: 40px; background: #f5f5f5; color: #333; }
+.container { max-width: 1100px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+h1 { font-size: 24px; margin-bottom: 10px; }
+h2 { font-size: 20px; border-bottom: 2px solid #e0e0e0; padding-bottom: 8px; margin-top: 30px; }
+h3 { font-size: 16px; margin: 15px 0 8px; }
+.verdict { font-size: 18px; font-weight: bold; padding: 10px 15px; border-radius: 5px; display: inline-block; margin: 10px 0; }
+.nack { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+.lgtm { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+.request-changes { background: #fff3e0; color: #ef6c00; border: 1px solid #ffcc80; }
+.warning { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
+.badge { padding: 3px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px; }
+.badge.pass, .badge.ok { background: #c8e6c9; color: #256029; }
+.badge.warning { background: #ffe0b2; color: #e65100; }
+.badge.fail, .badge.n/a { background: #ffcdd2; color: #b71c1c; }
+table.findings { width: 100%; border-collapse: collapse; margin-top: 10px; }
+table.findings th, table.findings td { border: 1px solid #ddd; padding: 10px; text-align: left; vertical-align: top; }
+table.findings th { background: #f0f0f0; }
+.critical { background: #ffebee; }
+.high { background: #fff3e0; }
+.medium { background: #fffde7; }
+.low { background: #e8f5e9; }
+.section { margin: 15px 0; padding: 12px; background: #fafafa; border-radius: 6px; }
+ul { margin: 5px 0; }
+li { margin: 4px 0; }
+.footer { margin-top: 40px; font-size: 12px; color: #888; text-align: center; }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>PR 21725 Review Report</h1>
+    <p><strong>标题：</strong>urma: fix Clos networking and add a new interface get_path_set.</p>
+    <p><strong>审查结论：</strong><span class="verdict request-changes">Request Changes</span></p>
+    
+    <h2>详细审查结果</h2>
+    
+        <div class='section'>
+            <h3>补丁格式 <span class='badge warning'>warning</span></h3>
+            <ul><li>inclusion-tag 应使用 driver inclusion</li><li>category: bugfix 与内容不完全匹配(更像 feature)</li><li>bugzilla 正确</li></ul>
+        </div>
+        
+        <div class='section'>
+            <h3>KABI/KAPI 兼容性 <span class='badge warning'>warning</span></h3>
+            <ul><li>新增 EXPORT_SYMBOL(ubcore_get_path_set)</li><li>新增 UAPI 结构体: ubcore_path_set, ubcore_path, ubcore_node_id</li><li>ubcore_uvs_global_cmd 枚举新增 UBCORE_CMD_GET_PATH_SET = 4</li><li>ubagg_topo_node 结构体字段重排(id-&gt;type/node_id)</li></ul>
+        </div>
+        
+        <div class='section'>
+            <h3>安全性 <span class='badge pass'>pass</span></h3>
+            <ul><li>新增边界检查完整</li><li>无 obvious 安全问题</li></ul>
+        </div>
+        
+        <div class='section'>
+            <h3>逻辑正确性 <span class='badge pass'>pass</span></h3>
+            <ul><li>Clos 与 FullMesh 分支处理逻辑清晰</li><li>ubcore_get_path_set 参数校验完整</li><li>路径数量上限检查正确</li></ul>
+        </div>
+        
+        <div class='section'>
+            <h3>Backport 验证 <span class='badge n/a'>N/A</span></h3>
+            <ul><li>非 backport</li></ul>
+        </div>
+        
+    
+    <h2>发现问题汇总</h2>
+    <table class='findings'><tr><th>严重级别</th><th>类别</th><th>问题描述</th><th>修复建议</th></tr><tr class='high'><td>high</td><td>KABI/UAPI</td><td>ubagg_topo_node 结构体布局发生 BREAKING 变更: 原第一个字段 uint32_t id 被替换为 type + super_node_id + node_id。该结构体通过 create_ubagg_topo_map_from_user() 从 userspace copy_from_user 传入,旧版用户态工具会直接传入错误数据</td><td>必须解决 UAPI 兼容性问题: 1) 保留原 id 字段并标记 deprecated; 2) 或在 copy_from_user 前进行版本识别/转换; 3) 或将变更限制在内部副本中</td></tr><tr class='medium'><td>medium</td><td>KABI</td><td>新增 EXPORT_SYMBOL(ubcore_get_path_set),需确认是否已加入 openEuler KABI 白名单</td><td>联系 KABI 维护者确认白名单状态</td></tr><tr class='medium'><td>medium</td><td>patch format</td><td>inclusion-tag 使用 &#x27;urma inclusion&#x27; 而非标准 &#x27;driver inclusion&#x27;</td><td>修改为 driver inclusion</td></tr><tr class='low'><td>low</td><td>style</td><td>ubcore_get_path_set 函数缩进不统一</td><td>修正缩进为内核标准</td></tr></table>
+    
+    <h2>修复建议</h2>
+    <ul><li>必须解决 ubagg_topo_node 的 UAPI 兼容性问题后再合入</li><li>确认 EXPORT_SYMBOL 白名单</li><li>补充用户态工具同步更新说明</li></ul>
+    
+    <div class="footer">
+        <p>报告由 AI 辅助生成，仅供参考。最终合入决策以人工审查为准。</p>
+    </div>
+</div>
+</body>
+</html>

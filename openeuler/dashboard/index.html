@@ -1,0 +1,209 @@
+---
+layout: default
+title: openEuler Kernel Dashboard
+---
+
+<style>
+.dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.stat-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1.2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  text-align: center;
+}
+.stat-card .value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1e3a5f;
+}
+.stat-card .label {
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 0.3rem;
+}
+.dashboard-section {
+  margin: 2rem 0;
+}
+.trend-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  height: 140px;
+  padding: 1rem 0;
+}
+.trend-bar {
+  flex: 1;
+  background: #2d5a87;
+  border-radius: 4px 4px 0 0;
+  min-height: 4px;
+  position: relative;
+}
+.trend-bar .tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.trend-bar:hover .tooltip {
+  opacity: 1;
+}
+.trend-labels {
+  display: flex;
+  gap: 0.5rem;
+}
+.trend-labels span {
+  flex: 1;
+  text-align: center;
+  font-size: 12px;
+  color: #666;
+}
+.patch-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  font-size: 0.95rem;
+}
+.patch-table th,
+.patch-table td {
+  border: 1px solid #e0e0e0;
+  padding: 10px;
+  text-align: left;
+}
+.patch-table th {
+  background: #f5f7fa;
+}
+.patch-table tr:nth-child(even) {
+  background: #fafafa;
+}
+.badge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.badge.lgtm { background: #e8f5e9; color: #2e7d32; }
+.badge.nack { background: #ffebee; color: #c62828; }
+.badge.request-changes { background: #fff3e0; color: #ef6c00; }
+.badge.warning { background: #e3f2fd; color: #1565c0; }
+.badge.pass { background: #e8f5e9; color: #2e7d32; }
+.loading {
+  color: #666;
+  padding: 1rem 0;
+}
+.error {
+  color: #c62828;
+  padding: 1rem 0;
+}
+</style>
+
+<h1>openEuler Kernel Dashboard</h1>
+<p id="last-updated" class="loading">正在加载数据...</p>
+
+<div class="dashboard-stats" id="stats-container"></div>
+
+<div class="dashboard-section">
+  <h2>📈 最近7天趋势</h2>
+  <div id="trend-container"></div>
+</div>
+
+<div class="dashboard-section">
+  <h2>📝 最新 Review 报告</h2>
+  <div id="patches-container"></div>
+</div>
+
+<script>
+(function() {
+  const dataUrl = '{{ "/openeuler/data/pr-status.json" | relative_url }}';
+
+  function renderStats(stats) {
+    const container = document.getElementById('stats-container');
+    const items = [
+      { key: 'total_patches', label: 'Review 报告总数' },
+      { key: 'reviewed_today', label: '今日 Review' },
+      { key: 'pending_review', label: '待 Review' },
+      { key: 'high_priority', label: '高优先级' },
+    ];
+    container.innerHTML = items.map(function(item) {
+      return '<div class="stat-card"><div class="value">' + (stats[item.key] || 0) +
+             '</div><div class="label">' + item.label + '</div></div>';
+    }).join('');
+  }
+
+  function renderTrend(trend) {
+    const container = document.getElementById('trend-container');
+    if (!trend || trend.length === 0) {
+      container.innerHTML = '<p>暂无趋势数据</p>';
+      return;
+    }
+    const max = Math.max.apply(null, trend.map(function(t) { return t.count; })) || 1;
+    let barsHtml = '<div class="trend-bars">';
+    let labelsHtml = '<div class="trend-labels">';
+    trend.forEach(function(t) {
+      const height = Math.max((t.count / max) * 100, 4);
+      const label = t.date.slice(5);
+      barsHtml += '<div class="trend-bar" style="height:' + height + '%">' +
+                  '<span class="tooltip">' + t.date + ': ' + t.count + '</span></div>';
+      labelsHtml += '<span>' + label + '</span>';
+    });
+    barsHtml += '</div>';
+    labelsHtml += '</div>';
+    container.innerHTML = barsHtml + labelsHtml;
+  }
+
+  function renderPatches(patches) {
+    const container = document.getElementById('patches-container');
+    if (!patches || patches.length === 0) {
+      container.innerHTML = '<p>暂无报告数据</p>';
+      return;
+    }
+    let html = '<table class="patch-table"><thead><tr>' +
+               '<th>PR</th><th>标题</th><th>日期</th><th>结论</th>' +
+               '</tr></thead><tbody>';
+    patches.slice(0, 30).forEach(function(p) {
+      const verdictClass = (p.verdict || 'pending').toLowerCase().replace(/\s+/g, '-');
+      html += '<tr>' +
+              '<td><a href="' + p.url + '" target="_blank">' + p.id + '</a></td>' +
+              '<td><a href="' + p.url + '" target="_blank">' + p.title + '</a></td>' +
+              '<td>' + p.date + '</td>' +
+              '<td><span class="badge ' + verdictClass + '">' + (p.verdict || 'Pending') + '</span></td>' +
+              '</tr>';
+    });
+    html += '</tbody></table>';
+    if (patches.length > 30) {
+      html += '<p style="color:#666;font-size:0.9rem;">显示前 30 条，共 ' + patches.length + ' 条</p>';
+    }
+    container.innerHTML = html;
+  }
+
+  fetch(dataUrl)
+    .then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    })
+    .then(function(data) {
+      const updated = data.last_updated ? new Date(data.last_updated).toLocaleString('zh-CN') : '-';
+      document.getElementById('last-updated').textContent = '数据更新时间：' + updated;
+      renderStats(data.stats || {});
+      renderTrend(data.trend || []);
+      renderPatches(data.patches || []);
+    })
+    .catch(function(err) {
+      document.getElementById('last-updated').innerHTML = '<span class="error">加载失败：' + err.message + '</span>';
+    });
+})();
+</script>

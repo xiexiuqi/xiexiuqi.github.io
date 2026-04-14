@@ -1,0 +1,88 @@
+---
+{
+  "layout": "none",
+  "title": "revert",
+  "pr_id": "21742",
+  "date": "2026-04-14",
+  "overall_verdict": "nack"
+}
+---
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>PR 21742 Review Report - revert</title>
+<style>
+body { font-family: 'Segoe UI', 'Microsoft YaHei', Arial, sans-serif; margin: 40px; background: #f5f5f5; color: #333; }
+.container { max-width: 1100px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+h1 { font-size: 24px; margin-bottom: 10px; }
+h2 { font-size: 20px; border-bottom: 2px solid #e0e0e0; padding-bottom: 8px; margin-top: 30px; }
+h3 { font-size: 16px; margin: 15px 0 8px; }
+.verdict { font-size: 18px; font-weight: bold; padding: 10px 15px; border-radius: 5px; display: inline-block; margin: 10px 0; }
+.nack { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+.lgtm { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+.request-changes { background: #fff3e0; color: #ef6c00; border: 1px solid #ffcc80; }
+.warning { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
+.badge { padding: 3px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px; }
+.badge.pass, .badge.ok { background: #c8e6c9; color: #256029; }
+.badge.warning { background: #ffe0b2; color: #e65100; }
+.badge.fail, .badge.n/a { background: #ffcdd2; color: #b71c1c; }
+table.findings { width: 100%; border-collapse: collapse; margin-top: 10px; }
+table.findings th, table.findings td { border: 1px solid #ddd; padding: 10px; text-align: left; vertical-align: top; }
+table.findings th { background: #f0f0f0; }
+.critical { background: #ffebee; }
+.high { background: #fff3e0; }
+.medium { background: #fffde7; }
+.low { background: #e8f5e9; }
+.section { margin: 15px 0; padding: 12px; background: #fafafa; border-radius: 6px; }
+ul { margin: 5px 0; }
+li { margin: 4px 0; }
+.footer { margin-top: 40px; font-size: 12px; color: #888; text-align: center; }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>PR 21742 Review Report</h1>
+    <p><strong>标题：</strong>revert</p>
+    <p><strong>审查结论：</strong><span class="verdict nack">NACK</span></p>
+    
+    <h2>详细审查结果</h2>
+    
+        <div class='section'>
+            <h3>补丁格式 <span class='badge fail'>fail</span></h3>
+            <ul><li>提交标题 &#x27;revert&#x27; 过于简略</li><li>无 inclusion-tag</li><li>无 category</li><li>无 bugzilla</li><li>无 Signed-off-by</li><li>提交描述完全缺失</li></ul>
+        </div>
+        
+        <div class='section'>
+            <h3>KABI/KAPI 兼容性 <span class='badge warning'>warning</span></h3>
+            <ul><li>添加大量新函数</li><li>修改 ubcore_connect_bonding.c 网络路径</li><li>需确认是否影响内部 ABI</li></ul>
+        </div>
+        
+        <div class='section'>
+            <h3>安全性 <span class='badge warning'>warning</span></h3>
+            <ul><li>copy_from_user/copy_to_user 路径需审查</li><li>用户输入验证逻辑需确认</li></ul>
+        </div>
+        
+        <div class='section'>
+            <h3>逻辑正确性 <span class='badge warning'>warning</span></h3>
+            <ul><li>功能逻辑无法评估(缺乏描述)</li></ul>
+        </div>
+        
+        <div class='section'>
+            <h3>Backport 验证 <span class='badge n/a'>N/A</span></h3>
+            <ul><li>非 backport</li></ul>
+        </div>
+        
+    
+    <h2>发现问题汇总</h2>
+    <table class='findings'><tr><th>严重级别</th><th>类别</th><th>问题描述</th><th>修复建议</th></tr><tr class='critical'><td>critical</td><td>patch format</td><td>提交信息严重不规范: 标题仅为 &#x27;revert&#x27;, 无描述, 无 Signed-off-by</td><td>重新提交并包含完整信息: 1) 说明 revert 的原因 2) 说明 revert 的内容 3) 添加 Signed-off-by</td></tr><tr class='high'><td>high</td><td>engineering</td><td>代码添加 246 行但标题为 &#x27;revert&#x27;, 实际为新增功能而非 revert</td><td>修正提交标题以反映实际变更内容</td></tr></table>
+    
+    <h2>修复建议</h2>
+    <ul><li>必须重新提交,当前状态完全不符合合入标准</li></ul>
+    
+    <div class="footer">
+        <p>报告由 AI 辅助生成，仅供参考。最终合入决策以人工审查为准。</p>
+    </div>
+</div>
+</body>
+</html>

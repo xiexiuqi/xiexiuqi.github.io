@@ -1,0 +1,88 @@
+---
+{
+  "layout": "none",
+  "title": "urma: bugfix ubagg get physical dev info acquisition",
+  "pr_id": "21743",
+  "date": "2026-04-14",
+  "overall_verdict": "request-changes"
+}
+---
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>PR 21743 Review Report - urma: bugfix ubagg get physical dev info acquisition</title>
+<style>
+body { font-family: 'Segoe UI', 'Microsoft YaHei', Arial, sans-serif; margin: 40px; background: #f5f5f5; color: #333; }
+.container { max-width: 1100px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+h1 { font-size: 24px; margin-bottom: 10px; }
+h2 { font-size: 20px; border-bottom: 2px solid #e0e0e0; padding-bottom: 8px; margin-top: 30px; }
+h3 { font-size: 16px; margin: 15px 0 8px; }
+.verdict { font-size: 18px; font-weight: bold; padding: 10px 15px; border-radius: 5px; display: inline-block; margin: 10px 0; }
+.nack { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+.lgtm { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+.request-changes { background: #fff3e0; color: #ef6c00; border: 1px solid #ffcc80; }
+.warning { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
+.badge { padding: 3px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px; }
+.badge.pass, .badge.ok { background: #c8e6c9; color: #256029; }
+.badge.warning { background: #ffe0b2; color: #e65100; }
+.badge.fail, .badge.n/a { background: #ffcdd2; color: #b71c1c; }
+table.findings { width: 100%; border-collapse: collapse; margin-top: 10px; }
+table.findings th, table.findings td { border: 1px solid #ddd; padding: 10px; text-align: left; vertical-align: top; }
+table.findings th { background: #f0f0f0; }
+.critical { background: #ffebee; }
+.high { background: #fff3e0; }
+.medium { background: #fffde7; }
+.low { background: #e8f5e9; }
+.section { margin: 15px 0; padding: 12px; background: #fafafa; border-radius: 6px; }
+ul { margin: 5px 0; }
+li { margin: 4px 0; }
+.footer { margin-top: 40px; font-size: 12px; color: #888; text-align: center; }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>PR 21743 Review Report</h1>
+    <p><strong>标题：</strong>urma: bugfix ubagg get physical dev info acquisition</p>
+    <p><strong>审查结论：</strong><span class="verdict request-changes">Request Changes</span></p>
+    
+    <h2>详细审查结果</h2>
+    
+        <div class='section'>
+            <h3>补丁格式 <span class='badge warning'>warning</span></h3>
+            <ul><li>inclusion-tag 应使用 driver inclusion 而非 urma inclusion</li><li>bugzilla 链接使用 gitcode.com 而非 atomgit.com</li></ul>
+        </div>
+        
+        <div class='section'>
+            <h3>KABI/KAPI 兼容性 <span class='badge pass'>pass</span></h3>
+            <ul><li>无 EXPORT_SYMBOL 变更</li><li>修改 drivers/ 内部结构体,不影响 UAPI</li><li>enum 值数值未变(1),仅重命名</li></ul>
+        </div>
+        
+        <div class='section'>
+            <h3>安全性 <span class='badge pass'>pass</span></h3>
+            <ul><li>修复 copy_to_user 大小不匹配问题</li><li>修复 get_slave_dev() 静默失败问题</li></ul>
+        </div>
+        
+        <div class='section'>
+            <h3>逻辑正确性 <span class='badge warning'>warning</span></h3>
+            <ul><li>结构体重命名正确</li><li>新增 bonding_eid 字段用于设备查找</li><li>spin_lock 使用正确</li><li>IS_ERR_OR_NULL 检查正确</li></ul>
+        </div>
+        
+        <div class='section'>
+            <h3>Backport 验证 <span class='badge n/a'>N/A</span></h3>
+            <ul><li>非 backport,为原创补丁</li></ul>
+        </div>
+        
+    
+    <h2>发现问题汇总</h2>
+    <table class='findings'><tr><th>严重级别</th><th>类别</th><th>问题描述</th><th>修复建议</th></tr><tr class='medium'><td>medium</td><td>patch format</td><td>inclusion-tag 不规范: 使用 &#x27;urma inclusion&#x27; 而非标准 &#x27;driver inclusion&#x27;</td><td>修改为 &#x27;driver inclusion&#x27;</td></tr><tr class='medium'><td>medium</td><td>compatibility</td><td>结构体布局变更: ubagg_device 新增 bonding_eid 字段在中间位置</td><td>虽然为内部结构体,但建议将新增字段放在末尾以遵循内核惯例</td></tr><tr class='high'><td>high</td><td>security</td><td>修复信息泄露: 原代码 copy_to_user 使用错误结构体大小</td><td>已正确修复,验证通过</td></tr></table>
+    
+    <h2>修复建议</h2>
+    <ul><li>修正 inclusion-tag</li><li>考虑 bonding_eid 字段位置</li><li>建议补充测试用例验证新老结构体兼容性</li></ul>
+    
+    <div class="footer">
+        <p>报告由 AI 辅助生成，仅供参考。最终合入决策以人工审查为准。</p>
+    </div>
+</div>
+</body>
+</html>

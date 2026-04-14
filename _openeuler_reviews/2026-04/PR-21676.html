@@ -1,0 +1,88 @@
+---
+{
+  "layout": "none",
+  "title": "CVE-2026-23076：正确循环索引初始化避免OOB",
+  "pr_id": "21676",
+  "date": "2026-04-14",
+  "overall_verdict": "request-changes"
+}
+---
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>PR 21676 Review Report - CVE-2026-23076：正确循环索引初始化避免OOB</title>
+<style>
+body { font-family: 'Segoe UI', 'Microsoft YaHei', Arial, sans-serif; margin: 40px; background: #f5f5f5; color: #333; }
+.container { max-width: 1100px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+h1 { font-size: 24px; margin-bottom: 10px; }
+h2 { font-size: 20px; border-bottom: 2px solid #e0e0e0; padding-bottom: 8px; margin-top: 30px; }
+h3 { font-size: 16px; margin: 15px 0 8px; }
+.verdict { font-size: 18px; font-weight: bold; padding: 10px 15px; border-radius: 5px; display: inline-block; margin: 10px 0; }
+.nack { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+.lgtm { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+.request-changes { background: #fff3e0; color: #ef6c00; border: 1px solid #ffcc80; }
+.warning { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
+.badge { padding: 3px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px; }
+.badge.pass, .badge.ok { background: #c8e6c9; color: #256029; }
+.badge.warning { background: #ffe0b2; color: #e65100; }
+.badge.fail, .badge.n/a { background: #ffcdd2; color: #b71c1c; }
+table.findings { width: 100%; border-collapse: collapse; margin-top: 10px; }
+table.findings th, table.findings td { border: 1px solid #ddd; padding: 10px; text-align: left; vertical-align: top; }
+table.findings th { background: #f0f0f0; }
+.critical { background: #ffebee; }
+.high { background: #fff3e0; }
+.medium { background: #fffde7; }
+.low { background: #e8f5e9; }
+.section { margin: 15px 0; padding: 12px; background: #fafafa; border-radius: 6px; }
+ul { margin: 5px 0; }
+li { margin: 4px 0; }
+.footer { margin-top: 40px; font-size: 12px; color: #888; text-align: center; }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>PR 21676 Review Report</h1>
+    <p><strong>标题：</strong>CVE-2026-23076：正确循环索引初始化避免OOB</p>
+    <p><strong>审查结论：</strong><span class="verdict request-changes">Request Changes</span></p>
+    
+    <h2>详细审查结果</h2>
+    
+        <div class='section'>
+            <h3>补丁格式 <span class='badge fail'>fail</span></h3>
+            <ul><li>无 inclusion-tag</li><li>无 category</li><li>无 bugzilla 链接</li><li>无英文描述</li><li>无 Fixes 标签指向引入 commit</li><li>Signed-off-by 使用学生邮箱格式</li></ul>
+        </div>
+        
+        <div class='section'>
+            <h3>KABI/KAPI 兼容性 <span class='badge pass'>pass</span></h3>
+            <ul><li>仅初始化字段,无 ABI 变更</li></ul>
+        </div>
+        
+        <div class='section'>
+            <h3>安全性 <span class='badge pass'>pass</span></h3>
+            <ul><li>修复 sound/pci/ctxfi/ 中的未初始化 conj 字段导致的 OOB</li></ul>
+        </div>
+        
+        <div class='section'>
+            <h3>逻辑正确性 <span class='badge pass'>pass</span></h3>
+            <ul><li>amixer-&gt;rsc.conj = 0 和 sum-&gt;rsc.conj = 0 初始化正确</li></ul>
+        </div>
+        
+        <div class='section'>
+            <h3>Backport 验证 <span class='badge n/a'>N/A</span></h3>
+            <ul><li>非 backport</li></ul>
+        </div>
+        
+    
+    <h2>发现问题汇总</h2>
+    <table class='findings'><tr><th>严重级别</th><th>类别</th><th>问题描述</th><th>修复建议</th></tr><tr class='critical'><td>critical</td><td>patch format</td><td>提交信息严重不足: 仅有中文标题和 CVE 编号,缺少 inclusion-tag, category, bugzilla, Fixes, 英文描述等所有标准字段</td><td>重新整理提交信息,补充: driver inclusion, category: bugfix, bugzilla 链接, Fixes 标签, 英文变更描述</td></tr><tr class='medium'><td>medium</td><td>style</td><td>sum_rsc_init 函数中添加了多余空行(sum-&gt;rsc.conj = 0 后有尾随空格/空行问题)</td><td>清理尾随空格</td></tr></table>
+    
+    <h2>修复建议</h2>
+    <ul><li>修复提交格式问题后重新提交</li></ul>
+    
+    <div class="footer">
+        <p>报告由 AI 辅助生成，仅供参考。最终合入决策以人工审查为准。</p>
+    </div>
+</div>
+</body>
+</html>

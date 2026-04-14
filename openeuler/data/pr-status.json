@@ -1,0 +1,442 @@
+{
+  "last_updated": "2026-04-14T06:08:33Z",
+  "source_repo": "~/git/openEuler-kernel",
+  "stats": {
+    "total_patches": 124,
+    "reviewed_today": 0,
+    "pending_review": 0,
+    "high_priority": 0
+  },
+  "trend": [
+    {
+      "date": "2026-04-08",
+      "count": 17
+    },
+    {
+      "date": "2026-04-09",
+      "count": 17
+    },
+    {
+      "date": "2026-04-10",
+      "count": 17
+    },
+    {
+      "date": "2026-04-11",
+      "count": 17
+    },
+    {
+      "date": "2026-04-12",
+      "count": 17
+    },
+    {
+      "date": "2026-04-13",
+      "count": 1
+    },
+    {
+      "date": "2026-04-14",
+      "count": 123
+    }
+  ],
+  "patches": [
+    {
+      "id": "19935",
+      "title": "[Intel-SIG] new CPU topology series - 4/4: x86/apic: Rework APIC registration",
+      "verdict": "Request Changes",
+      "date": "2026-04-13",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-19935.html"
+    },
+    {
+      "id": "21257",
+      "title": "[Backport] net: macb: Fix rx ring initialization and resume",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21257.html"
+    },
+    {
+      "id": "21259",
+      "title": "bfq: Lock when clearing the q-&gt;elevator entry",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21259.html"
+    },
+    {
+      "id": "21260",
+      "title": "bfq: Lock when clearing the q-&gt;elevator entry",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21260.html"
+    },
+    {
+      "id": "21266",
+      "title": "iommu/ummu: prevent duplicate block allocation causing memory leak",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21266.html"
+    },
+    {
+      "id": "21268",
+      "title": "[Backport] tg3: replace placeholder MAC address with device property",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21268.html"
+    },
+    {
+      "id": "21273",
+      "title": "l2tp: fix double dst_release() on sk_dst_cache race",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21273.html"
+    },
+    {
+      "id": "21279",
+      "title": "urma: support non-root execute &#x27;urma_ping&#x27; and &#x27;urma_admin show topo&#x27;",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21279.html"
+    },
+    {
+      "id": "21294",
+      "title": "[OLK-6.6][LoongArch] LoongArch KVM 子系统问题修复合集",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21294.html"
+    },
+    {
+      "id": "21295",
+      "title": "[OLK-6.6][LoongArch] LoongArch EFI 子系统问题修复合集",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21295.html"
+    },
+    {
+      "id": "21296",
+      "title": "[OLK-6.6][LoongArch] LoongArch ACPI/cpufreq 子系统问题修复合集",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21296.html"
+    },
+    {
+      "id": "21297",
+      "title": "[OLK-6.6][LoongArch] LoongArch KASAN 相关问题修复合集",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21297.html"
+    },
+    {
+      "id": "21298",
+      "title": "[OLK-6.6][LoongArch] LoongArch 架构及杂项问题修复合集",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21298.html"
+    },
+    {
+      "id": "21299",
+      "title": "[OLK-6.6][LoongArch] LoongArch 驱动子系统问题修复合集",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21299.html"
+    },
+    {
+      "id": "21306",
+      "title": "[Backport] atm: lec: fix use-after-free in sock_def_readable()",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21306.html"
+    },
+    {
+      "id": "21308",
+      "title": "urma: support rmmod ubagg and uburma",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21308.html"
+    },
+    {
+      "id": "21315",
+      "title": "btf : add output module name with missing module BTF",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21315.html"
+    },
+    {
+      "id": "21317",
+      "title": "urma: rework ubagg get physical dev info",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21317.html"
+    },
+    {
+      "id": "21327",
+      "title": "[OLK-6.6] ata: ahci: Fix Zhaoxin SATA LED quirk for KH-50000",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21327.html"
+    },
+    {
+      "id": "21332",
+      "title": "AMD Turin PREFETCHI support patches for openEuler 6.6 kernel",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21332.html"
+    },
+    {
+      "id": "21341",
+      "title": "[virtCCA Live Migration] virtcca cvm supports live migration with host agent",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21341.html"
+    },
+    {
+      "id": "21347",
+      "title": "media: dvb-core: fix wrong reinitialization of ringbuffer on reopen",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21347.html"
+    },
+    {
+      "id": "21349",
+      "title": "media: dvb-core: fix wrong reinitialization of ringbuffer on reopen",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21349.html"
+    },
+    {
+      "id": "21352",
+      "title": "[WIP] Backport intel_pstate OOB mode support for DMR",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21352.html"
+    },
+    {
+      "id": "21353",
+      "title": "[WIP]  Backport cstate PMU for DMR",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21353.html"
+    },
+    {
+      "id": "21358",
+      "title": "[Hygon][6.6][Feature] EDAC/amd64: Add support for Hygon family 18h model 18h",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21358.html"
+    },
+    {
+      "id": "21368",
+      "title": "Transition from CPU Type to MIDR Register for Virtualization Feature Detection",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21368.html"
+    },
+    {
+      "id": "21370",
+      "title": "[Backport] Fix CVE-2026-22982",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21370.html"
+    },
+    {
+      "id": "21373",
+      "title": "xsched: xcu cgrp kabi",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21373.html"
+    },
+    {
+      "id": "21377",
+      "title": "[Backport] MPTCP: fix lock class name family in pm_nl_create_listen_socket",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21377.html"
+    },
+    {
+      "id": "21382",
+      "title": "scsi: core: Fix refcount leak for tagset_refcnt",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21382.html"
+    },
+    {
+      "id": "21396",
+      "title": "KVM: arm64: Add Support for MBIGEN vtimer&#x27;s pv active status",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21396.html"
+    },
+    {
+      "id": "21401",
+      "title": "fix queue start/stop imbalance under race",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21401.html"
+    },
+    {
+      "id": "21413",
+      "title": "regmap: maple: free entry on mas_store_gfp() failure",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21413.html"
+    },
+    {
+      "id": "21414",
+      "title": "x86/efi: defer freeing of boot services memory",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21414.html"
+    },
+    {
+      "id": "21417",
+      "title": "[Backport] MPTCP lockdep fix to OLK-6.6",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21417.html"
+    },
+    {
+      "id": "21418",
+      "title": "v2  *** SUBJECT HERE ***",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21418.html"
+    },
+    {
+      "id": "21424",
+      "title": "[WIP] urma: add reliable tp echange",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21424.html"
+    },
+    {
+      "id": "21427",
+      "title": "urma: change topo map from 1d full-mesh to clos",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21427.html"
+    },
+    {
+      "id": "21437",
+      "title": "bpf: Fix a UAF issue in bpf_trampoline_link_cgroup_shim",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21437.html"
+    },
+    {
+      "id": "21442",
+      "title": "Fix CVE-2026-23347",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21442.html"
+    },
+    {
+      "id": "21443",
+      "title": "Fix CVE-2026-23357",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21443.html"
+    },
+    {
+      "id": "21445",
+      "title": "Fix CVE-2026-23306",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21445.html"
+    },
+    {
+      "id": "21452",
+      "title": "arm-smmu-v3: add HIP09A, HIP09B, HIP10C, HIP10CA for 162100602 errata",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21452.html"
+    },
+    {
+      "id": "21453",
+      "title": "v2  kvm: arm64: Transition from CPU Type to MIDR Register for Virtualization Feature Detection",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21453.html"
+    },
+    {
+      "id": "21454",
+      "title": "[Backport] sunrpc + NFSD fixes to OLK-6.6",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21454.html"
+    },
+    {
+      "id": "21457",
+      "title": "v3  kvm: arm64: Transition from CPU Type to MIDR Register for Virtualization Feature Detection",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21457.html"
+    },
+    {
+      "id": "21461",
+      "title": "v4  kvm: arm64: Transition from CPU Type to MIDR Register for Virtualization Feature Detection",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21461.html"
+    },
+    {
+      "id": "21463",
+      "title": "mm/huge_memory: fix folio isn&#x27;t locked in softleaf_to_folio()",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21463.html"
+    },
+    {
+      "id": "21478",
+      "title": "xSched/cgroup: utilize xcu cmdline to dynamically switch between xcu and freezer subsys",
+      "verdict": "lgtm",
+      "date": "2026-04-14",
+      "month": "2026-04",
+      "url": "/openeuler/reviews/2026-04/PR-21478.html"
+    }
+  ]
+}

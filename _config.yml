@@ -36,6 +36,12 @@ exclude:
   - vendor/gems/
   - vendor/ruby/
 
+# Collections
+collections:
+  openeuler_reviews:
+    output: true
+    permalink: /openeuler/reviews/:path/
+
 # 默认配置
 defaults:
   - scope:
@@ -43,3 +49,8 @@ defaults:
       type: "posts"
     values:
       layout: "post"
+  - scope:
+      path: ""
+      type: "openeuler_reviews"
+    values:
+      layout: "none"

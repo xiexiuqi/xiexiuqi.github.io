@@ -1,0 +1,88 @@
+---
+{
+  "layout": "none",
+  "title": "cgroup/dmem: reuse SUBSYS for dmem and devices to preserve KABI",
+  "pr_id": "21691",
+  "date": "2026-04-14",
+  "overall_verdict": "request-changes"
+}
+---
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>PR 21691 Review Report - cgroup/dmem: reuse SUBSYS for dmem and devices to preserve KABI</title>
+<style>
+body { font-family: 'Segoe UI', 'Microsoft YaHei', Arial, sans-serif; margin: 40px; background: #f5f5f5; color: #333; }
+.container { max-width: 1100px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+h1 { font-size: 24px; margin-bottom: 10px; }
+h2 { font-size: 20px; border-bottom: 2px solid #e0e0e0; padding-bottom: 8px; margin-top: 30px; }
+h3 { font-size: 16px; margin: 15px 0 8px; }
+.verdict { font-size: 18px; font-weight: bold; padding: 10px 15px; border-radius: 5px; display: inline-block; margin: 10px 0; }
+.nack { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+.lgtm { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+.request-changes { background: #fff3e0; color: #ef6c00; border: 1px solid #ffcc80; }
+.warning { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
+.badge { padding: 3px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px; }
+.badge.pass, .badge.ok { background: #c8e6c9; color: #256029; }
+.badge.warning { background: #ffe0b2; color: #e65100; }
+.badge.fail, .badge.n/a { background: #ffcdd2; color: #b71c1c; }
+table.findings { width: 100%; border-collapse: collapse; margin-top: 10px; }
+table.findings th, table.findings td { border: 1px solid #ddd; padding: 10px; text-align: left; vertical-align: top; }
+table.findings th { background: #f0f0f0; }
+.critical { background: #ffebee; }
+.high { background: #fff3e0; }
+.medium { background: #fffde7; }
+.low { background: #e8f5e9; }
+.section { margin: 15px 0; padding: 12px; background: #fafafa; border-radius: 6px; }
+ul { margin: 5px 0; }
+li { margin: 4px 0; }
+.footer { margin-top: 40px; font-size: 12px; color: #888; text-align: center; }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>PR 21691 Review Report</h1>
+    <p><strong>标题：</strong>cgroup/dmem: reuse SUBSYS for dmem and devices to preserve KABI</p>
+    <p><strong>审查结论：</strong><span class="verdict request-changes">Request Changes</span></p>
+    
+    <h2>详细审查结果</h2>
+    
+        <div class='section'>
+            <h3>补丁格式 <span class='badge pass'>pass</span></h3>
+            <ul><li>hulk inclusion 正确</li><li>bugzilla 正确</li><li>Fixes 标签正确</li><li>详细描述了四种运行模式</li></ul>
+        </div>
+        
+        <div class='section'>
+            <h3>KABI/KAPI 兼容性 <span class='badge pass'>pass</span></h3>
+            <ul><li>通过共享 SUBSYS slot 避免 CGROUP_SUBSYS_COUNT 增加,正确保护 KABI</li><li>BUILD_BUG_ON 从 17 改为 16</li></ul>
+        </div>
+        
+        <div class='section'>
+            <h3>安全性 <span class='badge pass'>pass</span></h3>
+            <ul><li>无直接安全问题</li></ul>
+        </div>
+        
+        <div class='section'>
+            <h3>逻辑正确性 <span class='badge warning'>warning</span></h3>
+            <ul><li>dmem_devices_compat_css_alloc 中版本不匹配返回 -EPERM</li><li>static_branch 控制动态行为</li><li>#define devices_cgrp_id dmem_cgrp_id 宏替换</li></ul>
+        </div>
+        
+        <div class='section'>
+            <h3>Backport 验证 <span class='badge n/a'>N/A</span></h3>
+            <ul><li>非 backport</li></ul>
+        </div>
+        
+    
+    <h2>发现问题汇总</h2>
+    <table class='findings'><tr><th>严重级别</th><th>类别</th><th>问题描述</th><th>修复建议</th></tr><tr class='high'><td>high</td><td>architecture</td><td>dmem 和 devices 共享同一个 cgroup subsys slot 是一个相当 hacky 的设计。虽然当前它们互斥(v1 vs v2),但未来如果需求变化,这种耦合会严重限制扩展性</td><td>建议评估是否有更干净的方式(如使用未使用的 slot 或扩展 subsys 数量),至少应在代码中添加大量注释说明维护约束</td></tr><tr class='medium'><td>medium</td><td>compatibility</td><td>注释中提到 &#x27;cpuacct_cgrp_subsys and dmem_cgrp_subsys share the same set of cgroup_subsys hook functions&#x27; 但代码中实际共享的是 devices 和 dmem</td><td>修正注释中的笔误</td></tr></table>
+    
+    <h2>修复建议</h2>
+    <ul><li>修正注释笔误</li><li>确认维护者接受这种 slot 共享方案</li><li>添加更醒目的维护警告注释</li></ul>
+    
+    <div class="footer">
+        <p>报告由 AI 辅助生成，仅供参考。最终合入决策以人工审查为准。</p>
+    </div>
+</div>
+</body>
+</html>
