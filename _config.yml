@@ -40,7 +40,7 @@ exclude:
 collections:
   openeuler_reviews:
     output: true
-    permalink: /openeuler/reviews/:path/
+    permalink: /openeuler/reviews/:path.html
 
 # 默认配置
 defaults:

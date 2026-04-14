@@ -97,7 +97,7 @@ def main():
             "verdict": verdict,
             "date": date_str,
             "month": month,
-            "url": f"/openeuler/reviews/{month}/PR-{pr_id}/",
+            "url": f"/openeuler/reviews/{month}/PR-{pr_id}.html",
         })
     
     stats = {

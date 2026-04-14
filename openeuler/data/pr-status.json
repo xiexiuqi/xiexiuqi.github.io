@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-14T07:41:54Z",
+  "last_updated": "2026-04-14T07:47:43Z",
   "source_repo": "~/git/openEuler-kernel",
   "stats": {
     "total_patches": 124,
@@ -44,7 +44,7 @@
       "verdict": "Request Changes",
       "date": "2026-04-13",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-19935/"
+      "url": "/openeuler/reviews/2026-04/PR-19935.html"
     },
     {
       "id": "21257",
@@ -52,7 +52,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21257/"
+      "url": "/openeuler/reviews/2026-04/PR-21257.html"
     },
     {
       "id": "21259",
@@ -60,7 +60,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21259/"
+      "url": "/openeuler/reviews/2026-04/PR-21259.html"
     },
     {
       "id": "21260",
@@ -68,7 +68,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21260/"
+      "url": "/openeuler/reviews/2026-04/PR-21260.html"
     },
     {
       "id": "21266",
@@ -76,7 +76,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21266/"
+      "url": "/openeuler/reviews/2026-04/PR-21266.html"
     },
     {
       "id": "21268",
@@ -84,7 +84,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21268/"
+      "url": "/openeuler/reviews/2026-04/PR-21268.html"
     },
     {
       "id": "21273",
@@ -92,7 +92,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21273/"
+      "url": "/openeuler/reviews/2026-04/PR-21273.html"
     },
     {
       "id": "21279",
@@ -100,7 +100,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21279/"
+      "url": "/openeuler/reviews/2026-04/PR-21279.html"
     },
     {
       "id": "21294",
@@ -108,7 +108,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21294/"
+      "url": "/openeuler/reviews/2026-04/PR-21294.html"
     },
     {
       "id": "21295",
@@ -116,7 +116,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21295/"
+      "url": "/openeuler/reviews/2026-04/PR-21295.html"
     },
     {
       "id": "21296",
@@ -124,7 +124,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21296/"
+      "url": "/openeuler/reviews/2026-04/PR-21296.html"
     },
     {
       "id": "21297",
@@ -132,7 +132,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21297/"
+      "url": "/openeuler/reviews/2026-04/PR-21297.html"
     },
     {
       "id": "21298",
@@ -140,7 +140,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21298/"
+      "url": "/openeuler/reviews/2026-04/PR-21298.html"
     },
     {
       "id": "21299",
@@ -148,7 +148,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21299/"
+      "url": "/openeuler/reviews/2026-04/PR-21299.html"
     },
     {
       "id": "21306",
@@ -156,7 +156,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21306/"
+      "url": "/openeuler/reviews/2026-04/PR-21306.html"
     },
     {
       "id": "21308",
@@ -164,7 +164,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21308/"
+      "url": "/openeuler/reviews/2026-04/PR-21308.html"
     },
     {
       "id": "21315",
@@ -172,7 +172,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21315/"
+      "url": "/openeuler/reviews/2026-04/PR-21315.html"
     },
     {
       "id": "21317",
@@ -180,7 +180,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21317/"
+      "url": "/openeuler/reviews/2026-04/PR-21317.html"
     },
     {
       "id": "21327",
@@ -188,7 +188,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21327/"
+      "url": "/openeuler/reviews/2026-04/PR-21327.html"
     },
     {
       "id": "21332",
@@ -196,7 +196,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21332/"
+      "url": "/openeuler/reviews/2026-04/PR-21332.html"
     },
     {
       "id": "21341",
@@ -204,7 +204,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21341/"
+      "url": "/openeuler/reviews/2026-04/PR-21341.html"
     },
     {
       "id": "21347",
@@ -212,7 +212,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21347/"
+      "url": "/openeuler/reviews/2026-04/PR-21347.html"
     },
     {
       "id": "21349",
@@ -220,7 +220,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21349/"
+      "url": "/openeuler/reviews/2026-04/PR-21349.html"
     },
     {
       "id": "21352",
@@ -228,7 +228,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21352/"
+      "url": "/openeuler/reviews/2026-04/PR-21352.html"
     },
     {
       "id": "21353",
@@ -236,7 +236,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21353/"
+      "url": "/openeuler/reviews/2026-04/PR-21353.html"
     },
     {
       "id": "21358",
@@ -244,7 +244,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21358/"
+      "url": "/openeuler/reviews/2026-04/PR-21358.html"
     },
     {
       "id": "21368",
@@ -252,7 +252,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21368/"
+      "url": "/openeuler/reviews/2026-04/PR-21368.html"
     },
     {
       "id": "21370",
@@ -260,7 +260,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21370/"
+      "url": "/openeuler/reviews/2026-04/PR-21370.html"
     },
     {
       "id": "21373",
@@ -268,7 +268,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21373/"
+      "url": "/openeuler/reviews/2026-04/PR-21373.html"
     },
     {
       "id": "21377",
@@ -276,7 +276,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21377/"
+      "url": "/openeuler/reviews/2026-04/PR-21377.html"
     },
     {
       "id": "21382",
@@ -284,7 +284,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21382/"
+      "url": "/openeuler/reviews/2026-04/PR-21382.html"
     },
     {
       "id": "21396",
@@ -292,7 +292,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21396/"
+      "url": "/openeuler/reviews/2026-04/PR-21396.html"
     },
     {
       "id": "21401",
@@ -300,7 +300,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21401/"
+      "url": "/openeuler/reviews/2026-04/PR-21401.html"
     },
     {
       "id": "21413",
@@ -308,7 +308,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21413/"
+      "url": "/openeuler/reviews/2026-04/PR-21413.html"
     },
     {
       "id": "21414",
@@ -316,7 +316,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21414/"
+      "url": "/openeuler/reviews/2026-04/PR-21414.html"
     },
     {
       "id": "21417",
@@ -324,7 +324,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21417/"
+      "url": "/openeuler/reviews/2026-04/PR-21417.html"
     },
     {
       "id": "21418",
@@ -332,7 +332,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21418/"
+      "url": "/openeuler/reviews/2026-04/PR-21418.html"
     },
     {
       "id": "21424",
@@ -340,7 +340,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21424/"
+      "url": "/openeuler/reviews/2026-04/PR-21424.html"
     },
     {
       "id": "21427",
@@ -348,7 +348,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21427/"
+      "url": "/openeuler/reviews/2026-04/PR-21427.html"
     },
     {
       "id": "21437",
@@ -356,7 +356,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21437/"
+      "url": "/openeuler/reviews/2026-04/PR-21437.html"
     },
     {
       "id": "21442",
@@ -364,7 +364,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21442/"
+      "url": "/openeuler/reviews/2026-04/PR-21442.html"
     },
     {
       "id": "21443",
@@ -372,7 +372,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21443/"
+      "url": "/openeuler/reviews/2026-04/PR-21443.html"
     },
     {
       "id": "21445",
@@ -380,7 +380,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21445/"
+      "url": "/openeuler/reviews/2026-04/PR-21445.html"
     },
     {
       "id": "21452",
@@ -388,7 +388,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21452/"
+      "url": "/openeuler/reviews/2026-04/PR-21452.html"
     },
     {
       "id": "21453",
@@ -396,7 +396,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21453/"
+      "url": "/openeuler/reviews/2026-04/PR-21453.html"
     },
     {
       "id": "21454",
@@ -404,7 +404,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21454/"
+      "url": "/openeuler/reviews/2026-04/PR-21454.html"
     },
     {
       "id": "21457",
@@ -412,7 +412,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21457/"
+      "url": "/openeuler/reviews/2026-04/PR-21457.html"
     },
     {
       "id": "21461",
@@ -420,7 +420,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21461/"
+      "url": "/openeuler/reviews/2026-04/PR-21461.html"
     },
     {
       "id": "21463",
@@ -428,7 +428,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21463/"
+      "url": "/openeuler/reviews/2026-04/PR-21463.html"
     },
     {
       "id": "21478",
@@ -436,7 +436,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21478/"
+      "url": "/openeuler/reviews/2026-04/PR-21478.html"
     },
     {
       "id": "21487",
@@ -444,7 +444,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21487/"
+      "url": "/openeuler/reviews/2026-04/PR-21487.html"
     },
     {
       "id": "21493",
@@ -452,7 +452,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21493/"
+      "url": "/openeuler/reviews/2026-04/PR-21493.html"
     },
     {
       "id": "21496",
@@ -460,7 +460,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21496/"
+      "url": "/openeuler/reviews/2026-04/PR-21496.html"
     },
     {
       "id": "21509",
@@ -468,7 +468,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21509/"
+      "url": "/openeuler/reviews/2026-04/PR-21509.html"
     },
     {
       "id": "21512",
@@ -476,7 +476,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21512/"
+      "url": "/openeuler/reviews/2026-04/PR-21512.html"
     },
     {
       "id": "21514",
@@ -484,7 +484,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21514/"
+      "url": "/openeuler/reviews/2026-04/PR-21514.html"
     },
     {
       "id": "21515",
@@ -492,7 +492,7 @@
       "verdict": "nack",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21515/"
+      "url": "/openeuler/reviews/2026-04/PR-21515.html"
     },
     {
       "id": "21521",
@@ -500,7 +500,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21521/"
+      "url": "/openeuler/reviews/2026-04/PR-21521.html"
     },
     {
       "id": "21529",
@@ -508,7 +508,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21529/"
+      "url": "/openeuler/reviews/2026-04/PR-21529.html"
     },
     {
       "id": "21529",
@@ -516,7 +516,7 @@
       "verdict": "request-changes",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21529/"
+      "url": "/openeuler/reviews/2026-04/PR-21529.html"
     },
     {
       "id": "21532",
@@ -524,7 +524,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21532/"
+      "url": "/openeuler/reviews/2026-04/PR-21532.html"
     },
     {
       "id": "21537",
@@ -532,7 +532,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21537/"
+      "url": "/openeuler/reviews/2026-04/PR-21537.html"
     },
     {
       "id": "21539",
@@ -540,7 +540,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21539/"
+      "url": "/openeuler/reviews/2026-04/PR-21539.html"
     },
     {
       "id": "21540",
@@ -548,7 +548,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21540/"
+      "url": "/openeuler/reviews/2026-04/PR-21540.html"
     },
     {
       "id": "21545",
@@ -556,7 +556,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21545/"
+      "url": "/openeuler/reviews/2026-04/PR-21545.html"
     },
     {
       "id": "21546",
@@ -564,7 +564,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21546/"
+      "url": "/openeuler/reviews/2026-04/PR-21546.html"
     },
     {
       "id": "21564",
@@ -572,7 +572,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21564/"
+      "url": "/openeuler/reviews/2026-04/PR-21564.html"
     },
     {
       "id": "21565",
@@ -580,7 +580,7 @@
       "verdict": "nack",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21565/"
+      "url": "/openeuler/reviews/2026-04/PR-21565.html"
     },
     {
       "id": "21566",
@@ -588,7 +588,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21566/"
+      "url": "/openeuler/reviews/2026-04/PR-21566.html"
     },
     {
       "id": "21569",
@@ -596,7 +596,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21569/"
+      "url": "/openeuler/reviews/2026-04/PR-21569.html"
     },
     {
       "id": "21575",
@@ -604,7 +604,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21575/"
+      "url": "/openeuler/reviews/2026-04/PR-21575.html"
     },
     {
       "id": "21577",
@@ -612,7 +612,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21577/"
+      "url": "/openeuler/reviews/2026-04/PR-21577.html"
     },
     {
       "id": "21581",
@@ -620,7 +620,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21581/"
+      "url": "/openeuler/reviews/2026-04/PR-21581.html"
     },
     {
       "id": "21583",
@@ -628,7 +628,7 @@
       "verdict": "nack",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21583/"
+      "url": "/openeuler/reviews/2026-04/PR-21583.html"
     },
     {
       "id": "21585",
@@ -636,7 +636,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21585/"
+      "url": "/openeuler/reviews/2026-04/PR-21585.html"
     },
     {
       "id": "21592",
@@ -644,7 +644,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21592/"
+      "url": "/openeuler/reviews/2026-04/PR-21592.html"
     },
     {
       "id": "21596",
@@ -652,7 +652,7 @@
       "verdict": "nack",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21596/"
+      "url": "/openeuler/reviews/2026-04/PR-21596.html"
     },
     {
       "id": "21598",
@@ -660,7 +660,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21598/"
+      "url": "/openeuler/reviews/2026-04/PR-21598.html"
     },
     {
       "id": "21599",
@@ -668,7 +668,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21599/"
+      "url": "/openeuler/reviews/2026-04/PR-21599.html"
     },
     {
       "id": "21604",
@@ -676,7 +676,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21604/"
+      "url": "/openeuler/reviews/2026-04/PR-21604.html"
     },
     {
       "id": "21605",
@@ -684,7 +684,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21605/"
+      "url": "/openeuler/reviews/2026-04/PR-21605.html"
     },
     {
       "id": "21608",
@@ -692,7 +692,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21608/"
+      "url": "/openeuler/reviews/2026-04/PR-21608.html"
     },
     {
       "id": "21612",
@@ -700,7 +700,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21612/"
+      "url": "/openeuler/reviews/2026-04/PR-21612.html"
     },
     {
       "id": "21613",
@@ -708,7 +708,7 @@
       "verdict": "nack",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21613/"
+      "url": "/openeuler/reviews/2026-04/PR-21613.html"
     },
     {
       "id": "21621",
@@ -716,7 +716,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21621/"
+      "url": "/openeuler/reviews/2026-04/PR-21621.html"
     },
     {
       "id": "21622",
@@ -724,7 +724,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21622/"
+      "url": "/openeuler/reviews/2026-04/PR-21622.html"
     },
     {
       "id": "21624",
@@ -732,7 +732,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21624/"
+      "url": "/openeuler/reviews/2026-04/PR-21624.html"
     },
     {
       "id": "21628",
@@ -740,7 +740,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21628/"
+      "url": "/openeuler/reviews/2026-04/PR-21628.html"
     },
     {
       "id": "21638",
@@ -748,7 +748,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21638/"
+      "url": "/openeuler/reviews/2026-04/PR-21638.html"
     },
     {
       "id": "21643",
@@ -756,7 +756,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21643/"
+      "url": "/openeuler/reviews/2026-04/PR-21643.html"
     },
     {
       "id": "21649",
@@ -764,7 +764,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21649/"
+      "url": "/openeuler/reviews/2026-04/PR-21649.html"
     },
     {
       "id": "21650",
@@ -772,7 +772,7 @@
       "verdict": "request-changes",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21650/"
+      "url": "/openeuler/reviews/2026-04/PR-21650.html"
     },
     {
       "id": "21664",
@@ -780,7 +780,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21664/"
+      "url": "/openeuler/reviews/2026-04/PR-21664.html"
     },
     {
       "id": "21665",
@@ -788,7 +788,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21665/"
+      "url": "/openeuler/reviews/2026-04/PR-21665.html"
     },
     {
       "id": "21675",
@@ -796,7 +796,7 @@
       "verdict": "nack",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21675/"
+      "url": "/openeuler/reviews/2026-04/PR-21675.html"
     },
     {
       "id": "21676",
@@ -804,7 +804,7 @@
       "verdict": "request-changes",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21676/"
+      "url": "/openeuler/reviews/2026-04/PR-21676.html"
     },
     {
       "id": "21678",
@@ -812,7 +812,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21678/"
+      "url": "/openeuler/reviews/2026-04/PR-21678.html"
     },
     {
       "id": "21679",
@@ -820,7 +820,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21679/"
+      "url": "/openeuler/reviews/2026-04/PR-21679.html"
     },
     {
       "id": "21680",
@@ -828,7 +828,7 @@
       "verdict": "request-changes",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21680/"
+      "url": "/openeuler/reviews/2026-04/PR-21680.html"
     },
     {
       "id": "21686",
@@ -836,7 +836,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21686/"
+      "url": "/openeuler/reviews/2026-04/PR-21686.html"
     },
     {
       "id": "21689",
@@ -844,7 +844,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21689/"
+      "url": "/openeuler/reviews/2026-04/PR-21689.html"
     },
     {
       "id": "21691",
@@ -852,7 +852,7 @@
       "verdict": "request-changes",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21691/"
+      "url": "/openeuler/reviews/2026-04/PR-21691.html"
     },
     {
       "id": "21698",
@@ -860,7 +860,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21698/"
+      "url": "/openeuler/reviews/2026-04/PR-21698.html"
     },
     {
       "id": "21701",
@@ -868,7 +868,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21701/"
+      "url": "/openeuler/reviews/2026-04/PR-21701.html"
     },
     {
       "id": "21702",
@@ -876,7 +876,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21702/"
+      "url": "/openeuler/reviews/2026-04/PR-21702.html"
     },
     {
       "id": "21704",
@@ -884,7 +884,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21704/"
+      "url": "/openeuler/reviews/2026-04/PR-21704.html"
     },
     {
       "id": "21705",
@@ -892,7 +892,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21705/"
+      "url": "/openeuler/reviews/2026-04/PR-21705.html"
     },
     {
       "id": "21706",
@@ -900,7 +900,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21706/"
+      "url": "/openeuler/reviews/2026-04/PR-21706.html"
     },
     {
       "id": "21711",
@@ -908,7 +908,7 @@
       "verdict": "nack",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21711/"
+      "url": "/openeuler/reviews/2026-04/PR-21711.html"
     },
     {
       "id": "21714",
@@ -916,7 +916,7 @@
       "verdict": "request-changes",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21714/"
+      "url": "/openeuler/reviews/2026-04/PR-21714.html"
     },
     {
       "id": "21715",
@@ -924,7 +924,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21715/"
+      "url": "/openeuler/reviews/2026-04/PR-21715.html"
     },
     {
       "id": "21721",
@@ -932,7 +932,7 @@
       "verdict": "request-changes",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21721/"
+      "url": "/openeuler/reviews/2026-04/PR-21721.html"
     },
     {
       "id": "21725",
@@ -940,7 +940,7 @@
       "verdict": "request-changes",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21725/"
+      "url": "/openeuler/reviews/2026-04/PR-21725.html"
     },
     {
       "id": "21729",
@@ -948,7 +948,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21729/"
+      "url": "/openeuler/reviews/2026-04/PR-21729.html"
     },
     {
       "id": "21730",
@@ -956,7 +956,7 @@
       "verdict": "request-changes",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21730/"
+      "url": "/openeuler/reviews/2026-04/PR-21730.html"
     },
     {
       "id": "21731",
@@ -964,7 +964,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21731/"
+      "url": "/openeuler/reviews/2026-04/PR-21731.html"
     },
     {
       "id": "21733",
@@ -972,7 +972,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21733/"
+      "url": "/openeuler/reviews/2026-04/PR-21733.html"
     },
     {
       "id": "21735",
@@ -980,7 +980,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21735/"
+      "url": "/openeuler/reviews/2026-04/PR-21735.html"
     },
     {
       "id": "21739",
@@ -988,7 +988,7 @@
       "verdict": "request-changes",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21739/"
+      "url": "/openeuler/reviews/2026-04/PR-21739.html"
     },
     {
       "id": "21740",
@@ -996,7 +996,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21740/"
+      "url": "/openeuler/reviews/2026-04/PR-21740.html"
     },
     {
       "id": "21741",
@@ -1004,7 +1004,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21741/"
+      "url": "/openeuler/reviews/2026-04/PR-21741.html"
     },
     {
       "id": "21742",
@@ -1012,7 +1012,7 @@
       "verdict": "nack",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21742/"
+      "url": "/openeuler/reviews/2026-04/PR-21742.html"
     },
     {
       "id": "21743",
@@ -1020,7 +1020,7 @@
       "verdict": "request-changes",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21743/"
+      "url": "/openeuler/reviews/2026-04/PR-21743.html"
     },
     {
       "id": "21744",
@@ -1028,7 +1028,7 @@
       "verdict": "lgtm",
       "date": "2026-04-14",
       "month": "2026-04",
-      "url": "/openeuler/reviews/2026-04/PR-21744/"
+      "url": "/openeuler/reviews/2026-04/PR-21744.html"
     }
   ]
 }
