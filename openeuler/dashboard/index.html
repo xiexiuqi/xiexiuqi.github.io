@@ -174,19 +174,17 @@ title: openEuler Kernel Dashboard
     let html = '<table class="patch-table"><thead><tr>' +
                '<th>PR</th><th>标题</th><th>日期</th><th>结论</th>' +
                '</tr></thead><tbody>';
-    patches.slice(0, 30).forEach(function(p) {
+    patches.forEach(function(p) {
       const verdictClass = (p.verdict || 'pending').toLowerCase().replace(/\s+/g, '-');
       html += '<tr>' +
-              '<td><a href="' + p.url + '" target="_blank">' + p.id + '</a></td>' +
-              '<td><a href="' + p.url + '" target="_blank">' + p.title + '</a></td>' +
+              '<td><a href="' + p.url + '">' + p.id + '</a></td>' +
+              '<td><a href="' + p.url + '">' + p.title + '</a></td>' +
               '<td>' + p.date + '</td>' +
               '<td><span class="badge ' + verdictClass + '">' + (p.verdict || 'Pending') + '</span></td>' +
               '</tr>';
     });
     html += '</tbody></table>';
-    if (patches.length > 30) {
-      html += '<p style="color:#666;font-size:0.9rem;">显示前 30 条，共 ' + patches.length + ' 条</p>';
-    }
+    html += '<p style="color:#666;font-size:0.9rem;">共 ' + patches.length + ' 条报告</p>';
     container.innerHTML = html;
   }
 

@@ -97,7 +97,7 @@ def main():
             "verdict": verdict,
             "date": date_str,
             "month": month,
-            "url": f"/openeuler/reviews/{month}/PR-{pr_id}.html",
+            "url": f"/openeuler/reviews/{month}/PR-{pr_id}/",
         })
     
     stats = {
@@ -122,7 +122,7 @@ def main():
         "source_repo": "~/git/openEuler-kernel",
         "stats": stats,
         "trend": trend,
-        "patches": patches[:50],
+        "patches": patches,
     }
     
     (DATA_DIR / "pr-status.json").write_text(json.dumps(status, ensure_ascii=False, indent=2), encoding='utf-8')
