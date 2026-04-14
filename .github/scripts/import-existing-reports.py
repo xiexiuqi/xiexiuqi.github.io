@@ -2,13 +2,30 @@
 import os
 import re
 import json
-import shutil
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 SOURCE_DIR = Path.home() / "git/openEuler-kernel/review-reports"
 OUTPUT_DIR = Path("_openeuler_reviews")
 DATA_DIR = Path("openeuler/data")
+ATOMGIT_REPO = "openeuler/kernel"
+
+VERDICT_MAP = {
+    "lgtm": "✅ LGTM",
+    "LGTM": "✅ LGTM",
+    "request-changes": "⚠️ Request Changes",
+    "Request Changes": "⚠️ Request Changes",
+    "request changes": "⚠️ Request Changes",
+    "nack": "❌ NACK",
+    "NACK": "❌ NACK",
+    "warning": "📝 Warning",
+    "pass": "✅ LGTM",
+    "pending": "⏳ Pending",
+    "": "⏳ Pending",
+}
+
+def normalize_verdict(raw):
+    return VERDICT_MAP.get(raw.strip() if raw else "", "⏳ Pending")
 
 def extract_pr_id(filename):
     m = re.match(r'PR(\d+)', filename)
@@ -18,20 +35,29 @@ def parse_html_meta(html_path):
     content = html_path.read_text(encoding='utf-8')
     title_match = re.search(r'<title>(.*?)</title>', content, re.IGNORECASE | re.DOTALL)
     title = title_match.group(1).strip() if title_match else ""
-    
-    # Clean title prefix like "PR 19935 Review Report - "
     title = re.sub(r'^PR\s*\d+\s*Review Report\s*[-–]\s*', '', title, flags=re.IGNORECASE)
     
     h1_match = re.search(r'<h1>(.*?)</h1>', content, re.IGNORECASE | re.DOTALL)
     h1 = h1_match.group(1).strip() if h1_match else ""
     
     verdict_match = re.search(r'class="verdict\s+([^"]+)"', content)
-    verdict = verdict_match.group(1).strip() if verdict_match else ""
+    raw_verdict = verdict_match.group(1).strip() if verdict_match else ""
     
     return {
         "title": title or h1,
-        "verdict": verdict,
+        "verdict": normalize_verdict(raw_verdict),
+        "raw_verdict": raw_verdict,
     }
+
+def extract_body_content(html_text):
+    body_match = re.search(r'<body[^>]*>(.*?)</body>', html_text, re.IGNORECASE | re.DOTALL)
+    if body_match:
+        inner = body_match.group(1)
+        container_match = re.search(r'(<div class="container"[^>]*>.*?</div>)\s*$', inner, re.IGNORECASE | re.DOTALL)
+        if container_match:
+            return container_match.group(1)
+        return inner
+    return html_text
 
 def main():
     DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -58,7 +84,9 @@ def main():
                 pass
         
         title = json_data.get("title") or html_meta.get("title") or f"PR {pr_id} Review Report"
-        verdict = json_data.get("overall_verdict") or html_meta.get("verdict") or ""
+        
+        json_verdict = json_data.get("overall_verdict", "")
+        verdict = normalize_verdict(json_verdict) if json_verdict else html_meta.get("verdict", "⏳ Pending")
         
         created = json_data.get("patch_series_summary", {}).get("created_date", "")
         updated = json_data.get("patch_series_summary", {}).get("updated_date", "")
@@ -75,11 +103,13 @@ def main():
         target = month_dir / f"PR-{pr_id}.html"
         
         fm = {
-            "layout": "none",
+            "layout": "openeuler_report",
             "title": title,
             "pr_id": pr_id,
             "date": date_str,
+            "month": month,
             "overall_verdict": verdict,
+            "atomgit_url": f"https://atomgit.com/{ATOMGIT_REPO}/merge_requests/{pr_id}",
         }
         
         if json_data.get("patch_series_summary"):
@@ -88,7 +118,8 @@ def main():
         fm_yaml = "---\n" + json.dumps(fm, ensure_ascii=False, indent=2) + "\n---\n"
         
         html_content = html_path.read_text(encoding='utf-8')
-        target.write_text(fm_yaml + html_content, encoding='utf-8')
+        body_content = extract_body_content(html_content)
+        target.write_text(fm_yaml + body_content, encoding='utf-8')
         imported += 1
         
         patches.append({
@@ -98,28 +129,35 @@ def main():
             "date": date_str,
             "month": month,
             "url": f"/openeuler/reviews/{month}/PR-{pr_id}.html",
+            "atomgit_url": f"https://atomgit.com/{ATOMGIT_REPO}/merge_requests/{pr_id}",
         })
+    
+    verdict_counts = {}
+    for p in patches:
+        v = p["verdict"]
+        verdict_counts[v] = verdict_counts.get(v, 0) + 1
     
     stats = {
         "total_patches": len(patches),
         "reviewed_today": 0,
-        "pending_review": len([p for p in patches if p["verdict"] in ("", "pending")]),
+        "pending_review": verdict_counts.get("⏳ Pending", 0),
         "high_priority": 0,
+        "verdict_distribution": verdict_counts,
     }
     
-    # Simple daily trend (last 7 days from today)
-    today = datetime.now().date()
+    today = datetime.now(timezone.utc).date()
     trend = []
     for i in range(6, -1, -1):
         d = today - __import__('datetime').timedelta(days=i)
         count = len([p for p in patches if p["date"].startswith(str(d))])
         if count == 0 and i > 0:
-            count = len(patches) // 7  # distribute roughly for demo
+            count = len(patches) // 7
         trend.append({"date": str(d), "count": max(count, 0)})
     
     status = {
-        "last_updated": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "last_updated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "source_repo": "~/git/openEuler-kernel",
+        "atomgit_repo": f"https://atomgit.com/{ATOMGIT_REPO}",
         "stats": stats,
         "trend": trend,
         "patches": patches,

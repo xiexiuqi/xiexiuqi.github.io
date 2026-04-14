@@ -1,0 +1,1423 @@
+<!DOCTYPE html><html lang="zh-CN"><head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Arm AGI CPU 技术调研报告</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <style>
+        :root {
+            --primary: #1e293b;
+            --secondary: #475569;
+            --accent: #0f766e;
+            --muted: #64748b;
+            --background: #fefefe;
+            --surface: #f8fafc;
+        }
+        
+        body {
+            font-family: 'Inter', "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+            background: var(--background);
+            color: var(--primary);
+            line-height: 1.7;
+        }
+        
+        .serif { font-family: 'Playfair Display', "Songti SC", "SimSun", "Noto Serif SC", serif; }
+        
+        .toc-fixed {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            background: var(--surface);
+            border-right: 1px solid #e2e8f0;
+            overflow-y: auto;
+            z-index: 50;
+        }
+        
+        .main-content {
+            margin-left: 280px;
+            min-height: 100vh;
+        }
+        
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .citation {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 1px dotted var(--accent);
+        }
+        
+        .citation:hover {
+            background: rgba(15, 118, 110, 0.1);
+            padding: 0 2px;
+        }
+        
+        .insight-highlight {
+            background: linear-gradient(120deg, rgba(15, 118, 110, 0.1) 0%, rgba(15, 118, 110, 0.05) 100%);
+            border-left: 4px solid var(--accent);
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        
+        @media (max-width: 1024px) {
+            .toc-fixed { display: none; }
+            .main-content { margin-left: 0; }
+            .hero-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                overflow-x: hidden;
+            }
+        }
+        
+        .toc-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 40;
+            display: none;
+        }
+        
+        @media (max-width: 1024px) {
+            .toc-fixed.open {
+                transform: translateX(0);
+                transition: transform 0.3s ease;
+            }
+        }
+    </style>
+  <base target="_blank">
+<script src="https://www.kimi.com/sdk-seed.js" defer data-brand="dr"></script>
+</head>
+
+  <body>
+    <!-- Hamburger Menu Button (Mobile Only) -->
+    <button id="toc-toggle" class="fixed top-4 left-4 z-50 bg-white p-2 rounded-md shadow-md md:hidden">
+      <i class="fas fa-bars text-xl"></i>
+    </button>
+
+    <!-- Table of Contents -->
+    <nav class="toc-fixed">
+      <div class="p-6">
+        <div class="mb-8">
+          <h3 class="serif text-lg font-bold text-slate-800 mb-2">Arm AGI CPU</h3>
+          <p class="text-sm text-slate-600">技术调研报告</p>
+        </div>
+
+        <div class="space-y-3">
+          <a href="#executive-summary" class="block text-sm hover:text-teal-700 transition-colors">执行摘要</a>
+
+          <div class="space-y-2">
+            <h4 class="font-semibold text-slate-700 text-sm uppercase tracking-wide">目录</h4>
+            <a href="#overview" class="block text-xs text-slate-600 hover:text-teal-600 transition-colors">1. 产品概述与定位</a>
+            <a href="#architecture" class="block text-xs text-slate-600 hover:text-teal-600 transition-colors">2. 核心架构与规格</a>
+            <a href="#product-lineup" class="block text-xs text-slate-600 hover:text-teal-600 transition-colors">3. 产品型号与配置</a>
+            <a href="#documentation" class="block text-xs text-slate-600 hover:text-teal-600 transition-colors">4. 官方文档与技术资料</a>
+            <a href="#scenarios" class="block text-xs text-slate-600 hover:text-teal-600 transition-colors">5. 使用场景与部署模式</a>
+            <a href="#performance" class="block text-xs text-slate-600 hover:text-teal-600 transition-colors">6. 性能分析与SPECINT估算</a>
+            <a href="#comparison" class="block text-xs text-slate-600 hover:text-teal-600 transition-colors">7. 业界主流处理器对比</a>
+            <a href="#summary" class="block text-xs text-slate-600 hover:text-teal-600 transition-colors">8. 总结与评估</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Overlay for mobile TOC -->
+    <div id="toc-overlay" class="toc-overlay"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Hero Section -->
+      <section class="px-4 md:px-8 py-12 bg-gradient-to-br from-slate-50 to-teal-50">
+        <div class="max-w-6xl mx-auto">
+          <div class="hero-grid">
+            <div>
+              <div class="mb-6">
+                <span class="inline-block px-3 py-1 bg-teal-100 text-teal-800 text-sm font-medium rounded-full">技术调研报告</span>
+              </div>
+
+              <h1 class="serif text-4xl md:text-5xl font-bold text-slate-900 mb-6 leading-tight">
+                <em class="text-teal-700">Arm AGI CPU</em>：
+                <br/>
+                面向AI原生数据中心的
+                <br/>
+                革命性处理器架构
+              </h1>
+
+              <p class="text-lg md:text-xl text-slate-600 mb-8 leading-relaxed">
+                Arm首款直接面向数据中心销售的自研CPU，采用136核Neoverse V3架构，
+                专为AI代理编排优化，机架级性能宣称达x86平台2倍以上
+              </p>
+
+              <div class="flex flex-wrap gap-4">
+                <div class="bg-white px-4 py-2 rounded-lg shadow-sm">
+                  <span class="text-sm font-medium text-slate-700">136核心</span>
+                </div>
+                <div class="bg-white px-4 py-2 rounded-lg shadow-sm">
+                  <span class="text-sm font-medium text-slate-700">3nm工艺</span>
+                </div>
+                <div class="bg-white px-4 py-2 rounded-lg shadow-sm">
+                  <span class="text-sm font-medium text-slate-700">DDR5-8800</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="relative">
+              <img src="https://kimi-web-img.moonshot.cn/img/www.arm.com/08ee528e49d5a0e834d9c1da56ff8b7be5d941ee.png" alt="Arm AGI CPU处理器芯片" class="w-full rounded-2xl shadow-2xl" size="medium" aspect="wide" style="photo" query="Arm AGI CPU处理器" referrerpolicy="no-referrer" data-modified="1" data-score="0.00"/>
+              <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Executive Summary -->
+      <section id="executive-summary" class="px-8 py-16 bg-white">
+        <div class="max-w-4xl mx-auto">
+          <h2 class="serif text-3xl font-bold text-slate-900 mb-8">执行摘要</h2>
+
+          <div class="grid md:grid-cols-2 gap-8 mb-12">
+            <div class="space-y-6">
+              <div class="insight-highlight">
+                <h3 class="font-semibold text-slate-800 mb-2">
+                  <i class="fas fa-microchip text-teal-600 mr-2"></i>
+                  商业模式转型
+                </h3>
+                <p class="text-sm text-slate-700">
+                  Arm成立35年来首次从IP授权商转型为直接销售芯片制造商，
+                  单颗芯片收入提升5-10倍，预测未来五年年收入达250亿美元
+                  <a href="https://tech.sina.cn/2026-03-27/detail-inhsmnzv8282216.d.html" class="citation">[302]</a>
+                </p>
+              </div>
+
+              <div class="insight-highlight">
+                <h3 class="font-semibold text-slate-800 mb-2">
+                  <i class="fas fa-brain text-teal-600 mr-2"></i>
+                  AI原生设计
+                </h3>
+                <p class="text-sm text-slate-700">
+                  专为AI代理编排优化，放弃传统SMT技术，确保确定性性能扩展，
+                  每核心6 GB/s内存带宽，低于100纳秒内存延迟
+                  <a href="https://www.theregister.com/2026/03/24/arm_agi_cpu/" class="citation">[230]</a>
+                </p>
+              </div>
+            </div>
+
+            <div class="space-y-6">
+              <div class="insight-highlight">
+                <h3 class="font-semibold text-slate-800 mb-2">
+                  <i class="fas fa-tachometer-alt text-teal-600 mr-2"></i>
+                  性能表现
+                </h3>
+                <p class="text-sm text-slate-700">
+                  估算SPECint2017 Rate-1约10.8-11.0，超越所有x86服务器处理器，
+                  机架级性能宣称达x86平台2倍以上
+                  <a href="https://jia.je/benchmark/" class="citation">[358]</a>
+                </p>
+              </div>
+
+              <div class="insight-highlight">
+                <h3 class="font-semibold text-slate-800 mb-2">
+                  <i class="fas fa-network-wired text-teal-600 mr-2"></i>
+                  生态系统
+                </h3>
+                <p class="text-sm text-slate-700">
+                  首批客户包括Meta、OpenAI、Cerebras、Cloudflare等50+行业领军企业，
+                  与Supermicro合作推出液冷200kW机架方案
+                  <a href="https://www.techradar.com/pro/the-next-evolution-of-the-arm-compute-platform-agi-cpu-is-its-first-in-house-ai-chip-signs-up-meta-and-openai-as-early-clients" class="citation">[231]</a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Product Overview -->
+      <section id="overview" class="px-8 py-16 bg-slate-50">
+        <div class="max-w-6xl mx-auto">
+          <h2 class="serif text-3xl font-bold text-slate-900 mb-12">1. 产品概述与定位</h2>
+
+          <div class="grid md:grid-cols-3 gap-8 mb-12">
+            <div class="bg-white p-6 rounded-xl shadow-sm">
+              <div class="w-12 h-12 bg-teal-100 rounded-lg flex items-center justify-center mb-4">
+                <i class="fas fa-crown text-teal-600"></i>
+              </div>
+              <h3 class="font-bold text-slate-800 mb-3">自研CPU战略</h3>
+              <p class="text-sm text-slate-600">
+                Arm首款直接面向数据中心销售的自研CPU，标志商业模式重大转型，
+                从IP授权商转变为成品芯片制造商
+              </p>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-sm">
+              <div class="w-12 h-12 bg-teal-100 rounded-lg flex items-center justify-center mb-4">
+                <i class="fas fa-robot text-teal-600"></i>
+              </div>
+              <h3 class="font-bold text-slate-800 mb-3">AI原生设计</h3>
+              <p class="text-sm text-slate-600">
+                专为AI代理编排优化，聚焦智能体系统协调处理器角色，
+                与GPU/ASIC形成垂直分工而非直接竞争
+              </p>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-sm">
+              <div class="w-12 h-12 bg-teal-100 rounded-lg flex items-center justify-center mb-4">
+                <i class="fas fa-layer-group text-teal-600"></i>
+              </div>
+              <h3 class="font-bold text-slate-800 mb-3">机架级优化</h3>
+              <p class="text-sm text-slate-600">
+                面向高密度服务器机架的大规模并行部署，
+                提供风冷36kW和液冷200kW两种验证方案
+              </p>
+            </div>
+          </div>
+
+          <div class="bg-white p-8 rounded-xl shadow-sm">
+            <h3 class="serif text-xl font-bold text-slate-800 mb-6">商业模式转型的战略意义</h3>
+            <div class="grid md:grid-cols-2 gap-8">
+              <div>
+                <h4 class="font-semibold text-slate-700 mb-3">传统授权模式</h4>
+                <ul class="space-y-2 text-sm text-slate-600">
+                  <li class="flex items-start">
+                    <i class="fas fa-circle text-xs text-slate-400 mt-2 mr-2"></i>
+                    单颗芯片版税：0.05-0.30美元
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-circle text-xs text-slate-400 mt-2 mr-2"></i>
+                    依赖合作伙伴实现硬件价值
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-circle text-xs text-slate-400 mt-2 mr-2"></i>
+                    无法完整展示架构潜力
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <h4 class="font-semibold text-slate-700 mb-3">自研芯片模式</h4>
+                <ul class="space-y-2 text-sm text-slate-600">
+                  <li class="flex items-start">
+                    <i class="fas fa-circle text-xs text-teal-500 mt-2 mr-2"></i>
+                    单颗芯片收入：数百美元
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-circle text-xs text-teal-500 mt-2 mr-2"></i>
+                    收入提升5-10倍
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-circle text-xs text-teal-500 mt-2 mr-2"></i>
+                    完整捕获价值链利润
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Architecture -->
+      <section id="architecture" class="px-8 py-16 bg-white">
+        <div class="max-w-6xl mx-auto">
+          <h2 class="serif text-3xl font-bold text-slate-900 mb-12">2. 核心架构与详细规格</h2>
+
+          <div class="grid lg:grid-cols-2 gap-12 mb-12">
+            <div class="space-y-8">
+              <div class="bg-slate-50 p-6 rounded-xl">
+                <h3 class="font-bold text-slate-800 mb-4">
+                  <i class="fas fa-microchip text-teal-600 mr-2"></i>
+                  处理器核心
+                </h3>
+                <div class="space-y-3 text-sm">
+                  <div class="flex justify-between">
+                    <span class="text-slate-600">核心架构</span>
+                    <span class="font-medium">Arm Neoverse V3 (Armv9.2-A)</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-600">核心数量</span>
+                    <span class="font-medium">136核心/芯片</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-600">时钟频率</span>
+                    <span class="font-medium">3.2 GHz (最高3.7 GHz)</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-600">L2缓存</span>
+                    <span class="font-medium">2 MB/核心</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-600">SLC缓存</span>
+                    <span class="font-medium">128 MB共享</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-slate-50 p-6 rounded-xl">
+                <h3 class="font-bold text-slate-800 mb-4">
+                  <i class="fas fa-memory text-teal-600 mr-2"></i>
+                  内存子系统
+                </h3>
+                <div class="space-y-3 text-sm">
+                  <div class="flex justify-between">
+                    <span class="text-slate-600">内存通道</span>
+                    <span class="font-medium">12通道DDR5</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-600">内存速率</span>
+                    <span class="font-medium">DDR5-8800 MT/s</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-600">理论带宽</span>
+                    <span class="font-medium">844.8 GB/s</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-600">每核心带宽</span>
+                    <span class="font-medium">~6 GB/s</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-600">最大容量</span>
+                    <span class="font-medium">6 TB/芯片</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-600">内存延迟</span>
+                    <span class="font-medium">
+                      &lt; 100 ns</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-8">
+              <div class="bg-slate-50 p-6 rounded-xl">
+                <h3 class="font-bold text-slate-800 mb-4">
+                  <i class="fas fa-plug text-teal-600 mr-2"></i>
+                  I/O与互联
+                </h3>
+                <div class="space-y-3 text-sm">
+                  <div class="flex justify-between">
+                    <span class="text-slate-600">PCIe通道</span>
+                    <span class="font-medium">96条PCIe Gen6</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-600">CXL支持</span>
+                    <span class="font-medium">CXL 3.0</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-600">多插槽</span>
+                    <span class="font-medium">支持2P配置</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-600">参考设计</span>
+                    <span class="font-medium">1OU双节点刀片</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-slate-50 p-6 rounded-xl">
+                <h3 class="font-bold text-slate-800 mb-4">
+                  <i class="fas fa-industry text-teal-600 mr-2"></i>
+                  物理特性
+                </h3>
+                <div class="space-y-3 text-sm">
+                  <div class="flex justify-between">
+                    <span class="text-slate-600">制造工艺</span>
+                    <span class="font-medium">3nm (TSMC)</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-600">TDP范围</span>
+                    <span class="font-medium">230W-420W可配置</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-600">典型配置</span>
+                    <span class="font-medium">300W</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-600">核心密度</span>
+                    <span class="font-medium">0.45核/W</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-gradient-to-r from-teal-50 to-blue-50 p-8 rounded-xl">
+            <h3 class="serif text-xl font-bold text-slate-800 mb-4">架构创新亮点</h3>
+            <div class="grid md:grid-cols-2 gap-6">
+              <div>
+                <h4 class="font-semibold text-slate-700 mb-2">AI加速特性</h4>
+                <ul class="space-y-1 text-sm text-slate-600">
+                  <li>• bfloat16/INT8 AI指令支持</li>
+                  <li>• SME2矩阵运算扩展</li>
+                  <li>• 面向推理和训练的专用优化</li>
+                  <li>• KleidiAI库优化集成</li>
+                </ul>
+              </div>
+              <div>
+                <h4 class="font-semibold text-slate-700 mb-2">设计哲学</h4>
+                <ul class="space-y-1 text-sm text-slate-600">
+                  <li>• 无SMT设计确保确定性性能</li>
+                  <li>• &#34;AI原生&#34;功能裁剪策略</li>
+                  <li>• 机架级部署优化</li>
+                  <li>• 开放生态系统支持</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Product Lineup -->
+      <section id="product-lineup" class="px-8 py-16 bg-slate-50">
+        <div class="max-w-6xl mx-auto">
+          <h2 class="serif text-3xl font-bold text-slate-900 mb-12">3. 产品型号与配置选项</h2>
+
+          <div class="grid lg:grid-cols-3 gap-8">
+            <div class="bg-white p-8 rounded-xl shadow-sm border-2 border-teal-200">
+              <div class="mb-6">
+                <span class="inline-block px-3 py-1 bg-teal-100 text-teal-800 text-sm font-medium rounded-full mb-3">旗舰版</span>
+                <h3 class="serif text-xl font-bold text-slate-800">SP113012</h3>
+                <p class="text-sm text-slate-600">136核心完整配置</p>
+              </div>
+
+              <div class="space-y-4 text-sm">
+                <div class="flex justify-between">
+                  <span class="text-slate-600">核心数</span>
+                  <span class="font-bold text-teal-700">136核</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-slate-600">频率</span>
+                  <span class="font-medium">3.2 GHz</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-slate-600">TDP</span>
+                  <span class="font-medium">300W</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-slate-600">定位</span>
+                  <span class="font-medium">最高密度AI基础设施</span>
+                </div>
+              </div>
+
+              <div class="mt-6 p-3 bg-teal-50 rounded-lg">
+                <p class="text-xs text-teal-700">
+                  面向超大规模LLM推理服务、高密度智能体编排平台
+                </p>
+              </div>
+            </div>
+
+            <div class="bg-white p-8 rounded-xl shadow-sm">
+              <div class="mb-6">
+                <span class="inline-block px-3 py-1 bg-slate-100 text-slate-700 text-sm font-medium rounded-full mb-3">精简版</span>
+                <h3 class="serif text-xl font-bold text-slate-800">SP113012S</h3>
+                <p class="text-sm text-slate-600">128核心配置</p>
+              </div>
+
+              <div class="space-y-4 text-sm">
+                <div class="flex justify-between">
+                  <span class="text-slate-600">核心数</span>
+                  <span class="font-medium">128核</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-slate-600">频率</span>
+                  <span class="font-medium">3.2 GHz</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-slate-600">TDP</span>
+                  <span class="font-medium">300W</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-slate-600">定位</span>
+                  <span class="font-medium">TCO优化场景</span>
+                </div>
+              </div>
+
+              <div class="mt-6 p-3 bg-slate-50 rounded-lg">
+                <p class="text-xs text-slate-600">
+                  通过屏蔽8核心实现更高良率和成本效益
+                </p>
+              </div>
+            </div>
+
+            <div class="bg-white p-8 rounded-xl shadow-sm">
+              <div class="mb-6">
+                <span class="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full mb-3">低核心版</span>
+                <h3 class="serif text-xl font-bold text-slate-800">SP113012A</h3>
+                <p class="text-sm text-slate-600">64核心配置</p>
+              </div>
+
+              <div class="space-y-4 text-sm">
+                <div class="flex justify-between">
+                  <span class="text-slate-600">核心数</span>
+                  <span class="font-medium">64核</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-slate-600">频率</span>
+                  <span class="font-medium">3.2 GHz</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-slate-600">TDP</span>
+                  <span class="font-medium">230W</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-slate-600">定位</span>
+                  <span class="font-medium">边缘/低功耗场景</span>
+                </div>
+              </div>
+
+              <div class="mt-6 p-3 bg-blue-50 rounded-lg">
+                <p class="text-xs text-blue-700">
+                  面向边缘AI节点、开发测试环境
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Documentation -->
+      <section id="documentation" class="px-8 py-16 bg-white">
+        <div class="max-w-6xl mx-auto">
+          <h2 class="serif text-3xl font-bold text-slate-900 mb-12">4. 官方文档与技术资料</h2>
+
+          <div class="grid md:grid-cols-2 gap-8">
+            <div class="space-y-6">
+              <div class="bg-slate-50 p-6 rounded-xl">
+                <h3 class="font-bold text-slate-800 mb-4">
+                  <i class="fas fa-file-alt text-teal-600 mr-2"></i>
+                  产品手册
+                </h3>
+                <div class="space-y-4">
+                  <div>
+                    <h4 class="font-semibold text-slate-700 text-sm mb-1">Arm AGI CPU Product Brief</h4>
+                    <p class="text-xs text-slate-600">
+                      首要技术概述文档，包含核心规格、差异化价值主张
+                      <a href="https://www.arm.com/products/cloud-datacenter/arm-agi-cpu" class="citation">[319]</a>
+                    </p>
+                  </div>
+                  <div>
+                    <h4 class="font-semibold text-slate-700 text-sm mb-1">技术参考手册 (TRM)</h4>
+                    <p class="text-xs text-slate-600">
+                      面向系统开发者的详细技术规格，需要NDA获取
+                    </p>
+                  </div>
+                  <div>
+                    <h4 class="font-semibold text-slate-700 text-sm mb-1">系统开发指南</h4>
+                    <p class="text-xs text-slate-600">
+                      面向OEM/ODM的主板设计、固件开发指导
+                      <a href="https://news.mydrivers.com/1/1111/1111445.htm" class="citation">[320]</a>
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-slate-50 p-6 rounded-xl">
+                <h3 class="font-bold text-slate-800 mb-4">
+                  <i class="fas fa-sitemap text-teal-600 mr-2"></i>
+                  架构文档
+                </h3>
+                <div class="space-y-4">
+                  <div>
+                    <h4 class="font-semibold text-slate-700 text-sm mb-1">Neoverse V3微架构白皮书</h4>
+                    <p class="text-xs text-slate-600">
+                      深入解析V3架构设计哲学和技术创新
+                      <a href="https://www.arm.com/products/silicon-ip-cpu/neoverse/neoverse-v3" class="citation">[355]</a>
+                    </p>
+                  </div>
+                  <div>
+                    <h4 class="font-semibold text-slate-700 text-sm mb-1">Armv9.2-A架构参考手册</h4>
+                    <p class="text-xs text-slate-600">
+                      完整指令集架构定义，编译器和OS开发基础
+                    </p>
+                  </div>
+                  <div>
+                    <h4 class="font-semibold text-slate-700 text-sm mb-1">内存一致性模型文档</h4>
+                    <p class="text-xs text-slate-600">
+                      多核心/多插槽配置的内存访问规则定义
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-6">
+              <div class="bg-slate-50 p-6 rounded-xl">
+                <h3 class="font-bold text-slate-800 mb-4">
+                  <i class="fas fa-server text-teal-600 mr-2"></i>
+                  参考设计
+                </h3>
+                <div class="space-y-4">
+                  <div>
+                    <h4 class="font-semibold text-slate-700 text-sm mb-1">1OU双节点参考服务器</h4>
+                    <p class="text-xs text-slate-600">
+                      OCP DC-MHS标准兼容设计，30刀片/42U配置提供8,160核心
+                      <a href="https://www.linkedin.com/pulse/arm-just-changed-rules-why-first-arm-designed-cpu-matters-ryan-shrout-60dze" class="citation">[259]</a>
+                    </p>
+                  </div>
+                  <div>
+                    <h4 class="font-semibold text-slate-700 text-sm mb-1">液冷200kW机架方案</h4>
+                    <p class="text-xs text-slate-600">
+                      与Supermicro合作，336颗AGI CPU提供45,000+核心
+                      <a href="https://www.eet-china.com/news/202603305908.html" class="citation">[307]</a>
+                    </p>
+                  </div>
+                  <div>
+                    <h4 class="font-semibold text-slate-700 text-sm mb-1">36kW标准机架配置</h4>
+                    <p class="text-xs text-slate-600">
+                      主流风冷部署方案，适配现有数据中心基础设施
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-gradient-to-br from-teal-50 to-blue-50 p-6 rounded-xl">
+                <h3 class="font-bold text-slate-800 mb-4">
+                  <i class="fas fa-code text-teal-600 mr-2"></i>
+                  软件生态
+                </h3>
+                <div class="space-y-3 text-sm">
+                  <div>
+                    <span class="font-medium text-slate-700">操作系统：</span>
+                    <span class="text-slate-600">Ubuntu, RHEL, SUSE Linux</span>
+                  </div>
+                  <div>
+                    <span class="font-medium text-slate-700">容器平台：</span>
+                    <span class="text-slate-600">Kubernetes, Docker</span>
+                  </div>
+                  <div>
+                    <span class="font-medium text-slate-700">AI框架：</span>
+                    <span class="text-slate-600">PyTorch, TensorFlow, ONNX Runtime</span>
+                  </div>
+                  <div>
+                    <span class="font-medium text-slate-700">优化库：</span>
+                    <span class="text-slate-600">KleidiAI, XNNPACK</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scenarios -->
+      <section id="scenarios" class="px-8 py-16 bg-slate-50">
+        <div class="max-w-6xl mx-auto">
+          <h2 class="serif text-3xl font-bold text-slate-900 mb-12">5. 使用场景与部署模式</h2>
+
+          <div class="mb-12">
+            <h3 class="serif text-xl font-bold text-slate-800 mb-8">核心应用场景</h3>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div class="bg-white p-6 rounded-xl shadow-sm">
+                <div class="w-12 h-12 bg-teal-100 rounded-lg flex items-center justify-center mb-4">
+                  <i class="fas fa-project-diagram text-teal-600"></i>
+                </div>
+                <h4 class="font-bold text-slate-800 mb-2">AI代理编排</h4>
+                <p class="text-xs text-slate-600 mb-3">
+                  智能体系统的协调处理器，负责任务调度、状态管理、工具调用
+                </p>
+                <div class="text-xs text-slate-500">
+                  <i class="fas fa-check text-teal-500 mr-1"></i>
+                  核心设计目标
+                </div>
+              </div>
+
+              <div class="bg-white p-6 rounded-xl shadow-sm">
+                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                  <i class="fas fa-language text-blue-600"></i>
+                </div>
+                <h4 class="font-bold text-slate-800 mb-2">LLM推理服务</h4>
+                <p class="text-xs text-slate-600 mb-3">
+                  预处理、GPU协调、后处理、纯CPU中小模型推理
+                </p>
+                <div class="text-xs text-slate-500">
+                  <i class="fas fa-check text-blue-500 mr-1"></i>
+                  高内存带宽优势
+                </div>
+              </div>
+
+              <div class="bg-white p-6 rounded-xl shadow-sm">
+                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+                  <i class="fas fa-search text-purple-600"></i>
+                </div>
+                <h4 class="font-bold text-slate-800 mb-2">RAG工作负载</h4>
+                <p class="text-xs text-slate-600 mb-3">
+                  查询嵌入、向量搜索、文档重排序、上下文整合全流程优化
+                </p>
+                <div class="text-xs text-slate-500">
+                  <i class="fas fa-check text-purple-500 mr-1"></i>
+                  向量检索加速
+                </div>
+              </div>
+
+              <div class="bg-white p-6 rounded-xl shadow-sm">
+                <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
+                  <i class="fas fa-database text-indigo-600"></i>
+                </div>
+                <h4 class="font-bold text-slate-800 mb-2">向量数据库</h4>
+                <p class="text-xs text-slate-600 mb-3">
+                  十亿级向量索引内存驻留，亚毫秒级相似度检索
+                </p>
+                <div class="text-xs text-slate-500">
+                  <i class="fas fa-check text-indigo-500 mr-1"></i>
+                  大容量内存优势
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid lg:grid-cols-2 gap-12">
+            <div>
+              <h3 class="serif text-xl font-bold text-slate-800 mb-6">数据中心部署模式</h3>
+              <div class="space-y-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm">
+                  <h4 class="font-semibold text-slate-800 mb-3">
+                    <i class="fas fa-cloud text-teal-600 mr-2"></i>
+                    云服务商大规模部署
+                  </h4>
+                  <div class="space-y-2 text-sm text-slate-600">
+                    <div class="flex items-start">
+                      <i class="fas fa-circle text-xs text-teal-400 mt-2 mr-2"></i>
+                      <span>超大规模云：Meta、OpenAI等吉瓦级基础设施</span>
+                    </div>
+                    <div class="flex items-start">
+                      <i class="fas fa-circle text-xs text-teal-400 mt-2 mr-2"></i>
+                      <span>区域云：差异化竞争、供应链多元化</span>
+                    </div>
+                    <div class="flex items-start">
+                      <i class="fas fa-circle text-xs text-teal-400 mt-2 mr-2"></i>
+                      <span>AI原生云：异构计算集群、极致性能追求</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm">
+                  <h4 class="font-semibold text-slate-800 mb-3">
+                    <i class="fas fa-building text-blue-600 mr-2"></i>
+                    企业私有AI基础设施
+                  </h4>
+                  <div class="space-y-2 text-sm text-slate-600">
+                    <div class="flex items-start">
+                      <i class="fas fa-circle text-xs text-blue-400 mt-2 mr-2"></i>
+                      <span>数据主权：敏感数据本地处理</span>
+                    </div>
+                    <div class="flex items-start">
+                      <i class="fas fa-circle text-xs text-blue-400 mt-2 mr-2"></i>
+                      <span>定制化：行业特定模型和工作流程</span>
+                    </div>
+                    <div class="flex items-start">
+                      <i class="fas fa-circle text-xs text-blue-400 mt-2 mr-2"></i>
+                      <span>供应链安全：避免单一供应商锁定</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="serif text-xl font-bold text-slate-800 mb-6">软件生态支持</h3>
+              <div class="space-y-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm">
+                  <h4 class="font-semibold text-slate-800 mb-3">
+                    <i class="fas fa-linux text-orange-600 mr-2"></i>
+                    操作系统支持
+                  </h4>
+                  <div class="grid grid-cols-3 gap-4 text-sm">
+                    <div class="text-center">
+                      <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                        <i class="fab fa-ubuntu text-orange-600"></i>
+                      </div>
+                      <span class="text-slate-600">Ubuntu</span>
+                    </div>
+                    <div class="text-center">
+                      <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                        <i class="fab fa-redhat text-red-600"></i>
+                      </div>
+                      <span class="text-slate-600">RHEL</span>
+                    </div>
+                    <div class="text-center">
+                      <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                        <i class="fab fa-linux text-green-600"></i>
+                      </div>
+                      <span class="text-slate-600">SUSE</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm">
+                  <h4 class="font-semibold text-slate-800 mb-3">
+                    <i class="fas fa-cube text-blue-600 mr-2"></i>
+                    AI框架优化
+                  </h4>
+                  <div class="space-y-2 text-sm text-slate-600">
+                    <div class="flex items-center">
+                      <i class="fas fa-fire text-red-500 mr-2"></i>
+                      <span>PyTorch - XNNPACK/KleidiAI后端</span>
+                    </div>
+                    <div class="flex items-center">
+                      <i class="fas fa-brain text-orange-500 mr-2"></i>
+                      <span>TensorFlow - XLA编译器优化</span>
+                    </div>
+                    <div class="flex items-center">
+                      <i class="fas fa-exchange-alt text-blue-500 mr-2"></i>
+                      <span>ONNX Runtime - Arm NN集成</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Performance -->
+      <section id="performance" class="px-8 py-16 bg-white">
+        <div class="max-w-6xl mx-auto">
+          <h2 class="serif text-3xl font-bold text-slate-900 mb-12">6. 性能分析与SPECINT 2017估算</h2>
+
+          <div class="grid lg:grid-cols-3 gap-8 mb-12">
+            <div class="bg-slate-50 p-6 rounded-xl">
+              <h3 class="font-bold text-slate-800 mb-4">
+                <i class="fas fa-chart-line text-teal-600 mr-2"></i>
+                性能基准参考
+              </h3>
+              <div class="space-y-3 text-sm">
+                <div class="flex justify-between items-center">
+                  <span class="text-slate-600">Neoverse V1</span>
+                  <span class="font-bold">5.68</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-slate-600">Neoverse V2</span>
+                  <span class="font-bold">7.14</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-slate-600">Google Axion N4A</span>
+                  <span class="font-bold">7.16</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-slate-600">Qualcomm Oryon</span>
+                  <span class="font-bold">10.64</span>
+                </div>
+              </div>
+              <p class="text-xs text-slate-500 mt-3">
+                数据来源：<a href="https://jia.je/benchmark/" class="citation">[358]</a>
+              </p>
+            </div>
+
+            <div class="bg-slate-50 p-6 rounded-xl">
+              <h3 class="font-bold text-slate-800 mb-4">
+                <i class="fas fa-calculator text-blue-600 mr-2"></i>
+                估算方法
+              </h3>
+              <div class="space-y-3 text-sm">
+                <div>
+                  <span class="text-slate-600">IPC提升：</span>
+                  <span class="font-medium">V3较V2提升15%</span>
+                </div>
+                <div>
+                  <span class="text-slate-600">频率提升：</span>
+                  <span class="font-medium">3.7/2.8 = 1.32×</span>
+                </div>
+                <div>
+                  <span class="text-slate-600">综合系数：</span>
+                  <span class="font-medium">1.15 × 1.32 ≈ 1.52</span>
+                </div>
+                <div class="pt-2 border-t border-slate-200">
+                  <span class="text-slate-600">基准：</span>
+                  <span class="font-medium">7.14 (Graviton 4)</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-teal-50 to-blue-50 p-6 rounded-xl">
+              <h3 class="font-bold text-slate-800 mb-4">
+                <i class="fas fa-trophy text-teal-600 mr-2"></i>
+                估算结果
+              </h3>
+              <div class="text-center mb-4">
+                <div class="text-3xl font-bold text-teal-700 mb-1">~10.85</div>
+                <div class="text-sm text-slate-600">SPECint2017 Rate-1</div>
+              </div>
+              <div class="space-y-2 text-xs text-slate-600">
+                <div class="flex justify-between">
+                  <span>保守估算：</span>
+                  <span>~9.4 (3.2 GHz)</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>典型估算：</span>
+                  <span>~10.3 (3.5 GHz)</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>峰值估算：</span>
+                  <span class="font-medium">~10.85 (3.7 GHz)</span>
+                </div>
+              </div>
+              <p class="text-xs text-slate-500 mt-3">
+                不确定性：±10%
+              </p>
+            </div>
+          </div>
+
+          <div class="bg-white border border-slate-200 rounded-xl p-8">
+            <h3 class="serif text-xl font-bold text-slate-800 mb-6">性能分析洞察</h3>
+            <div class="grid md:grid-cols-3 gap-6">
+              <div class="text-center">
+                <div class="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <i class="fas fa-crown text-teal-600 text-xl"></i>
+                </div>
+                <h4 class="font-bold text-slate-800 mb-2">超越x86服务器</h4>
+                <p class="text-sm text-slate-600">
+                  估算成绩超越所有x86服务器处理器，包括AMD EPYC 9K65 (7.78)
+                  和Intel Xeon 6982P-C (6.90)
+                </p>
+              </div>
+
+              <div class="text-center">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <i class="fas fa-balance-scale text-blue-600 text-xl"></i>
+                </div>
+                <h4 class="font-bold text-slate-800 mb-2">能效与性能平衡</h4>
+                <p class="text-sm text-slate-600">
+                  在300W TDP约束和136核密度下实现性能领先，
+                  核心密度0.45核/W显著优于x86竞品
+                </p>
+              </div>
+
+              <div class="text-center">
+                <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <i class="fas fa-microchip text-purple-600 text-xl"></i>
+                </div>
+                <h4 class="font-bold text-slate-800 mb-2">架构效率验证</h4>
+                <p class="text-sm text-slate-600">
+                  相对保守频率(3.7 GHz)下实现高单线程性能，
+                  验证Arm架构在服务器场景的效率优势
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Comparison -->
+      <section id="comparison" class="px-8 py-16 bg-slate-50">
+        <div class="max-w-7xl mx-auto">
+          <h2 class="serif text-3xl font-bold text-slate-900 mb-12">7. 业界主流处理器对比</h2>
+
+          <div class="bg-white border border-slate-200 rounded-xl overflow-hidden mb-12">
+            <div class="px-8 py-6 bg-slate-50 border-b border-slate-200">
+              <h3 class="font-bold text-slate-800">单线程性能对比 (SPECint2017 Rate-1)</h3>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead class="bg-slate-50">
+                  <tr>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700">处理器</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700">架构</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700">频率</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700">SPECint2017</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700">备注</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200">
+                  <tr class="bg-teal-50">
+                    <td class="px-6 py-4 font-semibold text-slate-800">Arm AGI CPU</td>
+                    <td class="px-6 py-4 text-sm text-slate-600">Neoverse V3</td>
+                    <td class="px-6 py-4 text-sm text-slate-600">3.7 GHz</td>
+                    <td class="px-6 py-4 font-bold text-teal-700">~10.85</td>
+                    <td class="px-6 py-4 text-xs text-slate-500">估算值</td>
+                  </tr>
+                  <tr>
+                    <td class="px-6 py-4 font-medium text-slate-700">Qualcomm Oryon</td>
+                    <td class="px-6 py-4 text-sm text-slate-600">Oryon</td>
+                    <td class="px-6 py-4 text-sm text-slate-600">~4.3 GHz</td>
+                    <td class="px-6 py-4 font-medium text-slate-700">10.64</td>
+                    <td class="px-6 py-4 text-xs text-slate-500">消费级</td>
+                  </tr>
+                  <tr>
+                    <td class="px-6 py-4 font-medium text-slate-700">AMD Ryzen 9 9950X</td>
+                    <td class="px-6 py-4 text-sm text-slate-600">Zen 5</td>
+                    <td class="px-6 py-4 text-sm text-slate-600">5.7 GHz</td>
+                    <td class="px-6 py-4 font-medium text-slate-700">11.9-12.9</td>
+                    <td class="px-6 py-4 text-xs text-slate-500">消费级旗舰</td>
+                  </tr>
+                  <tr>
+                    <td class="px-6 py-4 font-medium text-slate-700">AMD EPYC 9R45</td>
+                    <td class="px-6 py-4 text-sm text-slate-600">Zen 5</td>
+                    <td class="px-6 py-4 text-sm text-slate-600">4.5 GHz</td>
+                    <td class="px-6 py-4 font-medium text-slate-700">9.07</td>
+                    <td class="px-6 py-4 text-xs text-slate-500">服务器</td>
+                  </tr>
+                  <tr>
+                    <td class="px-6 py-4 font-medium text-slate-700">AMD EPYC 9755</td>
+                    <td class="px-6 py-4 text-sm text-slate-600">Zen 5</td>
+                    <td class="px-6 py-4 text-sm text-slate-600">4.1 GHz</td>
+                    <td class="px-6 py-4 font-medium text-slate-700">8.97</td>
+                    <td class="px-6 py-4 text-xs text-slate-500">服务器</td>
+                  </tr>
+                  <tr>
+                    <td class="px-6 py-4 font-medium text-slate-700">Intel Xeon 6982P-C</td>
+                    <td class="px-6 py-4 text-sm text-slate-600">Redwood Cove</td>
+                    <td class="px-6 py-4 text-sm text-slate-600">3.6 GHz</td>
+                    <td class="px-6 py-4 font-medium text-slate-700">6.90</td>
+                    <td class="px-6 py-4 text-xs text-slate-500">服务器</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="grid lg:grid-cols-2 gap-8 mb-12">
+            <div class="bg-white p-8 rounded-xl shadow-sm">
+              <h3 class="font-bold text-slate-800 mb-6">规格参数综合对比</h3>
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                  <thead>
+                    <tr class="border-b border-slate-200">
+                      <th class="py-2 text-left font-semibold text-slate-700">特性</th>
+                      <th class="py-2 text-left font-semibold text-teal-700">Arm AGI CPU</th>
+                      <th class="py-2 text-left font-semibold text-slate-700">AMD EPYC 9005</th>
+                      <th class="py-2 text-left font-semibold text-slate-700">Intel Xeon 6</th>
+                    </tr>
+                  </thead>
+                  <tbody class="space-y-1">
+                    <tr>
+                      <td class="py-2 text-slate-600">最大核心数</td>
+                      <td class="py-2 font-medium text-teal-700">136</td>
+                      <td class="py-2 text-slate-600">128-192</td>
+                      <td class="py-2 text-slate-600">64-144</td>
+                    </tr>
+                    <tr>
+                      <td class="py-2 text-slate-600">制程工艺</td>
+                      <td class="py-2 font-medium text-teal-700">3nm</td>
+                      <td class="py-2 text-slate-600">3nm/4nm</td>
+                      <td class="py-2 text-slate-600">Intel 3</td>
+                    </tr>
+                    <tr>
+                      <td class="py-2 text-slate-600">典型TDP</td>
+                      <td class="py-2 font-medium text-teal-700">300W</td>
+                      <td class="py-2 text-slate-600">200-500W</td>
+                      <td class="py-2 text-slate-600">150-500W</td>
+                    </tr>
+                    <tr>
+                      <td class="py-2 text-slate-600">核心密度</td>
+                      <td class="py-2 font-medium text-teal-700">0.45核/W</td>
+                      <td class="py-2 text-slate-600">0.26-0.38</td>
+                      <td class="py-2 text-slate-600">0.29-0.41</td>
+                    </tr>
+                    <tr>
+                      <td class="py-2 text-slate-600">内存通道</td>
+                      <td class="py-2 font-medium text-teal-700">12×DDR5-8800</td>
+                      <td class="py-2 text-slate-600">12×DDR5-6400</td>
+                      <td class="py-2 text-slate-600">8×DDR5-6400</td>
+                    </tr>
+                    <tr>
+                      <td class="py-2 text-slate-600">每核带宽</td>
+                      <td class="py-2 font-medium text-teal-700">~6 GB/s</td>
+                      <td class="py-2 text-slate-600">~3-4 GB/s</td>
+                      <td class="py-2 text-slate-600">~2.5-3.5 GB/s</td>
+                    </tr>
+                    <tr>
+                      <td class="py-2 text-slate-600">PCIe</td>
+                      <td class="py-2 font-medium text-teal-700">96×Gen6</td>
+                      <td class="py-2 text-slate-600">128×Gen5</td>
+                      <td class="py-2 text-slate-600">80×Gen5</td>
+                    </tr>
+                    <tr>
+                      <td class="py-2 text-slate-600">CXL</td>
+                      <td class="py-2 font-medium text-teal-700">3.0</td>
+                      <td class="py-2 text-slate-600">2.0/3.0</td>
+                      <td class="py-2 text-slate-600">2.0</td>
+                    </tr>
+                    <tr>
+                      <td class="py-2 text-slate-600">SMT</td>
+                      <td class="py-2 font-medium text-teal-700">无</td>
+                      <td class="py-2 text-slate-600">有</td>
+                      <td class="py-2 text-slate-600">有</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="bg-white p-8 rounded-xl shadow-sm">
+              <h3 class="font-bold text-slate-800 mb-6">能效与总拥有成本</h3>
+              <div class="space-y-6">
+                <div>
+                  <h4 class="font-semibold text-slate-700 mb-3">机架级性能优势</h4>
+                  <div class="space-y-2 text-sm text-slate-600">
+                    <div class="flex justify-between">
+                      <span>核心密度优势：</span>
+                      <span class="font-medium">136核 vs 64-128核</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span>内存带宽优势：</span>
+                      <span class="font-medium">6 GB/s vs 2-3 GB/s</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span>机架性能宣称：</span>
+                      <span class="font-medium text-teal-700">2倍x86性能</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 class="font-semibold text-slate-700 mb-3">TCO优势</h4>
+                  <div class="space-y-2 text-sm text-slate-600">
+                    <div class="flex items-start">
+                      <i class="fas fa-circle text-xs text-teal-400 mt-2 mr-2"></i>
+                      <span>更少服务器数量（核心密度2×+）</span>
+                    </div>
+                    <div class="flex items-start">
+                      <i class="fas fa-circle text-xs text-teal-400 mt-2 mr-2"></i>
+                      <span>简化散热设计（液冷PUE&lt;1.1）</span>
+                    </div>
+                    <div class="flex items-start">
+                      <i class="fas fa-circle text-xs text-teal-400 mt-2 mr-2"></i>
+                      <span>降低电力基础设施投资</span>
+                    </div>
+                    <div class="flex items-start">
+                      <i class="fas fa-circle text-xs text-teal-400 mt-2 mr-2"></i>
+                      <span>统一软件栈减少维护成本</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Summary -->
+      <section id="summary" class="px-8 py-16 bg-white">
+        <div class="max-w-6xl mx-auto">
+          <h2 class="serif text-3xl font-bold text-slate-900 mb-12">8. 总结与评估</h2>
+
+          <div class="grid lg:grid-cols-2 gap-12 mb-12">
+            <div class="space-y-8">
+              <div class="bg-gradient-to-br from-teal-50 to-green-50 p-8 rounded-xl">
+                <h3 class="serif text-xl font-bold text-slate-800 mb-6">
+                  <i class="fas fa-star text-teal-600 mr-2"></i>
+                  核心优势
+                </h3>
+                <div class="space-y-4">
+                  <div>
+                    <h4 class="font-semibold text-slate-700 mb-2">极致核心密度与内存带宽</h4>
+                    <p class="text-sm text-slate-600">
+                      136核/12ch DDR5-8800/6GB/s每核配置业界领先，
+                      直接针对AI工作负载内存密集型特征优化
+                    </p>
+                  </div>
+                  <div>
+                    <h4 class="font-semibold text-slate-700 mb-2">AI代理工作负载专用架构</h4>
+                    <p class="text-sm text-slate-600">
+                      无SMT确定性性能、&lt;100ns内存延迟、SME2矩阵加速， 每一项设计决策围绕AI代理编排需求展开 </p>
+                  </div>
+                  <div>
+                    <h4 class="font-semibold text-slate-700 mb-2">灵活TDP配置与扩展能力</h4>
+                    <p class="text-sm text-slate-600">
+                      230W-420W可配置TDP覆盖从边缘到超大规模完整部署谱系，
+                      风冷/液冷双方案降低采用门槛
+                    </p>
+                  </div>
+                  <div>
+                    <h4 class="font-semibold text-slate-700 mb-2">统一Arm生态软件栈</h4>
+                    <p class="text-sm text-slate-600">
+                      KleidiAI优化库、主流框架Arm后端、成熟Linux发行版支持，
+                      避免专有硬件生态风险
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-8">
+              <div class="bg-gradient-to-br from-orange-50 to-red-50 p-8 rounded-xl">
+                <h3 class="serif text-xl font-bold text-slate-800 mb-6">
+                  <i class="fas fa-exclamation-triangle text-orange-600 mr-2"></i>
+                  潜在挑战
+                </h3>
+                <div class="space-y-4">
+                  <div>
+                    <h4 class="font-semibold text-slate-700 mb-2">软件生态成熟度差距</h4>
+                    <p class="text-sm text-slate-600">
+                      特定企业软件、遗留系统、专业工具链的x86依赖性仍然存在，
+                      需要持续投入Arm移植和优化
+                    </p>
+                  </div>
+                  <div>
+                    <h4 class="font-semibold text-slate-700 mb-2">传统企业应用兼容性</h4>
+                    <p class="text-sm text-slate-600">
+                      &#34;AI原生&#34;设计主动放弃遗留兼容性，依赖传统x86指令集的应用
+                      可能需要评估替代方案
+                    </p>
+                  </div>
+                  <div>
+                    <h4 class="font-semibold text-slate-700 mb-2">市场接受度与供应链验证</h4>
+                    <p class="text-sm text-slate-600">
+                      作为Arm首款自研数据中心CPU，大规模部署验证、长期可靠性数据、
+                      供应链稳定性仍需时间积累
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-slate-50 p-8 rounded-xl">
+            <h3 class="serif text-xl font-bold text-slate-800 mb-6">适用性建议</h3>
+            <div class="grid md:grid-cols-3 gap-6">
+              <div class="bg-white p-6 rounded-lg shadow-sm">
+                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+                  <i class="fas fa-thumbs-up text-green-600"></i>
+                </div>
+                <h4 class="font-bold text-slate-800 mb-3">优先场景</h4>
+                <ul class="space-y-2 text-sm text-slate-600">
+                  <li class="flex items-start">
+                    <i class="fas fa-check text-green-500 mr-2 mt-0.5"></i>
+                    <span>大规模LLM推理服务</span>
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-check text-green-500 mr-2 mt-0.5"></i>
+                    <span>AI代理编排平台</span>
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-check text-green-500 mr-2 mt-0.5"></i>
+                    <span>RAG/向量数据库</span>
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-check text-green-500 mr-2 mt-0.5"></i>
+                    <span>GPU集群协调节点</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="bg-white p-6 rounded-lg shadow-sm">
+                <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mb-4">
+                  <i class="fas fa-exclamation-circle text-yellow-600"></i>
+                </div>
+                <h4 class="font-bold text-slate-800 mb-3">谨慎场景</h4>
+                <ul class="space-y-2 text-sm text-slate-600">
+                  <li class="flex items-start">
+                    <i class="fas fa-times text-red-500 mr-2 mt-0.5"></i>
+                    <span>依赖x86指令集应用</span>
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-times text-red-500 mr-2 mt-0.5"></i>
+                    <span>未经Arm移植验证软件</span>
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-times text-red-500 mr-2 mt-0.5"></i>
+                    <span>单线程绝对性能敏感场景</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="bg-white p-6 rounded-lg shadow-sm">
+                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                  <i class="fas fa-lightbulb text-blue-600"></i>
+                </div>
+                <h4 class="font-bold text-slate-800 mb-3">建议验证</h4>
+                <ul class="space-y-2 text-sm text-slate-600">
+                  <li class="flex items-start">
+                    <i class="fas fa-cog text-blue-500 mr-2 mt-0.5"></i>
+                    <span>关键应用性能基准测试</span>
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-search text-blue-500 mr-2 mt-0.5"></i>
+                    <span>软件兼容性评估</span>
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-chart-bar text-blue-500 mr-2 mt-0.5"></i>
+                    <span>TCO建模分析</span>
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-shield-alt text-blue-500 mr-2 mt-0.5"></i>
+                    <span>供应链尽职调查</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-12 text-center">
+            <p class="text-sm text-slate-500">
+              <i class="fas fa-info-circle mr-1"></i>
+              报告日期：2026-04-02
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Toggle TOC on mobile
+        document.getElementById('toc-toggle').addEventListener('click', function() {
+            const toc = document.querySelector('.toc-fixed');
+            const overlay = document.getElementById('toc-overlay');
+            const isOpen = toc.classList.contains('open');
+            
+            if (isOpen) {
+                toc.classList.remove('open');
+                overlay.style.display = 'none';
+            } else {
+                toc.classList.add('open');
+                overlay.style.display = 'block';
+            }
+        });
+
+        // Close TOC when clicking on overlay
+        document.getElementById('toc-overlay').addEventListener('click', function() {
+            const toc = document.querySelector('.toc-fixed');
+            toc.classList.remove('open');
+            this.style.display = 'none';
+        });
+
+        // Close TOC when clicking outside on mobile
+        document.addEventListener('click', function(e) {
+            const toc = document.querySelector('.toc-fixed');
+            const toggle = document.getElementById('toc-toggle');
+            const overlay = document.getElementById('toc-overlay');
+            
+            if (window.innerWidth <= 1024 && 
+                !toc.contains(e.target) && 
+                !toggle.contains(e.target) &&
+                overlay.style.display === 'block') {
+                toc.classList.remove('open');
+                overlay.style.display = 'none';
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const toc = document.querySelector('.toc-fixed');
+            const overlay = document.getElementById('toc-overlay');
+            
+            if (window.innerWidth > 1024) {
+                toc.classList.remove('open');
+                overlay.style.display = 'none';
+            }
+        });
+    </script>
+  
+
+</body></html>

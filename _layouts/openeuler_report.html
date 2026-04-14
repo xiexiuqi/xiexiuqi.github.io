@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% if page.title %}{{ page.title | escape }} - {{ site.title | escape }}{% else %}{{ site.title | escape }}{% endif %}</title>
+  <meta name="description" content="{{ page.excerpt | default: site.description | strip_html | normalize_whitespace | truncate: 160 | escape }}">
+  {% seo %}
+  <link rel="stylesheet" href="{{ "/assets/css/style.css" | relative_url }}">
+  {% feed_meta %}
+  <style>
+    .report-breadcrumb {
+      padding: 1rem 0;
+      font-size: 0.9rem;
+      color: #666;
+      border-bottom: 1px solid #e0e0e0;
+      margin-bottom: 1rem;
+    }
+    .report-breadcrumb a {
+      color: #2d5a87;
+      text-decoration: none;
+    }
+    .report-breadcrumb a:hover {
+      text-decoration: underline;
+    }
+    .report-actions {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .report-actions a {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .btn-atomgit {
+      background: #1e3a5f;
+      color: #fff;
+    }
+    .btn-dashboard {
+      background: #f5f7fa;
+      color: #333;
+      border: 1px solid #ddd;
+    }
+    .report-container {
+      background: #fff;
+      border-radius: 8px;
+      padding: 2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    @media (max-width: 600px) {
+      .report-container {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrapper">
+      <a class="site-title" href="{{ "/" | relative_url }}">{{ site.title | escape }}</a>
+      <nav class="site-nav">
+        <a href="{{ "/" | relative_url }}">首页</a>
+        <a href="{{ "/reports/" | relative_url }}">性能报告</a>
+        <a href="{{ "/daily/" | relative_url }}">日报</a>
+        <a href="{{ "/features/" | relative_url }}">特性分析</a>
+        <a href="{{ "/openeuler/" | relative_url }}">openEuler Kernel</a>
+        <a href="{{ "/search/" | relative_url }}">🔍</a>
+        <a href="{{ "/about/" | relative_url }}">关于</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-content">
+    <div class="wrapper">
+      <nav class="report-breadcrumb">
+        <a href="{{ "/openeuler/" | relative_url }}">openEuler Kernel</a> &gt;
+        <a href="{{ "/openeuler/dashboard/" | relative_url }}">Dashboard</a> &gt;
+        <a href="{{ "/openeuler/reviews/" | relative_url }}">归档</a>
+        {% if page.month %}&gt; <a href="{{ "/openeuler/reviews/" | relative_url }}">{{ page.month }}</a>{% endif %}
+        &gt; <span>PR {{ page.pr_id }}</span>
+      </nav>
+
+      <div class="report-actions">
+        {% if page.atomgit_url %}
+          <a href="{{ page.atomgit_url }}" class="btn-atomgit" target="_blank" rel="noopener">🔗 在 atomgit 上查看 MR</a>
+        {% endif %}
+        <a href="{{ "/openeuler/dashboard/" | relative_url }}" class="btn-dashboard">← 返回 Dashboard</a>
+        <a href="{{ "/openeuler/reviews/" | relative_url }}" class="btn-dashboard">← 返回归档</a>
+      </div>
+
+      <div class="report-container">
+        {{ content }}
+      </div>
+
+      <div class="ai-disclaimer">
+        <strong>⚠️ 免责声明</strong>
+        <p>本网站内容由 AI 工具辅助生成，仅供参考和学习使用。作者不对内容的准确性、完整性和适用性做任何保证。使用本站信息所造成的任何损失，作者不承担任何责任。请在生产环境使用前进行充分测试和验证。</p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrapper">
+      <p>专注于 Linux 内核与系统性能优化技术分享</p>
+      <p>&copy; {{ site.time | date: "%Y" }} All rights reserved.</p>
+      <p><a href="{{ "/about/" | relative_url }}">查看免责声明</a></p>
+    </div>
+  </footer>
+</body>
+</html>

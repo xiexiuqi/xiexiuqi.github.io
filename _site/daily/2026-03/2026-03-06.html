@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux 性能日报 - 2026年03月06日</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        header .date { font-size: 1.2em; opacity: 0.9; }
+        .summary {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .summary h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-card .number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .stat-card .label { color: #666; font-size: 0.9em; }
+        .category-section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .category-section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        .article-list { list-style: none; }
+        .article-item {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            transition: background 0.2s;
+        }
+        .article-item:last-child { border-bottom: none; }
+        .article-item:hover { background: #f8f9fa; }
+        .article-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .article-title a {
+            color: #333;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .article-title a:hover { color: #667eea; }
+        .article-meta {
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .article-summary {
+            color: #555;
+            font-size: 0.95em;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        .tags { margin-top: 10px; }
+        .tag {
+            display: inline-block;
+            padding: 3px 10px;
+            background: #e3f2fd;
+            color: #1976d2;
+            border-radius: 15px;
+            font-size: 0.8em;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        .tag.importance-high { background: #ffebee; color: #c62828; }
+        .tag.importance-medium { background: #fff3e0; color: #ef6c00; }
+        .tag.importance-low { background: #e8f5e9; color: #2e7d32; }
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 0.9em;
+        }
+        .highlight-box {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .highlight-box h3 {
+            color: #e65100;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        .highlight-box ul {
+            margin-left: 20px;
+            color: #555;
+        }
+        .highlight-box li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🐧 Linux 性能日报</h1>
+            <div class="date">2026年03月06日 | 周五</div>
+        </header>
+        
+        <div class="summary">
+            <h2>📊 今日概览</h2>
+            <p>本日报汇总了 <strong>5</strong> 篇 Linux 内核与基础设施技术相关的重要资讯，涵盖内核更新、内存管理、开发工具等多个领域。所有文章均经过性能相关性筛选，确保为读者提供有价值的技术洞察。</p>
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="number">5</div>
+                    <div class="label">总文章数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">2</div>
+                    <div class="label">高重要性</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">2</div>
+                    <div class="label">中等重要性</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">3</div>
+                    <div class="label">技术领域</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <h2>内存管理 (1篇)</h2>
+            <ul class="article-list">
+
+                <li class="article-item">
+                    <div class="article-title">
+                        <a href="https://lwn.net/Articles/1060967/" target="_blank" rel="noopener">
+                            🧠 重新审视多代LRU（MGLRU）算法
+                        </a>
+                    </div>
+                    <div class="article-meta">
+                        📰 LWN.net | 
+                        🕐 2026-03-05 |
+                        👤 corbet
+                    </div>
+                    <div class="article-summary">
+                        多代LRU（MGLRU）内存管理算法于2022年底合并到Linux 6.1内核，承诺提供更好的性能和更简洁的代码。然而，自合并以来，MGLRU的进展已经停滞，许多系统仍未启用此功能。随着2026年LSFMM+BPF峰会的临近，内存管理开发者将讨论MGLRU的未来，有人寻求改进方案，也有人建议完全移除它。
+                    </div>
+                    <div class="tags">
+                        <span class="tag importance-高">重要性: 高</span>
+                        <span class="tag">性能评分: 14分</span>
+                    </div>
+                </li>
+
+            </ul>
+        </div>
+
+        <div class="category-section">
+            <h2>开发工具 (2篇)</h2>
+            <ul class="article-list">
+
+                <li class="article-item">
+                    <div class="article-title">
+                        <a href="https://lwn.net/Articles/1061543/" target="_blank" rel="noopener">
+                            🛠️ Buildroot 2026.02 版本发布
+                        </a>
+                    </div>
+                    <div class="article-meta">
+                        📰 LWN.net | 
+                        🕐 2026-03-05 |
+                        👤 jzb
+                    </div>
+                    <div class="article-summary">
+                        Buildroot 2026.02版本发布，这是一个用于通过交叉编译生成嵌入式Linux系统的工具。主要更新包括：新增对HPPA架构的支持、默认使用6.19.x内核头文件、改进SBOM生成功能。本次开发周期非常活跃，共有97位独立贡献者提交了超过1500个更改。
+                    </div>
+                    <div class="tags">
+                        <span class="tag importance-高">重要性: 高</span>
+                        <span class="tag">性能评分: 11分</span>
+                    </div>
+                </li>
+
+                <li class="article-item">
+                    <div class="article-title">
+                        <a href="https://lwn.net/Articles/1060024/" target="_blank" rel="noopener">
+                            🛠️ Magit和Majutsu：可发现的版本控制
+                        </a>
+                    </div>
+                    <div class="article-meta">
+                        📰 LWN.net | 
+                        🕐 2026-03-04 |
+                        👤 daroc
+                    </div>
+                    <div class="article-summary">
+                        Jujutsu是一个越来越受欢迎的Git兼容版本控制系统，专注于简化Git的概念模型。现在开发者正在为Jujutsu实现一个类似Magit的Emacs界面——Majutsu，让Emacs用户也能享受到更友好的版本控制体验，使版本控制操作更加直观和可发现。
+                    </div>
+                    <div class="tags">
+                        <span class="tag importance-中">重要性: 中</span>
+                        <span class="tag">性能评分: 6分</span>
+                    </div>
+                </li>
+
+            </ul>
+        </div>
+
+        <div class="category-section">
+            <h2>内核发布 (2篇)</h2>
+            <ul class="article-list">
+
+                <li class="article-item">
+                    <div class="article-title">
+                        <a href="https://lwn.net/Articles/1061524/" target="_blank" rel="noopener">
+                            🐧 新稳定版内核修复构建失败问题
+                        </a>
+                    </div>
+                    <div class="article-meta">
+                        📰 LWN.net | 
+                        🕐 2026-03-05 |
+                        👤 jzb
+                    </div>
+                    <div class="article-summary">
+                        Sasha Levin发布了6.12.76、6.6.129和6.1.166稳定版内核，修复了由Peter Schneider报告的回归问题。这些版本解决了6.12.75、6.6.128和6.1.165版本中的构建失败问题。仅建议遇到构建错误的用户升级。
+                    </div>
+                    <div class="tags">
+                        <span class="tag importance-中">重要性: 中</span>
+                        <span class="tag">性能评分: 9分</span>
+                    </div>
+                </li>
+
+                <li class="article-item">
+                    <div class="article-title">
+                        <a href="https://lwn.net/Articles/1061209/" target="_blank" rel="noopener">
+                            🐧 七个新的稳定版Linux内核
+                        </a>
+                    </div>
+                    <div class="article-meta">
+                        📰 LWN.net | 
+                        🕐 2026-03-04 |
+                        👤 jzb
+                    </div>
+                    <div class="article-summary">
+                        Sasha Levin发布了多个稳定版内核更新，包括6.19.6、6.18.16、6.12.75、6.6.128、6.1.165、5.15.202和5.10.252。每个版本都包含整个内核树的重要修复，建议这些内核的用户升级以获得更好的安全性和稳定性。
+                    </div>
+                    <div class="tags">
+                        <span class="tag importance-低">重要性: 低</span>
+                        <span class="tag">性能评分: 5分</span>
+                    </div>
+                </li>
+
+            </ul>
+        </div>
+
+        <div class="category-section">
+            <h2>🔥 重点推荐</h2>
+            <div class="highlight-box">
+                <h3>高优先级文章（性能评分≥10）</h3>
+                <ul>
+                    <li><strong>🧠 重新审视多代LRU（MGLRU）算法</strong> - 内存管理领域的重要讨论，可能决定MGLRU的未来走向，对Linux内存子系统发展有深远影响。</li>
+                    <li><strong>🛠️ Buildroot 2026.02版本发布</strong> - 嵌入式开发工具重大更新，新增HPPA架构支持和改进SBOM生成。</li>
+                </ul>
+            </div>
+        </div>
+
+        <footer>
+            <p>Linux 性能日报 - 每日自动收集和生成</p>
+            <p>数据来源: LWN.net, Kernel.org, Git</p>
+            <p>生成时间: 2026-03-06 09:35:41</p>
+        </footer>
+    </div>
+</body>
+</html>

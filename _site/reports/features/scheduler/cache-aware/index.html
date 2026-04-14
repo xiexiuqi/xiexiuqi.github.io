@@ -1,0 +1,2299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux Cache Aware Scheduling 深度洞察报告</title>
+    <script src="https://statics.moonshot.cn/kimi-ppt/html-gen/static/tailwindcss@4_0805.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.0/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdmirror.com/npm/mathjax@3.2.2/es5/tex-svg.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .ppt-slide {
+                @apply relative w-[1280px] h-[720px] mx-auto p-[40px] box-border overflow-hidden mb-[40px];
+            }
+        }
+    </style>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #F1F5F9;
+        }
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 py-8">
+    <!-- 第1页：封面 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="cover">
+        <div class="absolute inset-0 bg-gradient-to-br from-[#3B82F6]/20 via-transparent to-[#06B6D4]/20"></div>
+        <div class="relative h-full flex flex-col justify-center items-center text-center">
+            <div class="mb-8">
+                <i class="fas fa-microchip text-7xl text-[#3B82F6] mb-6"></i>
+            </div>
+            <h1 class="text-6xl font-bold text-[#F1F5F9] mb-6 leading-tight">
+                Linux Cache Aware Scheduling
+            </h1>
+            <h2 class="text-3xl font-light text-[#06B6D4] mb-8">
+                深度洞察报告
+            </h2>
+            <p class="text-xl text-[#F1F5F9]/70 mb-12">
+                从讨论到实现的全历程分析 | 2025-2026
+            </p>
+            <div class="flex gap-6 text-sm text-[#F1F5F9]/50">
+                <span><i class="fas fa-calendar-alt mr-2"></i>2026年3月</span>
+                <span><i class="fas fa-code-branch mr-2"></i>Linux Kernel</span>
+                <span><i class="fas fa-server mr-2"></i>x86 / ARM64</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第2页：目录 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="table_of_contents">
+        <div class="h-full flex flex-col">
+            <h2 class="text-4xl font-bold text-[#F1F5F9] mb-12">目录</h2>
+            <div class="flex-1 grid grid-cols-2 gap-8">
+                <div class="space-y-6">
+                    <div class="flex items-center gap-4 p-5 bg-[#1E293B] rounded-xl border-l-4 border-[#3B82F6]">
+                        <span class="text-3xl font-bold text-[#3B82F6]">01</span>
+                        <div>
+                            <h3 class="text-xl font-semibold text-[#F1F5F9]">背景与动机</h3>
+                            <p class="text-sm text-[#F1F5F9]/60">为什么需要 Cache Aware Scheduling</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 p-5 bg-[#1E293B] rounded-xl border-l-4 border-[#06B6D4]">
+                        <span class="text-3xl font-bold text-[#06B6D4]">02</span>
+                        <div>
+                            <h3 class="text-xl font-semibold text-[#F1F5F9]">现代CPU缓存架构</h3>
+                            <p class="text-sm text-[#F1F5F9]/60">x86 和 ARM64 的缓存拓扑</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 p-5 bg-[#1E293B] rounded-xl border-l-4 border-[#F59E0B]">
+                        <span class="text-3xl font-bold text-[#F59E0B]">03</span>
+                        <div>
+                            <h3 class="text-xl font-semibold text-[#F1F5F9]">问题分析</h3>
+                            <p class="text-sm text-[#F1F5F9]/60">缓存不感知调度的性能损失</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 p-5 bg-[#1E293B] rounded-xl border-l-4 border-[#3B82F6]">
+                        <span class="text-3xl font-bold text-[#3B82F6]">04</span>
+                        <div>
+                            <h3 class="text-xl font-semibold text-[#F1F5F9]">社区讨论历程</h3>
+                            <p class="text-sm text-[#F1F5F9]/60">从问题发现到方案成型</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-6">
+                    <div class="flex items-center gap-4 p-5 bg-[#1E293B] rounded-xl border-l-4 border-[#06B6D4]">
+                        <span class="text-3xl font-bold text-[#06B6D4]">05</span>
+                        <div>
+                            <h3 class="text-xl font-semibold text-[#F1F5F9]">方案演进</h3>
+                            <p class="text-sm text-[#F1F5F9]/60">从v1到v6的完整技术演进</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 p-5 bg-[#1E293B] rounded-xl border-l-4 border-[#F59E0B]">
+                        <span class="text-3xl font-bold text-[#F59E0B]">06</span>
+                        <div>
+                            <h3 class="text-xl font-semibold text-[#F1F5F9]">核心实现原理</h3>
+                            <p class="text-sm text-[#F1F5F9]/60">深入代码层面的技术实现</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 p-5 bg-[#1E293B] rounded-xl border-l-4 border-[#3B82F6]">
+                        <span class="text-3xl font-bold text-[#3B82F6]">07</span>
+                        <div>
+                            <h3 class="text-xl font-semibold text-[#F1F5F9]">测试与验证</h3>
+                            <p class="text-sm text-[#F1F5F9]/60">性能数据与案例分析</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 p-5 bg-[#1E293B] rounded-xl border-l-4 border-[#06B6D4]">
+                        <span class="text-3xl font-bold text-[#06B6D4]">08</span>
+                        <div>
+                            <h3 class="text-xl font-semibold text-[#F1F5F9]">未来展望</h3>
+                            <p class="text-sm text-[#F1F5F9]/60">下一步发展方向</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第3页：章节过渡页 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="chapter">
+        <div class="absolute inset-0 bg-gradient-to-r from-[#3B82F6]/30 to-transparent"></div>
+        <div class="relative h-full flex flex-col justify-center">
+            <div class="text-9xl font-bold text-[#3B82F6]/20 mb-4">01</div>
+            <h2 class="text-5xl font-bold text-[#F1F5F9] mb-6">背景与动机</h2>
+            <p class="text-2xl text-[#F1F5F9]/70">为什么需要 Cache Aware Scheduling？</p>
+        </div>
+    </div>
+
+    <!-- 第4页：现代数据中心CPU的缓存拓扑演进 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="content">
+        <div class="h-full flex flex-col">
+            <h3 class="text-2xl font-bold text-[#F1F5F9] mb-6">现代数据中心CPU的缓存拓扑演进</h3>
+            <div class="flex-1 grid grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div class="p-4 bg-[#1E293B] rounded-lg border border-[#3B82F6]/30">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i class="fas fa-microchip text-[#3B82F6]"></i>
+                            <h4 class="text-lg font-semibold text-[#F1F5F9]">多LLC成为主流架构</h4>
+                        </div>
+                        <p class="text-sm text-[#F1F5F9]/70 leading-relaxed">
+                            现代服务器CPU（Intel Xeon、AMD EPYC、ARM64 Neoverse）普遍采用多Chiplet/Tile设计，每个Die拥有独立的Last Level Cache（LLC）
+                        </p>
+                    </div>
+                    <div class="p-4 bg-[#1E293B] rounded-lg border border-[#06B6D4]/30">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i class="fab fa-amd text-[#06B6D4]"></i>
+                            <h4 class="text-lg font-semibold text-[#F1F5F9]">AMD EPYC架构</h4>
+                        </div>
+                        <ul class="text-sm text-[#F1F5F9]/70 space-y-1">
+                            <li>• Rome→Genoa→Turin：CCD从8个增至12-16个</li>
+                            <li>• 每CCD 32MB L3，Genoa总计384MB L3</li>
+                            <li>• 分布在4个NUMA节点上</li>
+                        </ul>
+                    </div>
+                    <div class="p-4 bg-[#1E293B] rounded-lg border border-[#F59E0B]/30">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i class="fab fa-intel text-[#F59E0B]"></i>
+                            <h4 class="text-lg font-semibold text-[#F1F5F9]">Intel Xeon架构</h4>
+                        </div>
+                        <ul class="text-sm text-[#F1F5F9]/70 space-y-1">
+                            <li>• SPR：4 Tile设计，每Tile独立L3</li>
+                            <li>• Clearwater Forest：576MB LLC分布在3 Base Tile</li>
+                            <li>• 3D Foveros Direct封装技术</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div class="p-4 bg-[#1E293B] rounded-lg border border-[#3B82F6]/30">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i class="fas fa-microchip text-[#3B82F6]"></i>
+                            <h4 class="text-lg font-semibold text-[#F1F5F9]">ARM64 Neoverse</h4>
+                        </div>
+                        <ul class="text-sm text-[#F1F5F9]/70 space-y-1">
+                            <li>• DSU-120集群设计，支持8-192核心</li>
+                            <li>• 每核心集群共享L3缓存</li>
+                            <li>• CMN互联形成2D/3D mesh拓扑</li>
+                        </ul>
+                    </div>
+                    <div class="p-4 bg-gradient-to-br from-[#EF4444]/20 to-[#EF4444]/10 rounded-lg border border-[#EF4444]/50">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i class="fas fa-exclamation-triangle text-[#EF4444]"></i>
+                            <h4 class="text-lg font-semibold text-[#F1F5F9]">关键问题</h4>
+                        </div>
+                        <p class="text-sm text-[#F1F5F9]/80 leading-relaxed">
+                            Linux传统调度器将同一NUMA节点内的所有CPU视为等价，<span class="text-[#EF4444] font-semibold">忽略了LLC边界</span>，导致任务在不同LLC间"跳动"，产生严重的缓存抖动问题。
+                        </p>
+                    </div>
+                    <div class="flex justify-center">
+                        <img src="cache_topology.png" alt="缓存拓扑架构" class="rounded-lg max-h-[180px] object-contain">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第5页：缓存未命中的性能代价 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="content">
+        <div class="h-full flex flex-col">
+            <h3 class="text-2xl font-bold text-[#F1F5F9] mb-6">缓存未命中的性能代价</h3>
+            <div class="flex-1 grid grid-cols-5 gap-4 mb-6">
+                <div class="col-span-2 p-5 bg-[#1E293B] rounded-xl">
+                    <h4 class="text-lg font-semibold text-[#F1F5F9] mb-4">缓存层次延迟对比</h4>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-[#0F172A] rounded-lg">
+                            <span class="text-[#F1F5F9]">L1 Cache</span>
+                            <span class="text-[#3B82F6] font-mono font-bold">3-4 cycles</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-[#0F172A] rounded-lg">
+                            <span class="text-[#F1F5F9]">L2 Cache</span>
+                            <span class="text-[#06B6D4] font-mono font-bold">12-16 cycles</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-[#0F172A] rounded-lg">
+                            <span class="text-[#F1F5F9]">L3/LLC Cache</span>
+                            <span class="text-[#F59E0B] font-mono font-bold">40-60 cycles</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-[#0F172A] rounded-lg border border-[#EF4444]">
+                            <span class="text-[#F1F5F9]">Main Memory</span>
+                            <span class="text-[#EF4444] font-mono font-bold">200-300 cycles</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-span-3 p-5 bg-[#1E293B] rounded-xl">
+                    <h4 class="text-lg font-semibold text-[#F1F5F9] mb-4">缓存抖动场景</h4>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="p-3 bg-[#0F172A] rounded-lg">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i class="fas fa-users text-[#3B82F6]"></i>
+                                <span class="text-sm font-semibold text-[#F1F5F9]">多线程共享数据</span>
+                            </div>
+                            <p class="text-xs text-[#F1F5F9]/60">进程多线程共享堆内存，分散到不同LLC产生跨LLC流量</p>
+                        </div>
+                        <div class="p-3 bg-[#0F172A] rounded-lg">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i class="fas fa-exchange-alt text-[#06B6D4]"></i>
+                                <span class="text-sm font-semibold text-[#F1F5F9]">生产者-消费者</span>
+                            </div>
+                            <p class="text-xs text-[#F1F5F9]/60">数据在不同LLC间传递产生缓存一致性开销</p>
+                        </div>
+                        <div class="p-3 bg-[#0F172A] rounded-lg">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i class="fas fa-lock text-[#F59E0B]"></i>
+                                <span class="text-sm font-semibold text-[#F1F5F9]">锁竞争</span>
+                            </div>
+                            <p class="text-xs text-[#F1F5F9]/60">锁的缓存行在不同LLC间"乒乓"传输</p>
+                        </div>
+                        <div class="p-3 bg-[#0F172A] rounded-lg">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i class="fas fa-database text-[#EF4444]"></i>
+                                <span class="text-sm font-semibold text-[#F1F5F9]">数据库连接池</span>
+                            </div>
+                            <p class="text-xs text-[#F1F5F9]/60">连接处理线程共享查询缓存，分散调度导致失效</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 bg-gradient-to-r from-[#EF4444]/20 to-[#F59E0B]/20 rounded-xl border border-[#EF4444]/30">
+                <div class="flex items-center gap-4">
+                    <i class="fas fa-chart-line text-3xl text-[#EF4444]"></i>
+                    <div>
+                        <h4 class="text-lg font-semibold text-[#F1F5F9]">实际性能损失</h4>
+                        <p class="text-sm text-[#F1F5F9]/70">在数据库、Web服务器、科学计算等共享数据密集的工作负载中，<span class="text-[#F59E0B] font-bold">缓存抖动可导致20-50%的性能损失</span>。缓存未命中导致处理器流水线停顿，降低ILP利用率。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第6页：现有调度器机制的局限性 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="content">
+        <div class="h-full flex flex-col">
+            <h3 class="text-2xl font-bold text-[#F1F5F9] mb-6">现有调度器机制的局限性</h3>
+            <div class="flex-1 grid grid-cols-2 gap-5">
+                <div class="space-y-4">
+                    <div class="p-5 bg-[#1E293B] rounded-xl border-l-4 border-[#EF4444]">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fas fa-memory text-[#EF4444] text-xl"></i>
+                            <h4 class="text-lg font-semibold text-[#F1F5F9]">NUMA Balancing的不足</h4>
+                        </div>
+                        <p class="text-sm text-[#F1F5F9]/70 leading-relaxed">
+                            Linux现有的NUMA Balancing主要关注<span class="text-[#EF4444]">内存节点亲和性</span>，而非缓存亲和性。当多个LLC共享一个NUMA节点时（如AMD EPYC），NUMA Balancing无法区分不同LLC。
+                        </p>
+                    </div>
+                    <div class="p-5 bg-[#1E293B] rounded-xl border-l-4 border-[#F59E0B]">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fas fa-balance-scale text-[#F59E0B] text-xl"></i>
+                            <h4 class="text-lg font-semibold text-[#F1F5F9]">CFS负载均衡的盲区</h4>
+                        </div>
+                        <p class="text-sm text-[#F1F5F9]/70 leading-relaxed">
+                            CFS（完全公平调度器）的负载均衡以<span class="text-[#F59E0B]">CPU负载为唯一指标</span>，不考虑任务的数据共享模式。负载均衡器可能将共享数据的任务分散到不同LLC。
+                        </p>
+                    </div>
+                    <div class="p-5 bg-[#1E293B] rounded-xl border-l-4 border-[#06B6D4]">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fas fa-bed text-[#06B6D4] text-xl"></i>
+                            <h4 class="text-lg font-semibold text-[#F1F5F9]">Wake-up路径的短视</h4>
+                        </div>
+                        <p class="text-sm text-[#F1F5F9]/70 leading-relaxed">
+                            任务唤醒时的CPU选择（select_idle_sibling）只考虑<span class="text-[#06B6D4]">空闲状态和简单拓扑</span>，不追踪任务的历史缓存访问模式。
+                        </p>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div class="p-5 bg-[#1E293B] rounded-xl border-l-4 border-[#3B82F6]">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fas fa-layer-group text-[#3B82F6] text-xl"></i>
+                            <h4 class="text-lg font-semibold text-[#F1F5F9]">SMT/核心/LLC层次混淆</h4>
+                        </div>
+                        <p class="text-sm text-[#F1F5F9]/70 leading-relaxed">
+                            调度器虽然能识别SMT、MC（内存控制器）、NUMA层次，但<span class="text-[#3B82F6]">缺乏对LLC边界的显式处理</span>。
+                        </p>
+                    </div>
+                    <div class="p-5 bg-[#1E293B] rounded-xl border-l-4 border-[#8B5CF6]">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fas fa-cog text-[#8B5CF6] text-xl"></i>
+                            <h4 class="text-lg font-semibold text-[#F1F5F9]">静态调度特征</h4>
+                        </div>
+                        <p class="text-sm text-[#F1F5F9]/70 leading-relaxed">
+                            现有机制<span class="text-[#8B5CF6]">无法动态适应</span>工作负载的缓存访问特征，缺乏运行时反馈机制。
+                        </p>
+                    </div>
+                    <div class="p-5 bg-gradient-to-br from-[#3B82F6]/20 to-[#06B6D4]/20 rounded-xl border border-[#3B82F6]/50">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fas fa-lightbulb text-[#F59E0B] text-xl"></i>
+                            <h4 class="text-lg font-semibold text-[#F1F5F9]">核心洞察</h4>
+                        </div>
+                        <p class="text-sm text-[#F1F5F9]/80 leading-relaxed">
+                            调度器需要理解"共享数据的任务应该尽可能在同一个LLC上运行"这一核心原则，而不是仅仅追求CPU负载的数值均衡。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 第7页：章节过渡页 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="chapter">
+        <div class="absolute inset-0 bg-gradient-to-r from-[#06B6D4]/30 to-transparent"></div>
+        <div class="relative h-full flex flex-col justify-center">
+            <div class="text-9xl font-bold text-[#06B6D4]/20 mb-4">02</div>
+            <h2 class="text-5xl font-bold text-[#F1F5F9] mb-6">现代CPU缓存架构详解</h2>
+            <p class="text-2xl text-[#F1F5F9]/70">深入理解 x86 和 ARM64 的缓存拓扑</p>
+        </div>
+    </div>
+
+    <!-- 第8页：AMD EPYC 缓存架构演进 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="content">
+        <div class="h-full flex flex-col">
+            <h3 class="text-2xl font-bold text-[#F1F5F9] mb-5">AMD EPYC 缓存架构演进</h3>
+            <div class="flex-1">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="bg-[#1E293B]">
+                            <th class="p-3 text-left text-[#F1F5F9] font-semibold rounded-tl-lg">架构</th>
+                            <th class="p-3 text-left text-[#F1F5F9] font-semibold">CCD数</th>
+                            <th class="p-3 text-left text-[#F1F5F9] font-semibold">核心/CCX</th>
+                            <th class="p-3 text-left text-[#F1F5F9] font-semibold">L3/CCD</th>
+                            <th class="p-3 text-left text-[#F1F5F9] font-semibold">总L3</th>
+                            <th class="p-3 text-left text-[#F1F5F9] font-semibold">NUMA</th>
+                            <th class="p-3 text-left text-[#F1F5F9] font-semibold rounded-tr-lg">内存</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-[#F1F5F9]/80">
+                        <tr class="bg-[#1E293B]/50 border-b border-[#334155]">
+                            <td class="p-3 font-semibold text-[#06B6D4]">Rome (Zen 2)</td>
+                            <td class="p-3">8</td>
+                            <td class="p-3">4×2 CCX</td>
+                            <td class="p-3">32MB</td>
+                            <td class="p-3">256MB</td>
+                            <td class="p-3">4节点</td>
+                            <td class="p-3">8×DDR4</td>
+                        </tr>
+                        <tr class="bg-[#1E293B]/30 border-b border-[#334155]">
+                            <td class="p-3 font-semibold text-[#06B6D4]">Milan (Zen 3)</td>
+                            <td class="p-3">8</td>
+                            <td class="p-3">8×1 CCX</td>
+                            <td class="p-3">32MB</td>
+                            <td class="p-3">256MB</td>
+                            <td class="p-3">4节点</td>
+                            <td class="p-3">8×DDR4</td>
+                        </tr>
+                        <tr class="bg-[#1E293B]/50 border-b border-[#334155]">
+                            <td class="p-3 font-semibold text-[#F59E0B]">Milan-X</td>
+                            <td class="p-3">8</td>
+                            <td class="p-3">8×1 CCX</td>
+                            <td class="p-3">96MB</td>
+                            <td class="p-3">768MB</td>
+                            <td class="p-3">4节点</td>
+                            <td class="p-3">8×DDR4</td>
+                        </tr>
+                        <tr class="bg-[#1E293B]/30 border-b border-[#334155]">
+                            <td class="p-3 font-semibold text-[#3B82F6]">Genoa (Zen 4)</td>
+                            <td class="p-3">12</td>
+                            <td class="p-3">8×1 CCX</td>
+                            <td class="p-3">32MB</td>
+                            <td class="p-3">384MB</td>
+                            <td class="p-3">4节点</td>
+                            <td class="p-3">12×DDR5</td>
+                        </tr>
+                        <tr class="bg-[#1E293B]/50 border-b border-[#334155]">
+                            <td class="p-3 font-semibold text-[#F59E0B]">Genoa-X</td>
+                            <td class="p-3">12</td>
+                            <td class="p-3">8×1 CCX</td>
+                            <td class="p-3">96MB</td>
+                            <td class="p-3">1152MB</td>
+                            <td class="p-3">4节点</td>
+                            <td class="p-3">12×DDR5</td>
+                        </tr>
+                        <tr class="bg-[#1E293B]/30">
+                            <td class="p-3 font-semibold text-[#8B5CF6]">Turin (Zen 5)</td>
+                            <td class="p-3">16</td>
+                            <td class="p-3">8×1 CCX</td>
+                            <td class="p-3">32MB</td>
+                            <td class="p-3">384MB</td>
+                            <td class="p-3">4-8节点</td>
+                            <td class="p-3">12×DDR5</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-4 p-4 bg-gradient-to-r from-[#3B82F6]/20 to-[#06B6D4]/20 rounded-xl border border-[#3B82F6]/30">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-chart-bar text-[#F59E0B] text-2xl"></i>
+                    <p class="text-sm text-[#F1F5F9]/80">
+                        <span class="font-semibold text-[#F1F5F9]">关键观察：</span>从Rome到Turin，CCD数量增加，每个NUMA节点的LLC数量也在增加。Genoa每NUMA节点有3个LLC，调度复杂度显著提升，这正是Cache Aware Scheduling的价值所在。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第9页：Intel Xeon 缓存架构演进 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="content">
+        <div class="h-full flex flex-col">
+            <h3 class="text-2xl font-bold text-[#F1F5F9] mb-5">Intel Xeon 缓存架构演进</h3>
+            <div class="flex-1 grid grid-cols-2 gap-5">
+                <div class="space-y-4">
+                    <div class="p-4 bg-[#1E293B] rounded-xl border-l-4 border-[#3B82F6]">
+                        <h4 class="text-lg font-semibold text-[#3B82F6] mb-2">Sapphire Rapids (2022)</h4>
+                        <ul class="text-sm text-[#F1F5F9]/70 space-y-1">
+                            <li>• 4 Tile设计，每Tile独立L3</li>
+                            <li>• 支持HBM2e内存</li>
+                            <li>• EMIB 2.5D封装技术</li>
+                            <li>• 最多60核心</li>
+                        </ul>
+                    </div>
+                    <div class="p-4 bg-[#1E293B] rounded-xl border-l-4 border-[#06B6D4]">
+                        <h4 class="text-lg font-semibold text-[#06B6D4] mb-2">Granite Rapids (2024)</h4>
+                        <ul class="text-sm text-[#F1F5F9]/70 space-y-1">
+                            <li>• Intel 3工艺</li>
+                            <li>• 最多128核心</li>
+                            <li>• 12通道DDR5-6400</li>
+                            <li>• 支持MRDIMM</li>
+                        </ul>
+                    </div>
+                    <div class="p-4 bg-[#1E293B] rounded-xl border-l-4 border-[#F59E0B]">
+                        <h4 class="text-lg font-semibold text-[#F59E0B] mb-2">Clearwater Forest (2026)</h4>
+                        <ul class="text-sm text-[#F1F5F9]/70 space-y-1">
+                            <li>• Intel 18A工艺</li>
+                            <li>• 最多288 Darkmont E-core</li>
+                            <li>• 3D Foveros Direct封装</li>
+                            <li>• 576MB LLC</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="p-5 bg-[#1E293B] rounded-xl">
+                    <h4 class="text-lg font-semibold text-[#F1F5F9] mb-4">Clearwater Forest 架构详情</h4>
+                    <div class="space-y-3">
+                        <div class="p-3 bg-[#0F172A] rounded-lg">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm font-semibold text-[#3B82F6]">Compute Tile (Intel 18A)</span>
+                                <span class="text-xs text-[#F1F5F9]/50">12个</span>
+                            </div>
+                            <p class="text-xs text-[#F1F5F9]/60">每Tile 24核心，6模块×4核心，每模块4MB L2</p>
+                        </div>
+                        <div class="p-3 bg-[#0F172A] rounded-lg">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm font-semibold text-[#06B6D4]">Base Tile (Intel 3)</span>
+                                <span class="text-xs text-[#F1F5F9]/50">3个</span>
+                            </div>
+                            <p class="text-xs text-[#F1F5F9]/60">每Tile 192MB LLC，4 DDR5控制器</p>
+                        </div>
+                        <div class="p-3 bg-[#0F172A] rounded-lg">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm font-semibold text-[#F59E0B]">I/O Tile (Intel 7)</span>
+                                <span class="text-xs text-[#F1F5F9]/50">2个</span>
+                            </div>
+                            <p class="text-xs text-[#F1F5F9]/60">PCIe Gen5, CXL 2.0, UPI 2.0</p>
+                        </div>
+                        <div class="p-3 bg-gradient-to-r from-[#3B82F6]/20 to-[#F59E0B]/20 rounded-lg border border-[#F59E0B]/50">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-semibold text-[#F1F5F9]">总LLC容量</span>
+                                <span class="text-xl font-bold text-[#F59E0B]">576MB</span>
+                            </div>
+                            <p class="text-xs text-[#F1F5F9]/60 mt-1">分布在3个Base Tile上，每Tile被4个Compute Tile共享</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 p-3 bg-[#1E293B]/50 rounded-lg">
+                <p class="text-xs text-[#F1F5F9]/60">
+                    <i class="fas fa-info-circle text-[#3B82F6] mr-2"></i>
+                    Intel的LLC设计更复杂，Clearwater Forest形成层次化缓存结构，需要调度器理解这种拓扑关系。
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第10页：ARM64 Neoverse 缓存架构 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="content">
+        <div class="h-full flex flex-col">
+            <h3 class="text-2xl font-bold text-[#F1F5F9] mb-5">ARM64 Neoverse 缓存架构</h3>
+            <div class="flex-1 grid grid-cols-3 gap-5">
+                <div class="p-5 bg-[#1E293B] rounded-xl">
+                    <div class="flex items-center gap-2 mb-4">
+                        <i class="fas fa-microchip text-[#3B82F6] text-2xl"></i>
+                        <h4 class="text-lg font-semibold text-[#F1F5F9]">Neoverse N2</h4>
+                    </div>
+                    <div class="space-y-2 text-sm text-[#F1F5F9]/70">
+                        <p><span class="text-[#3B82F6]">架构：</span>Armv9 (2021)</p>
+                        <p><span class="text-[#3B82F6]">DSU：</span>DSU-110</p>
+                        <p><span class="text-[#3B82F6]">核心：</span>8-64核心</p>
+                        <p><span class="text-[#3B82F6]">L2：</span>每核心1MB</p>
+                        <p><span class="text-[#3B82F6]">L3：</span>最大64MB共享</p>
+                        <p><span class="text-[#3B82F6]">扩展：</span>SVE2支持</p>
+                    </div>
+                </div>
+                <div class="p-5 bg-[#1E293B] rounded-xl">
+                    <div class="flex items-center gap-2 mb-4">
+                        <i class="fas fa-microchip text-[#06B6D4] text-2xl"></i>
+                        <h4 class="text-lg font-semibold text-[#F1F5F9]">Neoverse N3</h4>
+                    </div>
+                    <div class="space-y-2 text-sm text-[#F1F5F9]/70">
+                        <p><span class="text-[#06B6D4]">架构：</span>Armv9.2 (2025)</p>
+                        <p><span class="text-[#06B6D4]">DSU：</span>DSU-120</p>
+                        <p><span class="text-[#06B6D4]">核心：</span>8-192核心</p>
+                        <p><span class="text-[#06B6D4]">L2：</span>每核心2MB</p>
+                        <p><span class="text-[#06B6D4]">提升：</span>Perf/Watt +20%</p>
+                        <p><span class="text-[#06B6D4]">ML：</span>3x性能提升</p>
+                    </div>
+                </div>
+                <div class="p-5 bg-[#1E293B] rounded-xl">
+                    <div class="flex items-center gap-2 mb-4">
+                        <i class="fas fa-microchip text-[#F59E0B] text-2xl"></i>
+                        <h4 class="text-lg font-semibold text-[#F1F5F9]">Neoverse V3</h4>
+                    </div>
+                    <div class="space-y-2 text-sm text-[#F1F5F9]/70">
+                        <p><span class="text-[#F59E0B]">架构：</span>Armv9.2 (2025)</p>
+                        <p><span class="text-[#F59E0B]">定位：</span>高性能计算</p>
+                        <p><span class="text-[#F59E0B]">优化：</span>云计算/AI</p>
+                        <p><span class="text-[#F59E0B]">向量：</span>更大向量单元</p>
+                        <p><span class="text-[#F59E0B]">缓存：</span>增强一致性</p>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-5 p-5 bg-[#1E293B] rounded-xl">
+                <h4 class="text-lg font-semibold text-[#F1F5F9] mb-3">CMN (Coherent Mesh Network) 互联</h4>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="p-3 bg-[#0F172A] rounded-lg">
+                        <p class="text-sm text-[#F1F5F9]/70">
+                            <i class="fas fa-network-wired text-[#3B82F6] mr-2"></i>
+                            ARM64服务器使用<span class="text-[#3B82F6] font-semibold">CMN互联</span>，形成2D/3D mesh拓扑，缓存一致性通过分布式目录实现
+                        </p>
+                    </div>
+                    <div class="p-3 bg-[#0F172A] rounded-lg">
+                        <p class="text-sm text-[#F1F5F9]/70">
+                            <i class="fas fa-layer-group text-[#06B6D4] mr-2"></i>
+                            Linux支持DIE、MC、CLUSTER等多个层次，需要处理<span class="text-[#06B6D4] font-semibold">更复杂的缓存拓扑</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第11页：章节过渡页 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="chapter">
+        <div class="absolute inset-0 bg-gradient-to-r from-[#F59E0B]/30 to-transparent"></div>
+        <div class="relative h-full flex flex-col justify-center">
+            <div class="text-9xl font-bold text-[#F59E0B]/20 mb-4">03</div>
+            <h2 class="text-5xl font-bold text-[#F1F5F9] mb-6">问题分析</h2>
+            <p class="text-2xl text-[#F1F5F9]/70">缓存不感知调度带来的性能损失</p>
+        </div>
+    </div>
+
+    <!-- 第12页：缓存抖动场景分析 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="content">
+        <div class="h-full flex flex-col">
+            <h3 class="text-2xl font-bold text-[#F1F5F9] mb-5">缓存抖动场景分析</h3>
+            <div class="flex-1 grid grid-cols-2 gap-5">
+                <div class="space-y-4">
+                    <div class="p-5 bg-[#1E293B] rounded-xl border-l-4 border-[#3B82F6]">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 bg-[#3B82F6]/20 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-users text-[#3B82F6]"></i>
+                            </div>
+                            <h4 class="text-lg font-semibold text-[#F1F5F9]">场景1：多线程共享数据</h4>
+                        </div>
+                        <p class="text-sm text-[#F1F5F9]/70 leading-relaxed">
+                            一个进程的多个线程共享堆内存，如果被调度到不同LLC，每次数据共享都产生<span class="text-[#EF4444]">跨LLC流量</span>，严重降低性能。
+                        </p>
+                    </div>
+                    <div class="p-5 bg-[#1E293B] rounded-xl border-l-4 border-[#06B6D4]">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 bg-[#06B6D4]/20 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-exchange-alt text-[#06B6D4]"></i>
+                            </div>
+                            <h4 class="text-lg font-semibold text-[#F1F5F9]">场景2：生产者-消费者</h4>
+                        </div>
+                        <p class="text-sm text-[#F1F5F9]/70 leading-relaxed">
+                            一个线程生产数据，另一个线程消费，如果两者在不同LLC，每次数据传递都产生<span class="text-[#EF4444]">缓存一致性开销</span>。
+                        </p>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div class="p-5 bg-[#1E293B] rounded-xl border-l-4 border-[#F59E0B]">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 bg-[#F59E0B]/20 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-lock text-[#F59E0B]"></i>
+                            </div>
+                            <h4 class="text-lg font-semibold text-[#F1F5F9]">场景3：锁竞争</h4>
+                        </div>
+                        <p class="text-sm text-[#F1F5F9]/70 leading-relaxed">
+                            多个线程竞争同一锁，锁的缓存行在不同LLC间<span class="text-[#EF4444]">"乒乓"传输</span>，严重降低性能。
+                        </p>
+                    </div>
+                    <div class="p-5 bg-[#1E293B] rounded-xl border-l-4 border-[#EF4444]">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 bg-[#EF4444]/20 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-database text-[#EF4444]"></i>
+                            </div>
+                            <h4 class="text-lg font-semibold text-[#F1F5F9]">场景4：数据库连接池</h4>
+                        </div>
+                        <p class="text-sm text-[#F1F5F9]/70 leading-relaxed">
+                            数据库服务器的连接处理线程共享查询缓存和连接状态，分散调度导致<span class="text-[#EF4444]">缓存失效</span>。
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 p-4 bg-gradient-to-r from-[#EF4444]/20 to-[#F59E0B]/20 rounded-xl border border-[#EF4444]/30">
+                <div class="flex items-center gap-4">
+                    <i class="fas fa-exclamation-triangle text-3xl text-[#EF4444]"></i>
+                    <div>
+                        <h4 class="text-lg font-semibold text-[#F1F5F9]">性能损失量化</h4>
+                        <p class="text-sm text-[#F1F5F9]/70">根据Intel和AMD的测试，这些场景下性能损失可达<span class="text-[#F59E0B] font-bold text-lg">20-50%</span>，极端情况下更高。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第13页：Linux调度器负载均衡机制回顾 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="content">
+        <div class="h-full flex flex-col">
+            <h3 class="text-2xl font-bold text-[#F1F5F9] mb-5">Linux调度器负载均衡机制回顾</h3>
+            <div class="flex-1 grid grid-cols-2 gap-5">
+                <div class="space-y-4">
+                    <div class="p-4 bg-[#1E293B] rounded-xl">
+                        <h4 class="text-lg font-semibold text-[#3B82F6] mb-3">调度域（Sched Domain）层次</h4>
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-3 p-2 bg-[#0F172A] rounded-lg">
+                                <span class="px-2 py-1 bg-[#3B82F6]/20 text-[#3B82F6] text-xs rounded">L0</span>
+                                <span class="text-sm text-[#F1F5F9]">SMT（超线程）</span>
+                            </div>
+                            <div class="flex items-center gap-3 p-2 bg-[#0F172A] rounded-lg">
+                                <span class="px-2 py-1 bg-[#06B6D4]/20 text-[#06B6D4] text-xs rounded">L1</span>
+                                <span class="text-sm text-[#F1F5F9]">MC（内存控制器）</span>
+                            </div>
+                            <div class="flex items-center gap-3 p-2 bg-[#0F172A] rounded-lg">
+                                <span class="px-2 py-1 bg-[#F59E0B]/20 text-[#F59E0B] text-xs rounded">L2</span>
+                                <span class="text-sm text-[#F1F5F9]">DIE/LLC</span>
+                            </div>
+                            <div class="flex items-center gap-3 p-2 bg-[#0F172A] rounded-lg">
+                                <span class="px-2 py-1 bg-[#EF4444]/20 text-[#EF4444] text-xs rounded">L3</span>
+                                <span class="text-sm text-[#F1F5F9]">NUMA</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-[#1E293B] rounded-xl">
+                        <h4 class="text-lg font-semibold text-[#06B6D4] mb-3">负载均衡触发条件</h4>
+                        <ul class="text-sm text-[#F1F5F9]/70 space-y-1">
+                            <li>• tick时检查不平衡</li>
+                            <li>• 任务唤醒时</li>
+                            <li>• CPU空闲时</li>
+                            <li>• fork/exec时</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div class="p-4 bg-[#1E293B] rounded-xl">
+                        <h4 class="text-lg font-semibold text-[#F59E0B] mb-3">负载均衡算法</h4>
+                        <div class="p-3 bg-[#0F172A] rounded-lg">
+                            <p class="text-sm text-[#F1F5F9]/70 leading-relaxed">
+                                从顶层域（NUMA）向下遍历，找到最忙的调度组，选择任务迁移到轻载CPU。
+                            </p>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-gradient-to-br from-[#EF4444]/20 to-[#F59E0B]/20 rounded-xl border border-[#EF4444]/50">
+                        <h4 class="text-lg font-semibold text-[#EF4444] mb-3"><i class="fas fa-bug mr-2"></i>现有缺陷</h4>
+                        <p class="text-sm text-[#F1F5F9]/80 leading-relaxed">
+                            负载均衡只考虑"<span class="text-[#F59E0B]">负载</span>"（运行队列长度和任务权重），不考虑"<span class="text-[#3B82F6]">缓存亲和性</span>"。一个"高负载"的LLC可能只是因为聚集了共享数据的任务，迁移它们反而降低性能。
+                        </p>
+                    </div>
+                    <div class="p-4 bg-[#1E293B] rounded-xl">
+                        <h4 class="text-lg font-semibold text-[#8B5CF6] mb-3">迁移成本估算</h4>
+                        <p class="text-sm text-[#F1F5F9]/70">
+                            当前调度器对不同层次的迁移成本有粗略估计（SMT低、NUMA高），但<span class="text-[#EF4444]">缺乏对LLC边界的显式处理</span>。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 第14页：章节过渡页 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="chapter">
+        <div class="absolute inset-0 bg-gradient-to-r from-[#3B82F6]/30 to-transparent"></div>
+        <div class="relative h-full flex flex-col justify-center">
+            <div class="text-9xl font-bold text-[#3B82F6]/20 mb-4">04</div>
+            <h2 class="text-5xl font-bold text-[#F1F5F9] mb-6">社区讨论历程</h2>
+            <p class="text-2xl text-[#F1F5F9]/70">从问题发现到方案成型的完整时间线</p>
+        </div>
+    </div>
+
+    <!-- 第15页：讨论起源 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="content">
+        <div class="h-full flex flex-col">
+            <h3 class="text-2xl font-bold text-[#F1F5F9] mb-5">讨论起源：Peter Zijlstra 的原型</h3>
+            <div class="flex-1 grid grid-cols-5 gap-5">
+                <div class="col-span-3 space-y-4">
+                    <div class="p-4 bg-[#1E293B] rounded-xl">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fas fa-calendar text-[#3B82F6]"></i>
+                            <span class="text-lg font-semibold text-[#F1F5F9]">2025年3月</span>
+                        </div>
+                        <p class="text-sm text-[#F1F5F9]/70 leading-relaxed">
+                            Peter Zijlstra（Linux调度器核心维护者）在LKML发布首个<span class="text-[#3B82F6] font-semibold">Cache Aware Scheduling原型补丁</span>，开启了这一重要特性的讨论。
+                        </p>
+                    </div>
+                    <div class="p-4 bg-[#1E293B] rounded-xl">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fas fa-lightbulb text-[#F59E0B]"></i>
+                            <span class="text-lg font-semibold text-[#F1F5F9]">核心思想</span>
+                        </div>
+                        <p class="text-sm text-[#F1F5F9]/70 leading-relaxed">
+                            追踪每个进程的"<span class="text-[#F59E0B] font-semibold">最热LLC</span>"（hottest LLC），即该进程线程运行时间最长的LLC，优先将任务调度到该LLC。
+                        </p>
+                    </div>
+                    <div class="p-4 bg-[#1E293B] rounded-xl">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fas fa-code text-[#06B6D4]"></i>
+                            <span class="text-lg font-semibold text-[#F1F5F9]">实现机制</span>
+                        </div>
+                        <ul class="text-sm text-[#F1F5F9]/70 space-y-1">
+                            <li>• 在<span class="text-[#06B6D4]">task_struct</span>中添加preferred_llc字段</li>
+                            <li>• 在<span class="text-[#06B6D4]">mm_struct</span>中维护每个LLC的运行时间统计</li>
+                            <li>• 任务唤醒时优先选择preferred LLC中的CPU</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-span-2 space-y-4">
+                    <div class="p-4 bg-gradient-to-br from-[#3B82F6]/20 to-[#06B6D4]/20 rounded-xl border border-[#3B82F6]/50">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fas fa-comments text-[#3B82F6]"></i>
+                            <span class="text-lg font-semibold text-[#F1F5F9]">社区反馈</span>
+                        </div>
+                        <p class="text-sm text-[#F1F5F9]/80 leading-relaxed">
+                            初步反馈积极，但指出需要处理：
+                        </p>
+                        <ul class="text-sm text-[#F1F5F9]/70 mt-2 space-y-1">
+                            <li>• NUMA Balancing的冲突</li>
+                            <li>• 避免过度聚合</li>
+                            <li>• LLC大小差异</li>
+                        </ul>
+                    </div>
+                    <div class="p-4 bg-[#1E293B] rounded-xl">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fas fa-envelope text-[#F59E0B]"></i>
+                            <span class="text-lg font-semibold text-[#F1F5F9]">RFC v1发布</span>
+                        </div>
+                        <p class="text-sm text-[#F1F5F9]/70">
+                            <span class="text-[#F59E0B] font-mono">2025年3月25日</span><br>
+                            Peter发布正式RFC补丁集，包含基础框架和初步实现
+                        </p>
+                    </div>
+                    <div class="p-4 bg-[#1E293B] rounded-xl">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i class="fas fa-user-circle text-[#06B6D4]"></i>
+                            <span class="text-sm font-semibold text-[#F1F5F9]">Peter Zijlstra</span>
+                        </div>
+                        <p class="text-xs text-[#F1F5F9]/60">
+                            Linux调度器核心维护者，CFS主要开发者之一，Red Hat资深工程师
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第16页：Intel团队的接管与扩展 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="content">
+        <div class="h-full flex flex-col">
+            <h3 class="text-2xl font-bold text-[#F1F5F9] mb-5">Intel团队的接管与扩展</h3>
+            <div class="flex-1 grid grid-cols-2 gap-5">
+                <div class="space-y-4">
+                    <div class="p-5 bg-[#1E293B] rounded-xl">
+                        <h4 class="text-lg font-semibold text-[#3B82F6] mb-4">核心开发者</h4>
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-3 p-3 bg-[#0F172A] rounded-lg">
+                                <div class="w-10 h-10 bg-[#3B82F6]/20 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-[#3B82F6]"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-semibold text-[#F1F5F9]">Tim Chen</p>
+                                    <p class="text-xs text-[#F1F5F9]/60">Intel，主要开发者</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 p-3 bg-[#0F172A] rounded-lg">
+                                <div class="w-10 h-10 bg-[#06B6D4]/20 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-[#06B6D4]"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-semibold text-[#F1F5F9]">Chen Yu</p>
+                                    <p class="text-xs text-[#F1F5F9]/60">Intel，主要开发者</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-5 bg-gradient-to-br from-[#06B6D4]/20 to-[#3B82F6]/20 rounded-xl border border-[#06B6D4]/50">
+                        <h4 class="text-lg font-semibold text-[#F1F5F9] mb-3">开发目标</h4>
+                        <p class="text-sm text-[#F1F5F9]/80 leading-relaxed">
+                            将原型发展为<span class="text-[#06B6D4] font-semibold">可合入主线的生产级代码</span>，解决社区反馈的问题。
+                        </p>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div class="p-5 bg-[#1E293B] rounded-xl">
+                        <h4 class="text-lg font-semibold text-[#F59E0B] mb-4">关键改进方向</h4>
+                        <div class="space-y-2">
+                            <div class="flex items-start gap-2 p-2 bg-[#0F172A] rounded-lg">
+                                <span class="text-[#F59E0B] font-bold">1</span>
+                                <p class="text-sm text-[#F1F5F9]/70">与NUMA Balancing的协调</p>
+                            </div>
+                            <div class="flex items-start gap-2 p-2 bg-[#0F172A] rounded-lg">
+                                <span class="text-[#F59E0B] font-bold">2</span>
+                                <p class="text-sm text-[#F1F5F9]/70">避免过度聚合导致的负载不均</p>
+                            </div>
+                            <div class="flex items-start gap-2 p-2 bg-[#0F172A] rounded-lg">
+                                <span class="text-[#F59E0B] font-bold">3</span>
+                                <p class="text-sm text-[#F1F5F9]/70">支持动态LLC拓扑（CPU热插拔）</p>
+                            </div>
+                            <div class="flex items-start gap-2 p-2 bg-[#0F172A] rounded-lg">
+                                <span class="text-[#F59E0B] font-bold">4</span>
+                                <p class="text-sm text-[#F1F5F9]/70">添加调试和调优接口</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-5 bg-[#1E293B] rounded-xl">
+                        <h4 class="text-lg font-semibold text-[#06B6D4] mb-3">测试平台</h4>
+                        <div class="space-y-2 text-sm text-[#F1F5F9]/70">
+                            <p><i class="fab fa-intel text-[#06B6D4] mr-2"></i>Intel Sapphire Rapids（2 socket，30核心/socket，2 LLC）</p>
+                            <p><i class="fab fa-amd text-[#F59E0B] mr-2"></i>AMD Genoa（4 NUMA节点，32 CPU/节点，2 CCX/节点）</p>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-[#0F172A] rounded-lg">
+                        <p class="text-xs text-[#F1F5F9]/60">
+                            <i class="fas fa-handshake text-[#3B82F6] mr-2"></i>
+                            AMD工程师K Prateek Nayak、Gautham R. Shenoy参与测试和优化，确保在AMD平台的效果
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第17页：Linux Plumbers Conference 2025 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="content">
+        <div class="h-full flex flex-col">
+            <h3 class="text-2xl font-bold text-[#F1F5F9] mb-5">Linux Plumbers Conference 2025 讨论</h3>
+            <div class="flex-1 grid grid-cols-5 gap-5">
+                <div class="col-span-2 space-y-4">
+                    <div class="p-5 bg-gradient-to-br from-[#3B82F6]/20 to-[#06B6D4]/20 rounded-xl border border-[#3B82F6]/50">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i class="fas fa-calendar-alt text-[#3B82F6] text-2xl"></i>
+                            <div>
+                                <p class="text-sm text-[#F1F5F9]/60">会议信息</p>
+                                <p class="text-lg font-semibold text-[#F1F5F9]">2025年11月，东京</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-[#F1F5F9]/70">Linux Plumbers Conference（LPC）</p>
+                    </div>
+                    <div class="p-5 bg-[#1E293B] rounded-xl">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i class="fas fa-users text-[#06B6D4] text-2xl"></i>
+                            <div>
+                                <p class="text-sm text-[#F1F5F9]/60">演讲者</p>
+                                <p class="text-lg font-semibold text-[#F1F5F9]">Tim Chen, Chen Yu</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-[#F1F5F9]/70">Intel工程师</p>
+                    </div>
+                    <div class="p-5 bg-[#1E293B] rounded-xl">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fas fa-presentation text-[#F59E0B] text-xl"></i>
+                            <span class="text-lg font-semibold text-[#F1F5F9]">演讲主题</span>
+                        </div>
+                        <p class="text-sm text-[#F1F5F9]/70 italic">
+                            "Cache Aware Scheduling - Improving Performance on Modern CPUs"
+                        </p>
+                    </div>
+                </div>
+                <div class="col-span-3 p-5 bg-[#1E293B] rounded-xl">
+                    <h4 class="text-lg font-semibold text-[#F1F5F9] mb-4">主要讨论点</h4>
+                    <div class="space-y-3">
+                        <div class="p-4 bg-[#0F172A] rounded-lg border-l-4 border-[#3B82F6]">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="px-2 py-1 bg-[#3B82F6]/20 text-[#3B82F6] text-xs rounded font-bold">1</span>
+                                <span class="text-sm font-semibold text-[#F1F5F9]">用户接口设计</span>
+                            </div>
+                            <p class="text-sm text-[#F1F5F9]/70">是否需要通过cgroups或prctl暴露调度策略控制</p>
+                        </div>
+                        <div class="p-4 bg-[#0F172A] rounded-lg border-l-4 border-[#06B6D4]">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="px-2 py-1 bg-[#06B6D4]/20 text-[#06B6D4] text-xs rounded font-bold">2</span>
+                                <span class="text-sm font-semibold text-[#F1F5F9]">任务分组扩展</span>
+                            </div>
+                            <p class="text-sm text-[#F1F5F9]/70">除了进程级别，是否支持NUMA组、waker/wakee关系、用户定义组</p>
+                        </div>
+                        <div class="p-4 bg-[#0F172A] rounded-lg border-l-4 border-[#F59E0B]">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="px-2 py-1 bg-[#F59E0B]/20 text-[#F59E0B] text-xs rounded font-bold">3</span>
+                                <span class="text-sm font-semibold text-[#F1F5F9]">性能验证</span>
+                            </div>
+                            <p class="text-sm text-[#F1F5F9]/70">社区呼吁更多真实工作负载的测试数据</p>
+                        </div>
+                        <div class="p-4 bg-[#0F172A] rounded-lg border-l-4 border-[#EF4444]">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="px-2 py-1 bg-[#EF4444]/20 text-[#EF4444] text-xs rounded font-bold">4</span>
+                                <span class="text-sm font-semibold text-[#F1F5F9]">合入时间线</span>
+                            </div>
+                            <p class="text-sm text-[#F1F5F9]/70">目标Linux 6.19或6.20</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 p-3 bg-[#1E293B]/50 rounded-lg">
+                <p class="text-xs text-[#F1F5F9]/60">
+                    <i class="fas fa-arrow-right text-[#3B82F6] mr-2"></i>
+                    根据会议反馈，Intel团队发布v2补丁，重点改进NUMA协调和动态调整
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第18页：关键社区反馈与回应 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="content">
+        <div class="h-full flex flex-col">
+            <h3 class="text-2xl font-bold text-[#F1F5F9] mb-5">关键社区反馈与回应</h3>
+            <div class="flex-1 grid grid-cols-2 gap-5">
+                <div class="space-y-4">
+                    <div class="p-4 bg-[#1E293B] rounded-xl">
+                        <div class="flex items-center gap-2 mb-3">
+                            <i class="fas fa-exclamation-circle text-[#EF4444]"></i>
+                            <h4 class="text-lg font-semibold text-[#F1F5F9]">反馈1：过度聚合问题</h4>
+                        </div>
+                        <p class="text-sm text-[#F1F5F9]/70 mb-3">
+                            在LLC较小的系统（如IBM Power10，SMT4共享LLC）上，过度聚合导致性能回退
+                        </p>
+                        <div class="p-3 bg-[#0F172A] rounded-lg border-l-4 border-[#3B82F6]">
+                            <p class="text-xs text-[#F1F5F9]/60">
+                                <span class="text-[#3B82F6] font-semibold">回应：</span>v4引入RSS监控，当进程内存占用超过LLC容量时禁用缓存感知调度
+                            </p>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-[#1E293B] rounded-xl">
+                        <div class="flex items-center gap-2 mb-3">
+                            <i class="fas fa-memory text-[#F59E0B]"></i>
+                            <h4 class="text-lg font-semibold text-[#F1F5F9]">反馈2：与NUMA Balancing冲突</h4>
+                        </div>
+                        <p class="text-sm text-[#F1F5F9]/70 mb-3">
+                            当NUMA Balancing决定将任务迁移到远程节点时，缓存感知调度不应阻止
+                        </p>
+                        <div class="p-3 bg-[#0F172A] rounded-lg border-l-4 border-[#3B82F6]">
+                            <p class="text-xs text-[#F1F5F9]/60">
+                                <span class="text-[#3B82F6] font-semibold">回应：</span>v2引入优先级机制，NUMA Balancing决策优先于缓存亲和性
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div class="p-4 bg-[#1E293B] rounded-xl">
+                        <div class="flex items-center gap-2 mb-3">
+                            <i class="fas fa-bug text-[#06B6D4]"></i>
+                            <h4 class="text-lg font-semibold text-[#F1F5F9]">反馈3：调试困难</h4>
+                        </div>
+                        <p class="text-sm text-[#F1F5F9]/70 mb-3">
+                            缺乏运行时观察和调优手段
+                        </p>
+                        <div class="p-3 bg-[#0F172A] rounded-lg border-l-4 border-[#3B82F6]">
+                            <p class="text-xs text-[#F1F5F9]/60">
+                                <span class="text-[#3B82F6] font-semibold">回应：</span>添加多个debugfs接口（/sys/kernel/debug/sched/sched_cache_*）
+                            </p>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-[#1E293B] rounded-xl">
+                        <div class="flex items-center gap-2 mb-3">
+                            <i class="fas fa-cog text-[#8B5CF6]"></i>
+                            <h4 class="text-lg font-semibold text-[#F1F5F9]">反馈4：静态键优化</h4>
+                        </div>
+                        <p class="text-sm text-[#F1F5F9]/70 mb-3">
+                            单LLC系统不应承担缓存感知调度的开销
+                        </p>
+                        <div class="p-3 bg-[#0F172A] rounded-lg border-l-4 border-[#3B82F6]">
+                            <p class="text-xs text-[#F1F5F9]/60">
+                                <span class="text-[#3B82F6] font-semibold">回应：</span>引入sched_cache_present静态键，仅在多LLC时启用
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 p-4 bg-gradient-to-r from-[#3B82F6]/20 to-[#06B6D4]/20 rounded-xl border border-[#3B82F6]/30">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-check-circle text-[#3B82F6] text-2xl"></i>
+                    <p class="text-sm text-[#F1F5F9]/80">
+                        社区反馈驱动的迭代开发模式确保了方案的<span class="text-[#F1F5F9] font-semibold">实用性和通用性</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第19页：章节过渡页 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="chapter">
+        <div class="absolute inset-0 bg-gradient-to-r from-[#06B6D4]/30 to-transparent"></div>
+        <div class="relative h-full flex flex-col justify-center">
+            <div class="text-9xl font-bold text-[#06B6D4]/20 mb-4">05</div>
+            <h2 class="text-5xl font-bold text-[#F1F5F9] mb-6">方案演进</h2>
+            <p class="text-2xl text-[#F1F5F9]/70">从v1到v6的完整技术演进</p>
+        </div>
+    </div>
+
+    <!-- 第20页：v1 原型 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="content">
+        <div class="h-full flex flex-col">
+            <div class="flex items-center justify-between mb-5">
+                <h3 class="text-2xl font-bold text-[#F1F5F9]">v1 原型（2025年3月）</h3>
+                <span class="px-3 py-1 bg-[#3B82F6]/20 text-[#3B82F6] text-sm rounded-full">Peter Zijlstra</span>
+            </div>
+            <div class="flex-1 grid grid-cols-2 gap-5">
+                <div class="space-y-4">
+                    <div class="p-5 bg-[#1E293B] rounded-xl">
+                        <h4 class="text-lg font-semibold text-[#3B82F6] mb-4">核心机制</h4>
+                        <div class="space-y-3">
+                            <div class="p-3 bg-[#0F172A] rounded-lg">
+                                <p class="text-sm text-[#F1F5F9]/70">
+                                    <span class="text-[#3B82F6] font-mono">preferred_llc</span> 字段添加到task_struct
+                                </p>
+                            </div>
+                            <div class="p-3 bg-[#0F172A] rounded-lg">
+                                <p class="text-sm text-[#F1F5F9]/70">
+                                    <span class="text-[#3B82F6] font-mono">pcpu_sched</span> 数组维护per-LLC运行时间统计
+                                </p>
+                            </div>
+                            <div class="p-3 bg-[#0F172A] rounded-lg">
+                                <p class="text-sm text-[#F1F5F9]/70">
+                                    任务唤醒时选择preferred LLC中的空闲CPU
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-5 bg-[#1E293B] rounded-xl">
+                        <h4 class="text-lg font-semibold text-[#06B6D4] mb-4">统计更新</h4>
+                        <p class="text-sm text-[#F1F5F9]/70 leading-relaxed">
+                            在<span class="text-[#06B6D4] font-mono">account_mm_sched()</span>中，每次任务获得CPU时间时更新对应LLC的统计。
+                        </p>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div class="p-5 bg-[#1E293B] rounded-xl">
+                        <h4 class="text-lg font-semibold text-[#F59E0B] mb-4">LLC切换策略</h4>
+                        <div class="p-4 bg-[#0F172A] rounded-lg">
+                            <p class="text-sm text-[#F1F5F9]/70 leading-relaxed">
+                                在<span class="text-[#F59E0B] font-mono">task_tick_cache()</span>中定期检查（每10ms一个epoch）：
+                            </p>
+                            <ul class="text-sm text-[#F1F5F9]/60 mt-2 space-y-1">
+                                <li>• 找出运行时间最长的LLC（hottest_llc）</li>
+                                <li>• 如果hottest_llc与当前preferred_llc不同</li>
+                                <li>• 且运行时间差超过阈值，则切换</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="p-5 bg-gradient-to-br from-[#EF4444]/20 to-[#F59E0B]/20 rounded-xl border border-[#EF4444]/50">
+                        <h4 class="text-lg font-semibold text-[#EF4444] mb-3"><i class="fas fa-exclamation-triangle mr-2"></i>局限性</h4>
+                        <p class="text-sm text-[#F1F5F9]/80 leading-relaxed">
+                            仅在<span class="text-[#F59E0B]">唤醒路径</span>实现，负载均衡器不知情，可能导致<span class="text-[#EF4444] font-semibold">负载不均</span>。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 第21页：v2 负载均衡感知 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="content">
+        <div class="h-full flex flex-col">
+            <div class="flex items-center justify-between mb-5">
+                <h3 class="text-2xl font-bold text-[#F1F5F9]">v2 负载均衡感知（2025年6月）</h3>
+                <span class="px-3 py-1 bg-[#06B6D4]/20 text-[#06B6D4] text-sm rounded-full">Tim Chen, Chen Yu</span>
+            </div>
+            <div class="flex-1">
+                <div class="p-4 bg-[#1E293B] rounded-xl mb-4">
+                    <h4 class="text-lg font-semibold text-[#3B82F6] mb-3">核心改进：将缓存感知扩展到负载均衡路径</h4>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="space-y-3">
+                        <div class="p-4 bg-[#1E293B] rounded-xl border-l-4 border-[#3B82F6]">
+                            <h4 class="text-sm font-semibold text-[#F1F5F9] mb-2">1. NUMA协调</h4>
+                            <p class="text-xs text-[#F1F5F9]/70">当NUMA Balancing和缓存感知决策冲突时，<span class="text-[#3B82F6]">优先NUMA Balancing</span></p>
+                        </div>
+                        <div class="p-4 bg-[#1E293B] rounded-xl border-l-4 border-[#06B6D4]">
+                            <h4 class="text-sm font-semibold text-[#F1F5F9] mb-2">2. 动态LLC ID</h4>
+                            <p class="text-xs text-[#F1F5F9]/70">使用<span class="text-[#06B6D4]">连续的LLC-ID空间</span>，可直接作为数组索引</p>
+                        </div>
+                        <div class="p-4 bg-[#1E293B] rounded-xl border-l-4 border-[#F59E0B]">
+                            <h4 class="text-sm font-semibold text-[#F1F5F9] mb-2">3. 动态结构大小</h4>
+                            <p class="text-xs text-[#F1F5F9]/70">根据系统LLC数量<span class="text-[#F59E0B]">动态调整</span>per-LLC统计结构大小</p>
+                        </div>
+                        <div class="p-4 bg-[#1E293B] rounded-xl border-l-4 border-[#8B5CF6]">
+                            <h4 class="text-sm font-semibold text-[#F1F5F9] mb-2">4. SCHED_CACHE特性</h4>
+                            <p class="text-xs text-[#F1F5F9]/70">添加<span class="text-[#8B5CF6]">三个调度特性开关</span>：SCHED_CACHE、SCHED_CACHE_LB、SCHED_CACHE_WAKE</p>
+                        </div>
+                    </div>
+                    <div class="p-5 bg-[#1E293B] rounded-xl">
+                        <h4 class="text-lg font-semibold text-[#F59E0B] mb-4">负载均衡策略</h4>
+                        <div class="space-y-2">
+                            <div class="flex items-start gap-2 p-2 bg-[#0F172A] rounded-lg">
+                                <i class="fas fa-check text-[#3B82F6] mt-1"></i>
+                                <p class="text-sm text-[#F1F5F9]/70">识别"偏好LLC"的任务，优先将其迁移到目标LLC</p>
+                            </div>
+                            <div class="flex items-start gap-2 p-2 bg-[#0F172A] rounded-lg">
+                                <i class="fas fa-check text-[#06B6D4] mt-1"></i>
+                                <p class="text-sm text-[#F1F5F9]/70">阻止将任务从其偏好LLC迁出</p>
+                            </div>
+                            <div class="flex items-start gap-2 p-2 bg-[#0F172A] rounded-lg">
+                                <i class="fas fa-check text-[#F59E0B] mt-1"></i>
+                                <p class="text-sm text-[#F1F5F9]/70">在busiest queue选择任务时，优先选择偏好目标LLC的任务</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 bg-gradient-to-r from-[#3B82F6]/20 to-[#06B6D4]/20 rounded-xl border border-[#3B82F6]/30">
+                    <div class="flex items-center gap-4">
+                        <i class="fas fa-chart-line text-2xl text-[#3B82F6]"></i>
+                        <div>
+                            <h4 class="text-sm font-semibold text-[#F1F5F9]">测试结果</h4>
+                            <p class="text-xs text-[#F1F5F9]/70">Sapphire Rapids上hackbench提升<span class="text-[#F59E0B] font-bold">24%</span>，schbench唤醒延迟降低<span class="text-[#F59E0B] font-bold">21-28%</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第22页：v3 解决过度聚合 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="content">
+        <div class="h-full flex flex-col">
+            <div class="flex items-center justify-between mb-5">
+                <h3 class="text-2xl font-bold text-[#F1F5F9]">v3 解决过度聚合（2025年7月）</h3>
+                <span class="px-3 py-1 bg-[#F59E0B]/20 text-[#F59E0B] text-sm rounded-full">Tim Chen, Chen Yu</span>
+            </div>
+            <div class="flex-1 grid grid-cols-2 gap-5">
+                <div class="space-y-4">
+                    <div class="p-5 bg-gradient-to-br from-[#EF4444]/20 to-[#F59E0B]/20 rounded-xl border border-[#EF4444]/50">
+                        <h4 class="text-lg font-semibold text-[#EF4444] mb-3"><i class="fas fa-exclamation-triangle mr-2"></i>问题发现</h4>
+                        <p class="text-sm text-[#F1F5F9]/80 leading-relaxed">
+                            v2在AMD Milan和IBM Power10上某些工作负载出现<span class="text-[#EF4444] font-semibold">性能回退</span>：
+                        </p>
+                        <ul class="text-sm text-[#F1F5F9]/70 mt-2 space-y-1">
+                            <li>• 过度聚合导致单个LLC过载</li>
+                            <li>• 其他LLC空闲</li>
+                            <li>• 特别是内存密集型工作负载</li>
+                        </ul>
+                    </div>
+                    <div class="p-5 bg-[#1E293B] rounded-xl">
+                        <h4 class="text-lg font-semibold text-[#3B82F6] mb-4">解决方案</h4>
+                        <div class="space-y-3">
+                            <div class="p-3 bg-[#0F172A] rounded-lg">
+                                <p class="text-sm font-semibold text-[#F1F5F9] mb-1">1. RSS监控</p>
+                                <p class="text-xs text-[#F1F5F9]/60">添加/sys/kernel/debug/sched/sched_cache_ignore_rss接口</p>
+                            </div>
+                            <div class="p-3 bg-[#0F172A] rounded-lg">
+                                <p class="text-sm font-semibold text-[#F1F5F9] mb-1">2. 线程数监控</p>
+                                <p class="text-xs text-[#F1F5F9]/60">追踪进程活跃线程数，与LLC核心数比较</p>
+                            </div>
+                            <div class="p-3 bg-[#0F172A] rounded-lg">
+                                <p class="text-sm font-semibold text-[#F1F5F9] mb-1">3. 扫描范围限制</p>
+                                <p class="text-xs text-[#F1F5F9]/60">限制LLC候选扫描范围到相关NUMA节点</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div class="p-5 bg-[#1E293B] rounded-xl">
+                        <h4 class="text-lg font-semibold text-[#06B6D4] mb-4">RSS控制接口</h4>
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between p-2 bg-[#0F172A] rounded-lg">
+                                <span class="text-sm text-[#F1F5F9]/70">0</span>
+                                <span class="text-xs text-[#F1F5F9]/50">完全禁用</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2 bg-[#0F172A] rounded-lg border border-[#3B82F6]">
+                                <span class="text-sm text-[#3B82F6] font-semibold">1（默认）</span>
+                                <span class="text-xs text-[#F1F5F9]/50">RSS > LLC时禁用</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2 bg-[#0F172A] rounded-lg">
+                                <span class="text-sm text-[#F1F5F9]/70">100</span>
+                                <span class="text-xs text-[#F1F5F9]/50">不考虑RSS</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2 bg-[#0F172A] rounded-lg">
+                                <span class="text-sm text-[#F1F5F9]/70">N</span>
+                                <span class="text-xs text-[#F1F5F9]/50">RSS > (N-1)*256*LLC</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-5 bg-gradient-to-r from-[#3B82F6]/20 to-[#06B6D4]/20 rounded-xl border border-[#3B82F6]/30">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-check-circle text-[#3B82F6] text-2xl"></i>
+                            <div>
+                                <h4 class="text-sm font-semibold text-[#F1F5F9]">测试结果</h4>
+                                <p class="text-xs text-[#F1F5F9]/70">回退问题得到缓解，hackbench仍保持<span class="text-[#F59E0B] font-bold">20-30%</span>提升</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第23页：v4 静态键优化 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="content">
+        <div class="h-full flex flex-col">
+            <div class="flex items-center justify-between mb-5">
+                <h3 class="text-2xl font-bold text-[#F1F5F9]">v4 静态键优化（2025年8月）</h3>
+                <span class="px-3 py-1 bg-[#8B5CF6]/20 text-[#8B5CF6] text-sm rounded-full">Chen Yu</span>
+            </div>
+            <div class="flex-1 grid grid-cols-2 gap-5">
+                <div class="space-y-4">
+                    <div class="p-5 bg-gradient-to-br from-[#EF4444]/20 to-[#F59E0B]/20 rounded-xl border border-[#EF4444]/50">
+                        <h4 class="text-lg font-semibold text-[#EF4444] mb-3"><i class="fas fa-question-circle mr-2"></i>问题</h4>
+                        <p class="text-sm text-[#F1F5F9]/80 leading-relaxed">
+                            <span class="text-[#F59E0B]">单LLC系统</span>（如大多数桌面CPU、小型服务器）不应承担缓存感知调度的开销
+                        </p>
+                    </div>
+                    <div class="p-5 bg-[#1E293B] rounded-xl">
+                        <h4 class="text-lg font-semibold text-[#3B82F6] mb-4">解决方案</h4>
+                        <p class="text-sm text-[#F1F5F9]/70 mb-3">引入<span class="text-[#3B82F6] font-mono font-semibold">sched_cache_present</span>静态键</p>
+                        <div class="p-4 bg-[#0F172A] rounded-lg font-mono text-xs text-[#F1F5F9]/60">
+                            DEFINE_STATIC_KEY_FALSE(<br>
+                            &nbsp;&nbsp;sched_cache_present<br>
+                            );
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div class="p-5 bg-[#1E293B] rounded-xl">
+                        <h4 class="text-lg font-semibold text-[#06B6D4] mb-4">启用条件</h4>
+                        <div class="space-y-2">
+                            <div class="flex items-start gap-2 p-2 bg-[#0F172A] rounded-lg">
+                                <i class="fas fa-check text-[#06B6D4] mt-1"></i>
+                                <p class="text-sm text-[#F1F5F9]/70">系统存在至少一个拥有多个LLC的NUMA节点</p>
+                            </div>
+                            <div class="flex items-start gap-2 p-2 bg-[#0F172A] rounded-lg">
+                                <i class="fas fa-check text-[#06B6D4] mt-1"></i>
+                                <p class="text-sm text-[#F1F5F9]/70">且非非对称CPU拓扑</p>
+                            </div>
+                            <div class="flex items-start gap-2 p-2 bg-[#0F172A] rounded-lg">
+                                <i class="fas fa-check text-[#06B6D4] mt-1"></i>
+                                <p class="text-sm text-[#F1F5F9]/70">检查时机：build_sched_domains()</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-5 bg-[#1E293B] rounded-xl">
+                        <h4 class="text-lg font-semibold text-[#F59E0B] mb-4">代码实现</h4>
+                        <div class="p-3 bg-[#0F172A] rounded-lg font-mono text-xs text-[#F1F5F9]/60">
+                            if (!sched_feat(SCHED_CACHE) ||<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;!static_branch_likely(<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&amp;sched_cache_present))<br>
+                            &nbsp;&nbsp;return;
+                        </div>
+                        <p class="text-xs text-[#F1F5F9]/50 mt-2">条件不满足时，编译器优化掉相关代码，零运行时开销</p>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 p-4 bg-gradient-to-r from-[#3B82F6]/20 to-[#06B6D4]/20 rounded-xl border border-[#3B82F6]/30">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-bolt text-[#F59E0B] text-2xl"></i>
+                    <p class="text-sm text-[#F1F5F9]/80">
+                        <span class="text-[#F1F5F9] font-semibold">影响：</span>单LLC系统完全不受代码体积和性能影响
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第24页：v5 准备合入 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="content">
+        <div class="h-full flex flex-col">
+            <div class="flex items-center justify-between mb-5">
+                <h3 class="text-2xl font-bold text-[#F1F5F9]">v5 准备合入（2025年10月）</h3>
+                <span class="px-3 py-1 bg-[#10B981]/20 text-[#10B981] text-sm rounded-full">Tim Chen, Chen Yu</span>
+            </div>
+            <div class="flex-1 grid grid-cols-5 gap-5">
+                <div class="col-span-2 space-y-4">
+                    <div class="p-5 bg-gradient-to-br from-[#10B981]/20 to-[#3B82F6]/20 rounded-xl border border-[#10B981]/50">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fas fa-flag-checkered text-[#10B981] text-2xl"></i>
+                            <h4 class="text-lg font-semibold text-[#F1F5F9]">里程碑</h4>
+                        </div>
+                        <p class="text-sm text-[#F1F5F9]/80">
+                            移除<span class="text-[#EF4444]">RFC</span>标记，正式请求合入主线
+                        </p>
+                    </div>
+                    <div class="p-5 bg-[#1E293B] rounded-xl">
+                        <h4 class="text-lg font-semibold text-[#3B82F6] mb-3">代码成熟度</h4>
+                        <ul class="text-sm text-[#F1F5F9]/70 space-y-1">
+                            <li>• 19个补丁</li>
+                            <li>• 覆盖调度器核心、调试接口、文档</li>
+                            <li>• 通过Intel和AMD多平台测试</li>
+                            <li>• 社区审查反馈基本解决</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-span-3 p-5 bg-[#1E293B] rounded-xl">
+                    <h4 class="text-lg font-semibold text-[#F59E0B] mb-4">核心架构</h4>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="p-3 bg-[#0F172A] rounded-lg">
+                            <p class="text-xs text-[#3B82F6] font-semibold mb-1">Patch 1</p>
+                            <p class="text-sm text-[#F1F5F9]/70">Peter的原始补丁（基础框架）</p>
+                        </div>
+                        <div class="p-3 bg-[#0F172A] rounded-lg">
+                            <p class="text-xs text-[#06B6D4] font-semibold mb-1">Patch 2-5</p>
+                            <p class="text-sm text-[#F1F5F9]/70">修复和调优</p>
+                        </div>
+                        <div class="p-3 bg-[#0F172A] rounded-lg">
+                            <p class="text-xs text-[#F59E0B] font-semibold mb-1">Patch 6-12</p>
+                            <p class="text-sm text-[#F1F5F9]/70">负载均衡基础设施</p>
+                        </div>
+                        <div class="p-3 bg-[#0F172A] rounded-lg">
+                            <p class="text-xs text-[#8B5CF6] font-semibold mb-1">Patch 13-18</p>
+                            <p class="text-sm text-[#F1F5F9]/70">缓存感知负载均衡逻辑</p>
+                        </div>
+                        <div class="p-3 bg-[#0F172A] rounded-lg col-span-2">
+                            <p class="text-xs text-[#EF4444] font-semibold mb-1">Patch 19-20</p>
+                            <p class="text-sm text-[#F1F5F9]/70">SCHED_CACHE_LB和SCHED_CACHE_WAKE特性</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 p-4 bg-gradient-to-r from-[#F59E0B]/20 to-[#EF4444]/20 rounded-xl border border-[#F59E0B]/30">
+                <h4 class="text-sm font-semibold text-[#F1F5F9] mb-2"><i class="fas fa-trophy text-[#F59E0B] mr-2"></i>测试亮点</h4>
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-[#F59E0B]">44%</p>
+                        <p class="text-xs text-[#F1F5F9]/60">AMD Genoa ChaCha20提升</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-[#3B82F6]">24-31%</p>
+                        <p class="text-xs text-[#F1F5F9]/60">Intel SPR hackbench提升</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-[#06B6D4]">30+</p>
+                        <p class="text-xs text-[#F1F5F9]/60">Phoronix测试用例提升</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第25页：v6 最新优化 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="content">
+        <div class="h-full flex flex-col">
+            <div class="flex items-center justify-between mb-5">
+                <h3 class="text-2xl font-bold text-[#F1F5F9]">v6 最新优化（2026年2月）</h3>
+                <span class="px-3 py-1 bg-[#3B82F6]/20 text-[#3B82F6] text-sm rounded-full">v3 Post-RFC</span>
+            </div>
+            <div class="flex-1 grid grid-cols-2 gap-5">
+                <div class="space-y-3">
+                    <div class="p-4 bg-[#1E293B] rounded-xl border-l-4 border-[#3B82F6]">
+                        <h4 class="text-sm font-semibold text-[#F1F5F9] mb-2">1. 跳过重复失败</h4>
+                        <p class="text-xs text-[#F1F5F9]/70">当缓存感知负载均衡连续失败（达到cache_nice_tries）后，跳过该LLC</p>
+                    </div>
+                    <div class="p-4 bg-[#1E293B] rounded-xl border-l-4 border-[#06B6D4]">
+                        <h4 class="text-sm font-semibold text-[#F1F5F9] mb-2">2. 移除排序开销</h4>
+                        <p class="text-xs text-[#F1F5F9]/70">不再对busiest runqueue排序，改为在迁移时跳过不偏好目标的任务</p>
+                    </div>
+                    <div class="p-4 bg-[#1E293B] rounded-xl border-l-4 border-[#F59E0B]">
+                        <h4 class="text-sm font-semibold text-[#F1F5F9] mb-2">3. 简化LLC ID计算</h4>
+                        <p class="text-xs text-[#F1F5F9]/70">直接使用sched_domain_topology_level数据计算LLC ID</p>
+                    </div>
+                    <div class="p-4 bg-[#1E293B] rounded-xl border-l-4 border-[#8B5CF6]">
+                        <h4 class="text-sm font-semibold text-[#F1F5F9] mb-2">4. per-CPU统计</h4>
+                        <p class="text-xs text-[#F1F5F9]/70">将每个LLC的任务偏好计数移到per-CPU的最低层调度域</p>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div class="p-5 bg-[#1E293B] rounded-xl">
+                        <h4 class="text-lg font-semibold text-[#06B6D4] mb-4">代码重构</h4>
+                        <div class="space-y-2">
+                            <div class="p-3 bg-[#0F172A] rounded-lg">
+                                <p class="text-sm text-[#F1F5F9]/70">将<span class="text-[#06B6D4] font-mono">sched_cache_stats</span>从mm_struct分离</p>
+                            </div>
+                            <div class="p-3 bg-[#0F172A] rounded-lg">
+                                <p class="text-sm text-[#F1F5F9]/70">统一迁移策略到<span class="text-[#06B6D4] font-mono">_get_migrate_hint()</span>函数</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-5 bg-[#1E293B] rounded-xl">
+                        <h4 class="text-lg font-semibold text-[#F59E0B] mb-4">测试平台</h4>
+                        <p class="text-sm text-[#F1F5F9]/70">
+                            Linux 6.19-rc3<br>
+                            Intel Sapphire Rapids<br>
+                            AMD Genoa
+                        </p>
+                    </div>
+                    <div class="p-4 bg-gradient-to-r from-[#3B82F6]/20 to-[#06B6D4]/20 rounded-xl border border-[#3B82F6]/30">
+                        <h4 class="text-sm font-semibold text-[#F1F5F9] mb-2">测试结果</h4>
+                        <p class="text-xs text-[#F1F5F9]/70">
+                            hackbench 1-group：<span class="text-[#F59E0B] font-bold">+29-38%</span><br>
+                            schbench 99th延迟：<span class="text-[#F59E0B] font-bold">-21-28%</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 第26页：章节过渡页 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="chapter">
+        <div class="absolute inset-0 bg-gradient-to-r from-[#F59E0B]/30 to-transparent"></div>
+        <div class="relative h-full flex flex-col justify-center">
+            <div class="text-9xl font-bold text-[#F59E0B]/20 mb-4">06</div>
+            <h2 class="text-5xl font-bold text-[#F1F5F9] mb-6">核心实现原理</h2>
+            <p class="text-2xl text-[#F1F5F9]/70">深入代码层面的技术实现</p>
+        </div>
+    </div>
+
+    <!-- 第27页：数据结构设计 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="content">
+        <div class="h-full flex flex-col">
+            <h3 class="text-2xl font-bold text-[#F1F5F9] mb-5">数据结构设计</h3>
+            <div class="flex-1 grid grid-cols-3 gap-4">
+                <div class="p-4 bg-[#1E293B] rounded-xl">
+                    <h4 class="text-lg font-semibold text-[#3B82F6] mb-3">task_struct扩展</h4>
+                    <div class="p-3 bg-[#0F172A] rounded-lg font-mono text-xs text-[#F1F5F9]/70 overflow-hidden">
+                        <span class="text-[#8B5CF6]">struct</span> <span class="text-[#F59E0B]">task_struct</span> {<br>
+                        &nbsp;&nbsp;<span class="text-[#3B82F6]">int</span> preferred_llc;<br>
+                        &nbsp;&nbsp;<span class="text-[#3B82F6]">struct</span> callback_head<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;cache_work;<br>
+                        &nbsp;&nbsp;...<br>
+                        };
+                    </div>
+                    <p class="text-xs text-[#F1F5F9]/50 mt-2">preferred_llc: -1表示无偏好</p>
+                </div>
+                <div class="p-4 bg-[#1E293B] rounded-xl">
+                    <h4 class="text-lg font-semibold text-[#06B6D4] mb-3">mm_struct扩展</h4>
+                    <div class="p-3 bg-[#0F172A] rounded-lg font-mono text-xs text-[#F1F5F9]/70 overflow-hidden">
+                        <span class="text-[#8B5CF6]">struct</span> <span class="text-[#F59E0B]">mm_struct</span> {<br>
+                        &nbsp;&nbsp;<span class="text-[#3B82F6]">struct</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;sched_cache_stats<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;*pcpu_sched;<br>
+                        &nbsp;&nbsp;...<br>
+                        };<br><br>
+                        <span class="text-[#8B5CF6]">struct</span> <span class="text-[#F59E0B]">sched_cache_stats</span> {<br>
+                        &nbsp;&nbsp;atomic64_t<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;time_on_llc[0];<br>
+                        };
+                    </div>
+                </div>
+                <div class="p-4 bg-[#1E293B] rounded-xl">
+                    <h4 class="text-lg font-semibold text-[#F59E0B] mb-3">调度域扩展</h4>
+                    <div class="p-3 bg-[#0F172A] rounded-lg font-mono text-xs text-[#F1F5F9]/70 overflow-hidden">
+                        <span class="text-[#8B5CF6]">struct</span> <span class="text-[#F59E0B]">sched_domain</span> {<br>
+                        &nbsp;&nbsp;<span class="text-[#3B82F6]">int</span> llc_id;<br>
+                        &nbsp;&nbsp;...<br>
+                        };
+                    </div>
+                    <div class="mt-3 p-3 bg-[#0F172A] rounded-lg font-mono text-xs text-[#F1F5F9]/70">
+                        <span class="text-[#8B5CF6]">extern int</span> max_llcs;<br><br>
+                        DEFINE_STATIC_KEY_FALSE(<br>
+                        &nbsp;&nbsp;sched_cache_present<br>
+                        );
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 p-4 bg-gradient-to-r from-[#3B82F6]/20 to-[#06B6D4]/20 rounded-xl border border-[#3B82F6]/30">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-info-circle text-[#3B82F6] text-xl"></i>
+                    <p class="text-sm text-[#F1F5F9]/80">
+                        关键设计：使用<span class="text-[#F1F5F9] font-semibold">柔性数组</span>存储per-LLC统计，根据实际LLC数量动态分配内存
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第28页：运行时统计机制 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="content">
+        <div class="h-full flex flex-col">
+            <h3 class="text-2xl font-bold text-[#F1F5F9] mb-5">运行时统计机制</h3>
+            <div class="flex-1 grid grid-cols-2 gap-5">
+                <div class="space-y-4">
+                    <div class="p-5 bg-[#1E293B] rounded-xl">
+                        <h4 class="text-lg font-semibold text-[#3B82F6] mb-3">统计更新时机</h4>
+                        <p class="text-sm text-[#F1F5F9]/70 leading-relaxed">
+                            在<span class="text-[#3B82F6] font-mono">account_mm_sched()</span>中，每次任务获得CPU时间时更新
+                        </p>
+                    </div>
+                    <div class="p-5 bg-[#1E293B] rounded-xl">
+                        <h4 class="text-lg font-semibold text-[#06B6D4] mb-3">更新逻辑</h4>
+                        <div class="p-4 bg-[#0F172A] rounded-lg font-mono text-xs text-[#F1F5F9]/70 overflow-hidden">
+                            <span class="text-[#8B5CF6]">void</span> <span class="text-[#F59E0B]">account_mm_sched</span>(<br>
+                            &nbsp;&nbsp;<span class="text-[#3B82F6]">struct</span> rq *rq,<br>
+                            &nbsp;&nbsp;<span class="text-[#3B82F6]">struct</span> task_struct *p,<br>
+                            &nbsp;&nbsp;s64 delta_exec)<br>
+                            {<br>
+                            &nbsp;&nbsp;<span class="text-[#8B5CF6]">if</span> (!sched_feat(SCHED_CACHE))<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-[#8B5CF6]">return</span>;<br>
+                            &nbsp;&nbsp;<span class="text-[#3B82F6]">int</span> llc = llc_id(cpu_of(rq));<br>
+                            &nbsp;&nbsp;atomic64_add(delta_exec,<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&amp;mm->pcpu_sched->time_on_llc[llc]);<br>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div class="p-5 bg-[#1E293B] rounded-xl">
+                        <h4 class="text-lg font-semibold text-[#F59E0B] mb-3">LLC切换决策</h4>
+                        <p class="text-sm text-[#F1F5F9]/70 mb-3">
+                            在<span class="text-[#F59E0B] font-mono">task_tick_cache()</span>中定期检查（每10ms一个epoch）
+                        </p>
+                        <div class="space-y-2">
+                            <div class="flex items-start gap-2 p-2 bg-[#0F172A] rounded-lg">
+                                <span class="text-[#F59E0B] font-bold">1</span>
+                                <p class="text-sm text-[#F1F5F9]/70">找出运行时间最长的LLC（hottest_llc）</p>
+                            </div>
+                            <div class="flex items-start gap-2 p-2 bg-[#0F172A] rounded-lg">
+                                <span class="text-[#F59E0B] font-bold">2</span>
+                                <p class="text-sm text-[#F1F5F9]/70">如果hottest_llc与当前preferred_llc不同</p>
+                            </div>
+                            <div class="flex items-start gap-2 p-2 bg-[#0F172A] rounded-lg">
+                                <span class="text-[#F59E0B] font-bold">3</span>
+                                <p class="text-sm text-[#F1F5F9]/70">且运行时间差超过阈值，则切换</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-5 bg-[#1E293B] rounded-xl">
+                        <h4 class="text-lg font-semibold text-[#8B5CF6] mb-3">延迟更新</h4>
+                        <p class="text-sm text-[#F1F5F9]/70">
+                            使用<span class="text-[#8B5CF6] font-mono">task_work_add()</span>延迟执行LLC切换，避免在调度关键路径上执行复杂逻辑
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第29页：负载均衡算法 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="content">
+        <div class="h-full flex flex-col">
+            <h3 class="text-2xl font-bold text-[#F1F5F9] mb-5">负载均衡算法</h3>
+            <div class="flex-1 grid grid-cols-2 gap-5">
+                <div class="space-y-4">
+                    <div class="p-5 bg-[#1E293B] rounded-xl">
+                        <h4 class="text-lg font-semibold text-[#3B82F6] mb-4">缓存感知负载均衡流程</h4>
+                        <div class="space-y-2">
+                            <div class="flex items-start gap-2 p-2 bg-[#0F172A] rounded-lg">
+                                <span class="text-[#3B82F6] font-bold">1</span>
+                                <p class="text-sm text-[#F1F5F9]/70">在update_sg_lb_stats()中统计每个调度组的"偏好LLC任务数"</p>
+                            </div>
+                            <div class="flex items-start gap-2 p-2 bg-[#0F172A] rounded-lg">
+                                <span class="text-[#3B82F6] font-bold">2</span>
+                                <p class="text-sm text-[#F1F5F9]/70">在update_sg_if_llc()中标记需要LLC均衡的调度组</p>
+                            </div>
+                            <div class="flex items-start gap-2 p-2 bg-[#0F172A] rounded-lg">
+                                <span class="text-[#3B82F6] font-bold">3</span>
+                                <p class="text-sm text-[#F1F5F9]/70">在llc_balance()中决定是否进行缓存感知均衡</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-5 bg-[#1E293B] rounded-xl">
+                        <h4 class="text-lg font-semibold text-[#06B6D4] mb-3">任务选择策略</h4>
+                        <p class="text-sm text-[#F1F5F9]/70">
+                            在<span class="text-[#06B6D4] font-mono">detach_tasks()</span>中，优先选择偏好目标LLC的任务
+                        </p>
+                    </div>
+                </div>
+                <div class="p-5 bg-[#1E293B] rounded-xl">
+                    <h4 class="text-lg font-semibold text-[#F59E0B] mb-4">迁移决策函数</h4>
+                    <div class="p-4 bg-[#0F172A] rounded-lg font-mono text-xs text-[#F1F5F9]/70 overflow-hidden">
+                        <span class="text-[#8B5CF6]">enum</span> <span class="text-[#F59E0B]">migrate_hint</span> {<br>
+                        &nbsp;&nbsp;mig_allow,<br>
+                        &nbsp;&nbsp;mig_forbid,<br>
+                        &nbsp;&nbsp;mig_cache,<br>
+                        };<br><br>
+                        <span class="text-[#8B5CF6]">static int</span> <span class="text-[#F59E0B]">get_migrate_hint</span>(<br>
+                        &nbsp;&nbsp;<span class="text-[#3B82F6]">int</span> src_cpu,<br>
+                        &nbsp;&nbsp;<span class="text-[#3B82F6]">int</span> dst_cpu,<br>
+                        &nbsp;&nbsp;<span class="text-[#3B82F6]">struct</span> task_struct *p)<br>
+                        {<br>
+                        &nbsp;&nbsp;<span class="text-[#3B82F6]">int</span> src_llc = llc_id(src_cpu);<br>
+                        &nbsp;&nbsp;<span class="text-[#3B82F6]">int</span> dst_llc = llc_id(dst_cpu);<br><br>
+                        &nbsp;&nbsp;<span class="text-[#8B5CF6]">if</span> (p->preferred_llc == src_llc)<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-[#8B5CF6]">return</span> mig_forbid;<br><br>
+                        &nbsp;&nbsp;<span class="text-[#8B5CF6]">if</span> (p->preferred_llc == dst_llc)<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-[#8B5CF6]">return</span> mig_cache;<br><br>
+                        &nbsp;&nbsp;<span class="text-[#8B5CF6]">return</span> mig_allow;<br>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第30页：唤醒路径优化 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="content">
+        <div class="h-full flex flex-col">
+            <h3 class="text-2xl font-bold text-[#F1F5F9] mb-5">唤醒路径优化</h3>
+            <div class="flex-1 grid grid-cols-2 gap-5">
+                <div class="space-y-4">
+                    <div class="p-5 bg-[#1E293B] rounded-xl">
+                        <h4 class="text-lg font-semibold text-[#3B82F6] mb-4">唤醒CPU选择流程</h4>
+                        <div class="p-4 bg-[#0F172A] rounded-lg">
+                            <p class="text-sm text-[#F1F5F9]/70 font-mono">
+                                select_task_rq_fair()<br>
+                                &nbsp;&nbsp;→ select_idle_sibling()<br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;→ select_cache_cpu()
+                            </p>
+                        </div>
+                    </div>
+                    <div class="p-5 bg-[#1E293B] rounded-xl">
+                        <h4 class="text-lg font-semibold text-[#06B6D4] mb-3">与WAKE_WIDE的协调</h4>
+                        <p class="text-sm text-[#F1F5F9]/70 leading-relaxed">
+                            当任务被多个CPU频繁唤醒时，<span class="text-[#06B6D4]">禁用缓存感知唤醒</span>，避免过度聚合
+                        </p>
+                    </div>
+                </div>
+                <div class="p-5 bg-[#1E293B] rounded-xl">
+                    <h4 class="text-lg font-semibold text-[#F59E0B] mb-4">select_cache_cpu()实现</h4>
+                    <div class="p-4 bg-[#0F172A] rounded-lg font-mono text-xs text-[#F1F5F9]/70 overflow-hidden">
+                        <span class="text-[#8B5CF6]">static int</span> <span class="text-[#F59E0B]">select_cache_cpu</span>(<br>
+                        &nbsp;&nbsp;<span class="text-[#3B82F6]">struct</span> task_struct *p,<br>
+                        &nbsp;&nbsp;<span class="text-[#3B82F6]">int</span> prev_cpu)<br>
+                        {<br>
+                        &nbsp;&nbsp;<span class="text-[#3B82F6]">struct</span> mm_struct *mm = p->mm;<br>
+                        &nbsp;&nbsp;<span class="text-[#3B82F6]">int</span> cpu;<br><br>
+                        &nbsp;&nbsp;<span class="text-[#8B5CF6]">if</span> (!sched_feat(SCHED_CACHE))<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-[#8B5CF6]">return</span> prev_cpu;<br><br>
+                        &nbsp;&nbsp;<span class="text-[#3B82F6]">int</span> llc = p->preferred_llc;<br>
+                        &nbsp;&nbsp;<span class="text-[#8B5CF6]">if</span> (llc < 0)<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-[#8B5CF6]">return</span> prev_cpu;<br><br>
+                        &nbsp;&nbsp;<span class="text-[#8B5CF6]">for_each_cpu</span>(cpu,<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cpumask_of_llc(llc)) {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-[#8B5CF6]">if</span> (idle_cpu(cpu))<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-[#8B5CF6]">return</span> cpu;<br>
+                        &nbsp;&nbsp;}<br><br>
+                        &nbsp;&nbsp;<span class="text-[#8B5CF6]">return</span> prev_cpu;<br>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第31页：调试与调优接口 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="content">
+        <div class="h-full flex flex-col">
+            <h3 class="text-2xl font-bold text-[#F1F5F9] mb-5">调试与调优接口</h3>
+            <div class="flex-1 grid grid-cols-2 gap-5">
+                <div class="space-y-4">
+                    <div class="p-5 bg-[#1E293B] rounded-xl">
+                        <h4 class="text-lg font-semibold text-[#3B82F6] mb-4">debugfs接口</h4>
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between p-3 bg-[#0F172A] rounded-lg">
+                                <span class="text-xs text-[#F1F5F9]/70 font-mono">sched_cache_ignore_rss</span>
+                                <span class="text-xs text-[#3B82F6]">默认: 1</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-[#0F172A] rounded-lg">
+                                <span class="text-xs text-[#F1F5F9]/70 font-mono">sched_cache_aggr_cap</span>
+                                <span class="text-xs text-[#3B82F6]">默认: 50</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-[#0F172A] rounded-lg">
+                                <span class="text-xs text-[#F1F5F9]/70 font-mono">sched_cache_aggr_imb</span>
+                                <span class="text-xs text-[#3B82F6]">默认: 0</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-[#0F172A] rounded-lg">
+                                <span class="text-xs text-[#F1F5F9]/70 font-mono">sched_cache_nice_tries</span>
+                                <span class="text-xs text-[#3B82F6]">默认: 1</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-5 bg-[#1E293B] rounded-xl">
+                        <h4 class="text-lg font-semibold text-[#06B6D4] mb-3">内核启动参数</h4>
+                        <div class="p-3 bg-[#0F172A] rounded-lg">
+                            <p class="text-sm text-[#F1F5F9]/70 font-mono">nosched_cache</p>
+                            <p class="text-xs text-[#F1F5F9]/50 mt-1">完全禁用缓存感知调度</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div class="p-5 bg-[#1E293B] rounded-xl">
+                        <h4 class="text-lg font-semibold text-[#F59E0B] mb-4">sched_features控制</h4>
+                        <div class="space-y-2">
+                            <div class="p-3 bg-[#0F172A] rounded-lg border-l-4 border-[#3B82F6]">
+                                <p class="text-sm font-semibold text-[#F1F5F9]">SCHED_CACHE</p>
+                                <p class="text-xs text-[#F1F5F9]/50">总开关，启用缓存感知调度</p>
+                            </div>
+                            <div class="p-3 bg-[#0F172A] rounded-lg border-l-4 border-[#06B6D4]">
+                                <p class="text-sm font-semibold text-[#F1F5F9]">SCHED_CACHE_LB</p>
+                                <p class="text-xs text-[#F1F5F9]/50">启用缓存感知负载均衡</p>
+                            </div>
+                            <div class="p-3 bg-[#0F172A] rounded-lg border-l-4 border-[#F59E0B]">
+                                <p class="text-sm font-semibold text-[#F1F5F9]">SCHED_CACHE_WAKE</p>
+                                <p class="text-xs text-[#F1F5F9]/50">启用缓存感知唤醒</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-5 bg-[#1E293B] rounded-xl">
+                        <h4 class="text-lg font-semibold text-[#8B5CF6] mb-3">观察工具</h4>
+                        <div class="space-y-2">
+                            <div class="p-2 bg-[#0F172A] rounded-lg">
+                                <p class="text-sm text-[#F1F5F9]/70 font-mono">/proc/sched_debug</p>
+                                <p class="text-xs text-[#F1F5F9]/50">查看每个runqueue的preferred_llc任务数</p>
+                            </div>
+                            <div class="p-2 bg-[#0F172A] rounded-lg">
+                                <p class="text-sm text-[#F1F5F9]/70 font-mono">schedstat</p>
+                                <p class="text-xs text-[#F1F5F9]/50">追踪任务迁移次数和原因</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 第32页：章节过渡页 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="chapter">
+        <div class="absolute inset-0 bg-gradient-to-r from-[#3B82F6]/30 to-transparent"></div>
+        <div class="relative h-full flex flex-col justify-center">
+            <div class="text-9xl font-bold text-[#3B82F6]/20 mb-4">07</div>
+            <h2 class="text-5xl font-bold text-[#F1F5F9] mb-6">测试与验证</h2>
+            <p class="text-2xl text-[#F1F5F9]/70">性能数据与案例分析</p>
+        </div>
+    </div>
+
+    <!-- 第33页：测试平台配置 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="content">
+        <div class="h-full flex flex-col">
+            <h3 class="text-2xl font-bold text-[#F1F5F9] mb-5">测试平台配置</h3>
+            <div class="flex-1 grid grid-cols-2 gap-5">
+                <div class="p-6 bg-[#1E293B] rounded-xl border-l-4 border-[#3B82F6]">
+                    <div class="flex items-center gap-3 mb-5">
+                        <i class="fab fa-intel text-[#3B82F6] text-3xl"></i>
+                        <h4 class="text-xl font-semibold text-[#F1F5F9]">Intel Sapphire Rapids</h4>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-[#0F172A] rounded-lg">
+                            <span class="text-sm text-[#F1F5F9]/70">Socket</span>
+                            <span class="text-sm text-[#3B82F6] font-semibold">2</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-[#0F172A] rounded-lg">
+                            <span class="text-sm text-[#F1F5F9]/70">核心/Socket</span>
+                            <span class="text-sm text-[#3B82F6] font-semibold">30</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-[#0F172A] rounded-lg">
+                            <span class="text-sm text-[#F1F5F9]/70">LLC</span>
+                            <span class="text-sm text-[#3B82F6] font-semibold">2</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-[#0F172A] rounded-lg">
+                            <span class="text-sm text-[#F1F5F9]/70">CPU/LLC</span>
+                            <span class="text-sm text-[#3B82F6] font-semibold">60</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-[#0F172A] rounded-lg">
+                            <span class="text-sm text-[#F1F5F9]/70">内存</span>
+                            <span class="text-sm text-[#3B82F6] font-semibold">DDR5-4800</span>
+                        </div>
+                        <div class="p-3 bg-[#0F172A] rounded-lg">
+                            <p class="text-xs text-[#F1F5F9]/50">DRAM Interleaving启用，形成1个NUMA节点+2个LLC</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6 bg-[#1E293B] rounded-xl border-l-4 border-[#F59E0B]">
+                    <div class="flex items-center gap-3 mb-5">
+                        <i class="fab fa-amd text-[#F59E0B] text-3xl"></i>
+                        <h4 class="text-xl font-semibold text-[#F1F5F9]">AMD Genoa</h4>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-[#0F172A] rounded-lg">
+                            <span class="text-sm text-[#F1F5F9]/70">NUMA节点</span>
+                            <span class="text-sm text-[#F59E0B] font-semibold">4</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-[#0F172A] rounded-lg">
+                            <span class="text-sm text-[#F1F5F9]/70">CPU/节点</span>
+                            <span class="text-sm text-[#F59E0B] font-semibold">32</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-[#0F172A] rounded-lg">
+                            <span class="text-sm text-[#F1F5F9]/70">CCX/节点</span>
+                            <span class="text-sm text-[#F59E0B] font-semibold">2</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-[#0F172A] rounded-lg">
+                            <span class="text-sm text-[#F1F5F9]/70">CPU/CCX</span>
+                            <span class="text-sm text-[#F59E0B] font-semibold">16</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-[#0F172A] rounded-lg">
+                            <span class="text-sm text-[#F1F5F9]/70">总L3</span>
+                            <span class="text-sm text-[#F59E0B] font-semibold">384MB</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-[#0F172A] rounded-lg">
+                            <span class="text-sm text-[#F1F5F9]/70">内存</span>
+                            <span class="text-sm text-[#F59E0B] font-semibold">DDR5-4800, 12通道</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 p-4 bg-[#1E293B] rounded-xl">
+                <h4 class="text-sm font-semibold text-[#F1F5F9] mb-2">测试内核版本</h4>
+                <div class="flex gap-4">
+                    <span class="px-3 py-1 bg-[#3B82F6]/20 text-[#3B82F6] text-xs rounded">v1-v2: Linux 6.15</span>
+                    <span class="px-3 py-1 bg-[#06B6D4]/20 text-[#06B6D4] text-xs rounded">v3-v4: Linux 6.18-rc7</span>
+                    <span class="px-3 py-1 bg-[#F59E0B]/20 text-[#F59E0B] text-xs rounded">v5-v6: Linux 6.19-rc3</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第34页：Hackbench 测试结果 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="content">
+        <div class="h-full flex flex-col">
+            <h3 class="text-2xl font-bold text-[#F1F5F9] mb-5">Hackbench 测试结果</h3>
+            <div class="flex-1 grid grid-cols-5 gap-5">
+                <div class="col-span-2 space-y-4">
+                    <div class="p-5 bg-[#1E293B] rounded-xl">
+                        <h4 class="text-lg font-semibold text-[#3B82F6] mb-3">测试说明</h4>
+                        <p class="text-sm text-[#F1F5F9]/70 leading-relaxed">
+                            hackbench是Linux调度器基准测试，创建多对发送者/接收者线程通过pipe/socket通信
+                        </p>
+                    </div>
+                    <div class="p-5 bg-gradient-to-br from-[#F59E0B]/20 to-[#EF4444]/20 rounded-xl border border-[#F59E0B]/50">
+                        <h4 class="text-lg font-semibold text-[#F1F5F9] mb-3"><i class="fas fa-key text-[#F59E0B] mr-2"></i>关键发现</h4>
+                        <p class="text-sm text-[#F1F5F9]/80 leading-relaxed">
+                            当<span class="text-[#F59E0B] font-semibold">活跃线程数少于LLC容量</span>时，提升最明显；多组场景提升有限
+                        </p>
+                    </div>
+                </div>
+                <div class="col-span-3 p-5 bg-[#1E293B] rounded-xl">
+                    <h4 class="text-lg font-semibold text-[#F1F5F9] mb-4">Sapphire Rapids结果（v6）</h4>
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="bg-[#0F172A]">
+                                <th class="p-2 text-left text-[#F1F5F9] font-semibold">配置</th>
+                                <th class="p-2 text-center text-[#F1F5F9] font-semibold">基线</th>
+                                <th class="p-2 text-center text-[#F1F5F9] font-semibold">缓存感知</th>
+                                <th class="p-2 text-center text-[#F1F5F9] font-semibold">提升</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-[#F1F5F9]/70">
+                            <tr class="border-b border-[#334155]">
+                                <td class="p-2">threads-pipe-2, 1-group</td>
+                                <td class="p-2 text-center">基准</td>
+                                <td class="p-2 text-center text-[#3B82F6] font-semibold">+29.06%</td>
+                                <td class="p-2 text-center"><span class="px-2 py-1 bg-[#10B981]/20 text-[#10B981] text-xs rounded">显著</span></td>
+                            </tr>
+                            <tr class="border-b border-[#334155]">
+                                <td class="p-2">threads-pipe-4, 1-group</td>
+                                <td class="p-2 text-center">基准</td>
+                                <td class="p-2 text-center text-[#3B82F6] font-semibold">+28.63%</td>
+                                <td class="p-2 text-center"><span class="px-2 py-1 bg-[#10B981]/20 text-[#10B981] text-xs rounded">显著</span></td>
+                            </tr>
+                            <tr class="border-b border-[#334155]">
+                                <td class="p-2">threads-pipe-8, 1-group</td>
+                                <td class="p-2 text-center">基准</td>
+                                <td class="p-2 text-center text-[#3B82F6] font-semibold">+24.68%</td>
+                                <td class="p-2 text-center"><span class="px-2 py-1 bg-[#10B981]/20 text-[#10B981] text-xs rounded">显著</span></td>
+                            </tr>
+                            <tr class="border-b border-[#334155]">
+                                <td class="p-2">threads-pipe-16, 1-group</td>
+                                <td class="p-2 text-center">基准</td>
+                                <td class="p-2 text-center text-[#3B82F6] font-semibold">+28.46%</td>
+                                <td class="p-2 text-center"><span class="px-2 py-1 bg-[#10B981]/20 text-[#10B981] text-xs rounded">显著</span></td>
+                            </tr>
+                            <tr class="border-b border-[#334155]">
+                                <td class="p-2">threads-pipe-*, 2-group</td>
+                                <td class="p-2 text-center">基准</td>
+                                <td class="p-2 text-center text-[#F1F5F9]/50">-1% ~ +8%</td>
+                                <td class="p-2 text-center"><span class="px-2 py-1 bg-[#F1F5F9]/10 text-[#F1F5F9]/50 text-xs rounded">不明显</span></td>
+                            </tr>
+                            <tr>
+                                <td class="p-2">threads-pipe-*, 4/8-group</td>
+                                <td class="p-2 text-center">基准</td>
+                                <td class="p-2 text-center text-[#F1F5F9]/50">-1% ~ +8%</td>
+                                <td class="p-2 text-center"><span class="px-2 py-1 bg-[#F1F5F9]/10 text-[#F1F5F9]/50 text-xs rounded">不明显</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第35页：Schbench 与 ChaCha20 测试结果 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="content">
+        <div class="h-full flex flex-col">
+            <h3 class="text-2xl font-bold text-[#F1F5F9] mb-5">Schbench 与 ChaCha20 测试结果</h3>
+            <div class="flex-1 grid grid-cols-2 gap-5">
+                <div class="p-5 bg-[#1E293B] rounded-xl">
+                    <h4 class="text-lg font-semibold text-[#3B82F6] mb-4">Schbench（调度延迟测试）</h4>
+                    <p class="text-sm text-[#F1F5F9]/60 mb-4">测试99th百分位唤醒延迟</p>
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between p-3 bg-[#0F172A] rounded-lg">
+                            <span class="text-sm text-[#F1F5F9]/70">thread=2</span>
+                            <span class="text-sm text-[#3B82F6]">13.33ms → 13.00ms</span>
+                            <span class="text-sm text-[#10B981] font-semibold">+2.48%</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-[#0F172A] rounded-lg">
+                            <span class="text-sm text-[#F1F5F9]/70">thread=4</span>
+                            <span class="text-sm text-[#3B82F6]">12.33ms → 9.67ms</span>
+                            <span class="text-sm text-[#10B981] font-semibold">+21.57%</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-[#0F172A] rounded-lg">
+                            <span class="text-sm text-[#F1F5F9]/70">thread=8</span>
+                            <span class="text-sm text-[#3B82F6]">10.00ms → 10.67ms</span>
+                            <span class="text-sm text-[#EF4444]">-6.70%</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-[#0F172A] rounded-lg">
+                            <span class="text-sm text-[#F1F5F9]/70">thread=16</span>
+                            <span class="text-sm text-[#3B82F6]">10.00ms → 9.33ms</span>
+                            <span class="text-sm text-[#10B981] font-semibold">+6.70%</span>
+                        </div>
+                    </div>
+                    <p class="text-xs text-[#F1F5F9]/50 mt-3">总体趋势：中等负载下唤醒延迟改善明显</p>
+                </div>
+                <div class="p-5 bg-[#1E293B] rounded-xl">
+                    <h4 class="text-lg font-semibold text-[#F59E0B] mb-4">ChaCha20-xiangshan</h4>
+                    <p class="text-sm text-[#F1F5F9]/60 mb-4">RISC-V模拟器，大量共享内存访问</p>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-[#0F172A] rounded-lg">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i class="fab fa-amd text-[#F59E0B]"></i>
+                                <span class="text-sm font-semibold text-[#F1F5F9]">AMD Genoa</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-xs text-[#F1F5F9]/50">基线</p>
+                                    <p class="text-xl font-bold text-[#F1F5F9]/50">51432ms</p>
+                                </div>
+                                <i class="fas fa-arrow-right text-[#F1F5F9]/30"></i>
+                                <div>
+                                    <p class="text-xs text-[#F1F5F9]/50">缓存感知</p>
+                                    <p class="text-xl font-bold text-[#10B981]">28664ms</p>
+                                </div>
+                                <div class="px-3 py-1 bg-[#10B981]/20 rounded">
+                                    <p class="text-lg font-bold text-[#10B981]">-45%</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-[#0F172A] rounded-lg">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i class="fab fa-intel text-[#3B82F6]"></i>
+                                <span class="text-sm font-semibold text-[#F1F5F9]">Intel Sapphire Rapids</span>
+                            </div>
+                            <p class="text-sm text-[#F1F5F9]/70">约<span class="text-[#3B82F6] font-bold">10%</span>提升</p>
+                        </div>
+                    </div>
+                    <div class="mt-4 p-3 bg-gradient-to-r from-[#F59E0B]/20 to-[#10B981]/20 rounded-lg border border-[#F59E0B]/30">
+                        <p class="text-xs text-[#F1F5F9]/80">
+                            <i class="fas fa-star text-[#F59E0B] mr-2"></i>
+                            该测试最能体现缓存感知调度优势
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第36页：其他测试与回归分析 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="content">
+        <div class="h-full flex flex-col">
+            <h3 class="text-2xl font-bold text-[#F1F5F9] mb-5">其他测试与回归分析</h3>
+            <div class="flex-1 grid grid-cols-3 gap-4">
+                <div class="p-5 bg-[#1E293B] rounded-xl">
+                    <div class="flex items-center gap-2 mb-4">
+                        <i class="fas fa-water text-[#3B82F6] text-xl"></i>
+                        <h4 class="text-lg font-semibold text-[#F1F5F9]">Stream</h4>
+                    </div>
+                    <p class="text-sm text-[#F1F5F9]/60 mb-3">内存带宽测试</p>
+                    <div class="p-3 bg-[#0F172A] rounded-lg mb-3">
+                        <p class="text-sm text-[#F1F5F9]/70">512MB/2GB数据集</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-2xl font-bold text-[#F1F5F9]/50">~0%</span>
+                        <span class="text-xs text-[#F1F5F9]/50">无显著差异</span>
+                    </div>
+                    <p class="text-xs text-[#F1F5F9]/40 mt-2">Stream是内存密集型，缓存影响有限</p>
+                </div>
+                <div class="p-5 bg-[#1E293B] rounded-xl">
+                    <div class="flex items-center gap-2 mb-4">
+                        <i class="fas fa-network-wired text-[#06B6D4] text-xl"></i>
+                        <h4 class="text-lg font-semibold text-[#F1F5F9]">Netperf</h4>
+                    </div>
+                    <p class="text-sm text-[#F1F5F9]/60 mb-3">网络性能测试</p>
+                    <div class="p-3 bg-[#0F172A] rounded-lg mb-3">
+                        <p class="text-sm text-[#F1F5F9]/70">1-256对连接</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-2xl font-bold text-[#F1F5F9]/50">~0%</span>
+                        <span class="text-xs text-[#F1F5F9]/50">无显著差异</span>
+                    </div>
+                    <p class="text-xs text-[#F1F5F9]/40 mt-2">网络I/O主导，CPU调度影响小</p>
+                </div>
+                <div class="p-5 bg-[#1E293B] rounded-xl">
+                    <div class="flex items-center gap-2 mb-4">
+                        <i class="fas fa-dumbbell text-[#F59E0B] text-xl"></i>
+                        <h4 class="text-lg font-semibold text-[#F1F5F9]">Stress-ng</h4>
+                    </div>
+                    <p class="text-sm text-[#F1F5F9]/60 mb-3">压力测试</p>
+                    <div class="p-3 bg-[#0F172A] rounded-lg mb-3">
+                        <p class="text-sm text-[#F1F5F9]/70">上下文切换测试</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-2xl font-bold text-[#F1F5F9]/50">~0%</span>
+                        <span class="text-xs text-[#F1F5F9]/50">无显著差异</span>
+                    </div>
+                    <p class="text-xs text-[#F1F5F9]/40 mt-2">压力测试场景缓存影响有限</p>
+                </div>
+            </div>
+            <div class="mt-4 p-5 bg-gradient-to-br from-[#EF4444]/20 to-[#F59E0B]/20 rounded-xl border border-[#EF4444]/50">
+                <h4 class="text-lg font-semibold text-[#EF4444] mb-3"><i class="fas fa-exclamation-triangle mr-2"></i>已知回归场景</h4>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="p-3 bg-[#0F172A] rounded-lg">
+                        <p class="text-sm text-[#F1F5F9]/70">
+                            <span class="text-[#EF4444] font-semibold">IBM Power10：</span>小LLC（SMT4共享）+ 大内存占用工作负载
+                        </p>
+                    </div>
+                    <div class="p-3 bg-[#0F172A] rounded-lg">
+                        <p class="text-sm text-[#F1F5F9]/70">
+                            <span class="text-[#3B82F6] font-semibold">缓解方案：</span>可通过调整sched_cache_ignore_rss缓解
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第37页：章节过渡页 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="chapter">
+        <div class="absolute inset-0 bg-gradient-to-r from-[#06B6D4]/30 to-transparent"></div>
+        <div class="relative h-full flex flex-col justify-center">
+            <div class="text-9xl font-bold text-[#06B6D4]/20 mb-4">08</div>
+            <h2 class="text-5xl font-bold text-[#F1F5F9] mb-6">未来展望</h2>
+            <p class="text-2xl text-[#F1F5F9]/70">下一步发展方向</p>
+        </div>
+    </div>
+
+    <!-- 第38页：待解决问题与后续工作 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="content">
+        <div class="h-full flex flex-col">
+            <h3 class="text-2xl font-bold text-[#F1F5F9] mb-5">待解决问题与后续工作</h3>
+            <div class="flex-1 grid grid-cols-2 gap-5">
+                <div class="space-y-4">
+                    <div class="p-5 bg-[#1E293B] rounded-xl border-l-4 border-[#3B82F6]">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 bg-[#3B82F6]/20 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-users text-[#3B82F6]"></i>
+                            </div>
+                            <h4 class="text-lg font-semibold text-[#F1F5F9]">更灵活的任务分组</h4>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="p-2 bg-[#0F172A] rounded-lg">
+                                <p class="text-xs text-[#F1F5F9]/50">当前</p>
+                                <p class="text-sm text-[#F1F5F9]/70">仅支持进程级别分组</p>
+                            </div>
+                            <div class="p-2 bg-[#0F172A] rounded-lg border border-[#3B82F6]/30">
+                                <p class="text-xs text-[#3B82F6]">未来</p>
+                                <p class="text-sm text-[#F1F5F9]/70">支持NUMA组、waker/wakee关系、cgroups、用户自定义组</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-5 bg-[#1E293B] rounded-xl border-l-4 border-[#06B6D4]">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 bg-[#06B6D4]/20 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-sliders-h text-[#06B6D4]"></i>
+                            </div>
+                            <h4 class="text-lg font-semibold text-[#F1F5F9]">可配置调度策略</h4>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="p-2 bg-[#0F172A] rounded-lg">
+                                <p class="text-xs text-[#F1F5F9]/50">当前</p>
+                                <p class="text-sm text-[#F1F5F9]/70">全局统一策略</p>
+                            </div>
+                            <div class="p-2 bg-[#0F172A] rounded-lg border border-[#06B6D4]/30">
+                                <p class="text-xs text-[#06B6D4]">未来</p>
+                                <p class="text-sm text-[#F1F5F9]/70">per-process、per-task-group策略，通过prctl()或cgroups暴露</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div class="p-5 bg-[#1E293B] rounded-xl border-l-4 border-[#F59E0B]">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 bg-[#F59E0B]/20 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-microchip text-[#F59E0B]"></i>
+                            </div>
+                            <h4 class="text-lg font-semibold text-[#F1F5F9]">更多架构支持</h4>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="p-2 bg-[#0F172A] rounded-lg">
+                                <p class="text-xs text-[#F1F5F9]/50">当前</p>
+                                <p class="text-sm text-[#F1F5F9]/70">主要针对x86（Intel/AMD）</p>
+                            </div>
+                            <div class="p-2 bg-[#0F172A] rounded-lg border border-[#F59E0B]/30">
+                                <p class="text-xs text-[#F59E0B]">未来</p>
+                                <p class="text-sm text-[#F1F5F9]/70">优化ARM64（Neoverse）、RISC-V等架构支持</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-5 bg-[#1E293B] rounded-xl border-l-4 border-[#8B5CF6]">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 bg-[#8B5CF6]/20 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-brain text-[#8B5CF6]"></i>
+                            </div>
+                            <h4 class="text-lg font-semibold text-[#F1F5F9]">运行时自适应</h4>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="p-2 bg-[#0F172A] rounded-lg">
+                                <p class="text-xs text-[#F1F5F9]/50">当前</p>
+                                <p class="text-sm text-[#F1F5F9]/70">基于RSS和线程数的启发式</p>
+                            </div>
+                            <div class="p-2 bg-[#0F172A] rounded-lg border border-[#8B5CF6]/30">
+                                <p class="text-xs text-[#8B5CF6]">未来</p>
+                                <p class="text-sm text-[#F1F5F9]/70">基于实际缓存未命中率反馈的自适应算法</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第39页：合入时间线预测 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="content">
+        <div class="h-full flex flex-col">
+            <h3 class="text-2xl font-bold text-[#F1F5F9] mb-5">合入时间线预测</h3>
+            <div class="flex-1 grid grid-cols-5 gap-5">
+                <div class="col-span-2 space-y-4">
+                    <div class="p-5 bg-[#1E293B] rounded-xl">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fas fa-calendar-check text-[#3B82F6] text-xl"></i>
+                            <h4 class="text-lg font-semibold text-[#F1F5F9]">当前状态</h4>
+                        </div>
+                        <p class="text-sm text-[#F1F5F9]/70">
+                            <span class="text-[#3B82F6] font-semibold">2026年2月</span>：v6补丁已发布，社区审查中
+                        </p>
+                    </div>
+                    <div class="p-5 bg-gradient-to-br from-[#EF4444]/20 to-[#F59E0B]/20 rounded-xl border border-[#EF4444]/50">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fas fa-road text-[#EF4444] text-xl"></i>
+                            <h4 class="text-lg font-semibold text-[#F1F5F9]">主要障碍</h4>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="flex items-start gap-2">
+                                <span class="text-[#EF4444] font-bold">1</span>
+                                <p class="text-sm text-[#F1F5F9]/70">需要更多真实工作负载的长期测试数据</p>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <span class="text-[#EF4444] font-bold">2</span>
+                                <p class="text-sm text-[#F1F5F9]/70">某些边缘场景的性能回退需要进一步解决</p>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <span class="text-[#EF4444] font-bold">3</span>
+                                <p class="text-sm text-[#F1F5F9]/70">用户接口设计需要社区共识</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-span-3 space-y-4">
+                    <div class="p-5 bg-[#1E293B] rounded-xl">
+                        <h4 class="text-lg font-semibold text-[#F1F5F9] mb-4">时间线预测</h4>
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-4 p-4 bg-gradient-to-r from-[#10B981]/20 to-transparent rounded-lg border border-[#10B981]/30">
+                                <div class="w-12 h-12 bg-[#10B981]/20 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-rocket text-[#10B981]"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-semibold text-[#10B981]">乐观预测</p>
+                                    <p class="text-lg font-bold text-[#F1F5F9]">Linux 6.20</p>
+                                    <p class="text-xs text-[#F1F5F9]/50">2026年中</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4 p-4 bg-gradient-to-r from-[#F59E0B]/20 to-transparent rounded-lg border border-[#F59E0B]/30">
+                                <div class="w-12 h-12 bg-[#F59E0B]/20 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-clock text-[#F59E0B]"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-semibold text-[#F59E0B]">保守预测</p>
+                                    <p class="text-lg font-bold text-[#F1F5F9]">Linux 6.21 或 6.22</p>
+                                    <p class="text-xs text-[#F1F5F9]/50">2026年底</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-5 bg-[#1E293B] rounded-xl">
+                        <h4 class="text-lg font-semibold text-[#F1F5F9] mb-3">关键里程碑</h4>
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-2 p-2 bg-[#0F172A] rounded-lg">
+                                <i class="fas fa-check-circle text-[#3B82F6]"></i>
+                                <p class="text-sm text-[#F1F5F9]/70">获得Peter Zijlstra、Ingo Molnar等核心维护者的Reviewed-by</p>
+                            </div>
+                            <div class="flex items-center gap-2 p-2 bg-[#0F172A] rounded-lg">
+                                <i class="fas fa-check-circle text-[#06B6D4]"></i>
+                                <p class="text-sm text-[#F1F5F9]/70">通过0-day测试机器人的回归测试</p>
+                            </div>
+                            <div class="flex items-center gap-2 p-2 bg-[#0F172A] rounded-lg">
+                                <i class="fas fa-check-circle text-[#F59E0B]"></i>
+                                <p class="text-sm text-[#F1F5F9]/70">至少两个主要发行版的预览集成</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第40页：总结 -->
+    <div class="ppt-slide !bg-[#0F172A]" type="final">
+        <div class="absolute inset-0 bg-gradient-to-br from-[#3B82F6]/20 via-transparent to-[#06B6D4]/20"></div>
+        <div class="relative h-full flex flex-col justify-center">
+            <h2 class="text-4xl font-bold text-[#F1F5F9] mb-8 text-center">总结</h2>
+            <div class="grid grid-cols-2 gap-6 mb-8">
+                <div class="p-6 bg-[#1E293B]/80 rounded-xl backdrop-blur">
+                    <div class="flex items-center gap-3 mb-4">
+                        <i class="fas fa-lightbulb text-[#F59E0B] text-2xl"></i>
+                        <h3 class="text-xl font-semibold text-[#F1F5F9]">核心洞察</h3>
+                    </div>
+                    <p class="text-sm text-[#F1F5F9]/70 leading-relaxed">
+                        Cache Aware Scheduling是Linux调度器在现代多LLC CPU架构下的<span class="text-[#F59E0B] font-semibold">必要演进</span>，通过将共享数据的任务聚合到同一LLC，可显著提升性能。
+                    </p>
+                </div>
+                <div class="p-6 bg-[#1E293B]/80 rounded-xl backdrop-blur">
+                    <div class="flex items-center gap-3 mb-4">
+                        <i class="fas fa-chart-line text-[#3B82F6] text-2xl"></i>
+                        <h3 class="text-xl font-semibold text-[#F1F5F9]">关键数据</h3>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="text-center p-3 bg-[#0F172A] rounded-lg">
+                            <p class="text-2xl font-bold text-[#10B981]">44%</p>
+                            <p class="text-xs text-[#F1F5F9]/50">AMD Genoa提升</p>
+                        </div>
+                        <div class="text-center p-3 bg-[#0F172A] rounded-lg">
+                            <p class="text-2xl font-bold text-[#3B82F6]">31%</p>
+                            <p class="text-xs text-[#F1F5F9]/50">Intel SPR提升</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-6 bg-[#1E293B]/80 rounded-xl backdrop-blur mb-8">
+                <div class="flex items-center gap-3 mb-4">
+                    <i class="fas fa-cogs text-[#06B6D4] text-2xl"></i>
+                    <h3 class="text-xl font-semibold text-[#F1F5F9]">技术贡献</h3>
+                </div>
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="p-3 bg-[#0F172A] rounded-lg">
+                        <p class="text-sm text-[#F1F5F9]/70">建立了完整的缓存感知调度框架</p>
+                    </div>
+                    <div class="p-3 bg-[#0F172A] rounded-lg">
+                        <p class="text-sm text-[#F1F5F9]/70">解决了与NUMA Balancing的协调问题</p>
+                    </div>
+                    <div class="p-3 bg-[#0F172A] rounded-lg">
+                        <p class="text-sm text-[#F1F5F9]/70">引入了动态自适应机制避免过度聚合</p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-6 bg-gradient-to-r from-[#3B82F6]/20 to-[#06B6D4]/20 rounded-xl border border-[#3B82F6]/30">
+                <div class="flex items-center gap-4">
+                    <i class="fas fa-heart text-[#EF4444] text-3xl"></i>
+                    <div>
+                        <h3 class="text-lg font-semibold text-[#F1F5F9] mb-1">社区价值</h3>
+                        <p class="text-sm text-[#F1F5F9]/70">Intel主导开发，但AMD平台获益更大，体现了<span class="text-[#F1F5F9] font-semibold">开源协作的力量</span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 text-center">
+                <p class="text-sm text-[#F1F5F9]/50">
+                    <i class="fas fa-users mr-2"></i>
+                    感谢 Peter Zijlstra、Tim Chen、Chen Yu、K Prateek Nayak 及所有社区贡献者
+                </p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>openEuler Kernel Dashboard - Linux内核与系统性能优化</title>
+  <meta name="description" content="Linux 内核与系统性能优化技术分享">
+  
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>openEuler Kernel Dashboard | Linux内核与系统性能优化</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="openEuler Kernel Dashboard" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Linux 内核与系统性能优化技术分享" />
+<meta property="og:description" content="Linux 内核与系统性能优化技术分享" />
+<link rel="canonical" href="https://xiexiuqi.github.io/openeuler/dashboard/" />
+<meta property="og:url" content="https://xiexiuqi.github.io/openeuler/dashboard/" />
+<meta property="og:site_name" content="Linux内核与系统性能优化" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="openEuler Kernel Dashboard" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","description":"Linux 内核与系统性能优化技术分享","headline":"openEuler Kernel Dashboard","url":"https://xiexiuqi.github.io/openeuler/dashboard/"}</script>
+<!-- End Jekyll SEO tag -->
+
+  
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <link type="application/atom+xml" rel="alternate" href="https://xiexiuqi.github.io/feed.xml" title="Linux内核与系统性能优化" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrapper">
+      <a class="site-title" href="/">Linux内核与系统性能优化</a>
+      <nav class="site-nav">
+        <a href="/">首页</a>
+        <a href="/reports/">性能报告</a>
+        <a href="/daily/">日报</a>
+        <a href="/features/">特性分析</a>
+        <a href="/openeuler/">openEuler Kernel</a>
+        <a href="/search/">🔍</a>
+        <a href="/about/">关于</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-content">
+    <div class="wrapper">
+      <style>
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.stat-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1.2rem 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  text-align: center;
+  border-left: 4px solid #2d5a87;
+}
+.stat-card .value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1e3a5f;
+}
+.stat-card .label {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 0.3rem;
+}
+.dashboard-section {
+  margin: 2rem 0;
+}
+.trend-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  height: 140px;
+  padding: 1rem 0;
+}
+.trend-bar {
+  flex: 1;
+  background: #2d5a87;
+  border-radius: 4px 4px 0 0;
+  min-height: 4px;
+  position: relative;
+}
+.trend-bar .tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.trend-bar:hover .tooltip {
+  opacity: 1;
+}
+.trend-labels {
+  display: flex;
+  gap: 0.5rem;
+}
+.trend-labels span {
+  flex: 1;
+  text-align: center;
+  font-size: 12px;
+  color: #666;
+}
+
+/* Search and filters */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+.search-box {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.6rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.filter-chip {
+  padding: 0.4rem 0.9rem;
+  border-radius: 20px;
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+.filter-chip:hover, .filter-chip.active {
+  background: #1e3a5f;
+  color: #fff;
+  border-color: #1e3a5f;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 0.3rem;
+  margin: 1rem 0;
+  flex-wrap: wrap;
+}
+.pagination li {
+  list-style: none;
+}
+.pagination a, .pagination span {
+  display: block;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  text-decoration: none;
+  color: #333;
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+}
+.pagination a:hover, .pagination .active a {
+  background: #1e3a5f;
+  color: #fff;
+  border-color: #1e3a5f;
+}
+
+/* Table */
+.patch-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  font-size: 0.92rem;
+}
+.patch-table th,
+.patch-table td {
+  border: 1px solid #e0e0e0;
+  padding: 10px;
+  text-align: left;
+}
+.patch-table th {
+  background: #f5f7fa;
+  font-weight: 600;
+}
+.patch-table tr:nth-child(even) {
+  background: #fafafa;
+}
+.patch-table tr:hover {
+  background: #eef4fa;
+}
+.badge {
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.atomgit-link {
+  color: #1e3a5f;
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+.atomgit-link:hover {
+  text-decoration: underline;
+}
+.loading {
+  color: #666;
+  padding: 1rem 0;
+}
+.error {
+  color: #c62828;
+  padding: 1rem 0;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .patch-table thead {
+    display: none;
+  }
+  .patch-table, .patch-table tbody, .patch-table tr, .patch-table td {
+    display: block;
+    width: 100%;
+  }
+  .patch-table tr {
+    margin-bottom: 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .patch-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.7rem 1rem;
+    border: none;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .patch-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #666;
+    flex-shrink: 0;
+    margin-right: 1rem;
+  }
+  .patch-table td:last-child {
+    border-bottom: none;
+  }
+}
+</style>
+
+<div class="dashboard-header">
+  <h1>openEuler Kernel Dashboard</h1>
+  <a href="https://atomgit.com/openeuler/kernel/merge_requests" class="btn btn-primary" target="_blank" rel="noopener">🔗 atomgit MR 列表</a>
+</div>
+
+<p id="last-updated" class="loading">正在加载数据...</p>
+
+<div class="dashboard-stats" id="stats-container"></div>
+
+<div class="dashboard-section">
+  <h2>📈 最近7天趋势</h2>
+  <div id="trend-container"></div>
+</div>
+
+<div class="dashboard-section" id="report-dashboard">
+  <h2>📝 Review 报告列表</h2>
+  
+  <div class="filter-bar">
+    <input type="text" class="search search-box" placeholder="🔍 搜索 PR 号、标题...">
+    <div class="filter-chips">
+      <span class="filter-chip active" data-filter="all">全部</span>
+      <span class="filter-chip" data-filter="✅ LGTM">✅ LGTM</span>
+      <span class="filter-chip" data-filter="⚠️ Request Changes">⚠️ Request Changes</span>
+      <span class="filter-chip" data-filter="❌ NACK">❌ NACK</span>
+      <span class="filter-chip" data-filter="⏳ Pending">⏳ Pending</span>
+    </div>
+  </div>
+
+  <table class="patch-table">
+    <thead>
+      <tr>
+        <th>PR</th>
+        <th>标题</th>
+        <th>日期</th>
+        <th>结论</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody class="list" id="patches-tbody">
+      <!-- JS populates this -->
+    </tbody>
+  </table>
+  
+  <ul class="pagination"></ul>
+  <p id="report-count" style="color:#666;font-size:0.9rem;text-align:center;"></p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
+<script>
+(function() {
+  const dataUrl = '/openeuler/data/pr-status.json';
+  let reportList = null;
+
+  const verdictClassMap = {
+    '✅ LGTM': 'lgtm',
+    '⚠️ Request Changes': 'request-changes',
+    '❌ NACK': 'nack',
+    '⏳ Pending': 'pending'
+  };
+
+  function getBadgeStyle(verdict) {
+    const styles = {
+      '✅ LGTM': 'background:#e8f5e9;color:#2e7d32;',
+      '⚠️ Request Changes': 'background:#fff3e0;color:#ef6c00;',
+      '❌ NACK': 'background:#ffebee;color:#c62828;',
+      '⏳ Pending': 'background:#e3f2fd;color:#1565c0;'
+    };
+    return styles[verdict] || 'background:#f5f5f5;color:#333;';
+  }
+
+  function renderStats(stats, verdictDistribution) {
+    const container = document.getElementById('stats-container');
+    const vd = verdictDistribution || {};
+    const items = [
+      { value: stats.total_patches || 0, label: '报告总数' },
+      { value: vd['✅ LGTM'] || 0, label: '✅ LGTM' },
+      { value: vd['⚠️ Request Changes'] || 0, label: '⚠️ Request Changes' },
+      { value: vd['❌ NACK'] || 0, label: '❌ NACK' },
+    ];
+    container.innerHTML = items.map(function(item) {
+      return '<div class="stat-card"><div class="value">' + item.value +
+             '</div><div class="label">' + item.label + '</div></div>';
+    }).join('');
+  }
+
+  function renderTrend(trend) {
+    const container = document.getElementById('trend-container');
+    if (!trend || trend.length === 0) {
+      container.innerHTML = '<p>暂无趋势数据</p>';
+      return;
+    }
+    const max = Math.max.apply(null, trend.map(function(t) { return t.count; })) || 1;
+    let barsHtml = '<div class="trend-bars">';
+    let labelsHtml = '<div class="trend-labels">';
+    trend.forEach(function(t) {
+      const height = Math.max((t.count / max) * 100, 4);
+      const label = t.date.slice(5);
+      barsHtml += '<div class="trend-bar" style="height:' + height + '%"' +
+                  ' title="' + t.date + ': ' + t.count + '">' +
+                  '<span class="tooltip">' + t.date + ': ' + t.count + '</span></div>';
+      labelsHtml += '<span>' + label + '</span>';
+    });
+    barsHtml += '</div>';
+    labelsHtml += '</div>';
+    container.innerHTML = barsHtml + labelsHtml;
+  }
+
+  function renderTable(patches) {
+    const tbody = document.getElementById('patches-tbody');
+    tbody.innerHTML = patches.map(function(p) {
+      const badgeStyle = getBadgeStyle(p.verdict);
+      return '<tr>' +
+        '<td data-label="PR"><a href="' + p.url + '" class="pr-link">' + p.id + '</a></td>' +
+        '<td data-label="标题"><a href="' + p.url + '" class="title-link">' + (p.title || '') + '</a></td>' +
+        '<td data-label="日期">' + p.date + '</td>' +
+        '<td data-label="结论"><span class="badge" style="' + badgeStyle + '">' + p.verdict + '</span></td>' +
+        '<td data-label="操作">' +
+          '<a href="' + p.atomgit_url + '" class="atomgit-link" target="_blank" rel="noopener">🔗 atomgit</a>' +
+        '</td>' +
+      '</tr>';
+    }).join('');
+
+    document.getElementById('report-count').textContent = '共 ' + patches.length + ' 条报告';
+  }
+
+  function initListJs() {
+    if (reportList) {
+      reportList.destroy && reportList.destroy();
+    }
+    reportList = new List('report-dashboard', {
+      valueNames: [
+        { name: 'pr-link', attr: 'href' },
+        'title-link',
+        { name: 'badge', attr: 'class' },
+        { name: 'atomgit-link', attr: 'href' }
+      ],
+      page: 20,
+      pagination: [
+        {
+          name: "pagination",
+          paginationClass: "pagination",
+          innerWindow: 2,
+          outerWindow: 1
+        }
+      ]
+    });
+
+    document.querySelectorAll('.filter-chip').forEach(function(chip) {
+      chip.addEventListener('click', function() {
+        document.querySelectorAll('.filter-chip').forEach(function(c) { c.classList.remove('active'); });
+        chip.classList.add('active');
+        const filter = chip.dataset.filter;
+        if (filter === 'all') {
+          reportList.filter();
+        } else {
+          reportList.filter(function(item) {
+            const row = item.elm;
+            const badge = row.querySelector('.badge');
+            return badge && badge.textContent === filter;
+          });
+        }
+      });
+    });
+  }
+
+  fetch(dataUrl)
+    .then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    })
+    .then(function(data) {
+      const updated = data.last_updated ? new Date(data.last_updated).toLocaleString('zh-CN') : '-';
+      document.getElementById('last-updated').textContent = '数据更新时间：' + updated;
+      renderStats(data.stats || {}, data.stats && data.stats.verdict_distribution);
+      renderTrend(data.trend || []);
+      renderTable(data.patches || []);
+      initListJs();
+    })
+    .catch(function(err) {
+      document.getElementById('last-updated').innerHTML = '<span class="error">加载失败：' + err.message + '</span>';
+    });
+})();
+</script>
+
+      
+      <!-- AI Disclaimer -->
+      <div class="ai-disclaimer">
+        <strong>⚠️ 免责声明</strong>
+        <p>本网站内容由 AI 工具辅助生成，仅供参考和学习使用。作者不对内容的准确性、完整性和适用性做任何保证。使用本站信息所造成的任何损失，作者不承担任何责任。请在生产环境使用前进行充分测试和验证。</p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrapper">
+      <p>专注于 Linux 内核与系统性能优化技术分享</p>
+      <p>&copy; 2026 All rights reserved.</p>
+      <p><a href="/about/">查看免责声明</a></p>
+    </div>
+  </footer>
+</body>
+</html>

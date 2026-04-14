@@ -1,0 +1,1898 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>服务器处理器详细规格表 (按型号排序)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+            line-height: 1.4;
+        }
+        
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: white;
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: rgba(255,255,255,0.9);
+            font-size: 1em;
+            margin-bottom: 20px;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow-x: auto;
+        }
+        
+        .section-title {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 3px solid;
+        }
+        
+        .intel-title {
+            color: #0071c5;
+            border-color: #0071c5;
+        }
+        
+        .amd-title {
+            color: #ed1c24;
+            border-color: #ed1c24;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 0.82em;
+            min-width: 1600px;
+        }
+        
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        th {
+            padding: 10px 6px;
+            text-align: center;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border: 1px solid rgba(255,255,255,0.2);
+            font-size: 0.9em;
+        }
+        
+        td {
+            padding: 8px 6px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+            vertical-align: middle;
+        }
+        
+        tbody tr:hover {
+            background-color: #f5f5f5;
+            transition: all 0.2s ease;
+        }
+        
+        /* Intel Generations */
+        .intel-gen6 {
+            background-color: #e8f4f8;
+        }
+        .intel-gen5 {
+            background-color: #f0f8e8;
+        }
+        .intel-gen4 {
+            background-color: #f8f0e8;
+        }
+        
+        /* AMD Generations */
+        .amd-gen5 {
+            background-color: #ffe8e8;
+        }
+        .amd-gen4 {
+            background-color: #fff0e8;
+        }
+        .amd-bergamo {
+            background-color: #f8e8ff;
+        }
+        
+        .model-name {
+            font-weight: bold;
+            font-size: 1.05em;
+        }
+        
+        .generation-tag {
+            font-size: 0.85em;
+            color: #666;
+            display: block;
+            margin-top: 2px;
+        }
+        
+        .cache-detail {
+            font-size: 0.85em;
+            line-height: 1.3;
+        }
+        
+        .cache-l1 {
+            color: #2196F3;
+        }
+        
+        .cache-l2 {
+            color: #4CAF50;
+        }
+        
+        .cache-l3 {
+            color: #FF9800;
+            font-weight: bold;
+        }
+        
+        .spec-highlight {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .tdp-value {
+            font-weight: 600;
+        }
+        
+        .freq-base {
+            color: #666;
+        }
+        
+        .freq-boost {
+            color: #2196F3;
+            font-weight: 600;
+        }
+        
+        .footer {
+            text-align: center;
+            color: rgba(255,255,255,0.8);
+            margin-top: 20px;
+            font-size: 0.85em;
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+            color: white;
+        }
+        
+        .legend-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .notes {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .notes h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 8px;
+            font-size: 0.85em;
+        }
+        
+        .notes-item {
+            padding: 5px 0;
+        }
+        
+        @media (max-width: 1200px) {
+            table {
+                font-size: 0.75em;
+            }
+            th, td {
+                padding: 6px 4px;
+            }
+        }
+        
+        /* Pre-release products */
+        .pre-release {
+            background-color: #fff3cd !important;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .pre-release-badge {
+            display: inline-block;
+            background: #ffc107;
+            color: #856404;
+            font-size: 0.7em;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-left: 5px;
+            font-weight: bold;
+        }
+        
+        .bandwidth-value {
+            color: #52c41a;
+            font-weight: 600;
+        }
+        
+        .ratio-value {
+            color: #722ed1;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>服务器处理器详细规格表 (含预发布产品)</h1>
+        <p class="subtitle">按型号排序 | 包含完整缓存层次结构 | 含预发布产品 | Intel / AMD / 鲲鹏 / 海光 / 飞腾 / 龙芯 / 兆芯 / AWS Graviton / Ampere Altra / Arm AGI</p>
+        <p style="text-align: center; color: rgba(255,255,255,0.9); font-size: 0.9em; margin-top: 10px;">
+            <strong>⚠️ 本页面由 AI 生成，基于公开资料整理 | <a href="specifications-notes.md" style="color: #fff; text-decoration: underline;">查看详细说明和数据来源</a></strong>
+        </p>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-box" style="background: #e8f4f8;"></div>
+                <span>Intel Xeon</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background: #ffe8e8;"></div>
+                <span>AMD EPYC</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background: #fff5f0;"></div>
+                <span>华为鲲鹏</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background: #f9f0ff;"></div>
+                <span>海光</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background: #f6ffed;"></div>
+                <span>飞腾</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background: #fffbe6;"></div>
+                <span>龙芯</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background: #e6fffb;"></div>
+                <span>兆芯</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background: #fff7e6;"></div>
+                <span>AWS Graviton</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background: #e6f7ff;"></div>
+                <span>Ampere Altra</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background: #e8f5e9;"></div>
+                <span>Arm AGI</span>
+            </div>
+        </div>
+
+        <!-- Intel Xeon Table -->
+        <div class="section">
+            <h2 class="section-title intel-title">Intel Xeon Scalable 详细规格表</h2>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>型号</th>
+                        <th>代次/架构</th>
+                        <th>核心/<br>线程</th>
+                        <th>基础频率</th>
+                        <th>加速频率</th>
+                        <th>L1缓存<br>(数据+指令)</th>
+                        <th>L2缓存<br>(每核心)</th>
+                        <th>L3缓存<br>(共享)</th>
+                        <th>TDP</th>
+                        <th>内存类型</th>
+                        <th>内存通道</th>
+                        <th>最大内存</th>
+                        <th>内存带宽</th>
+                        <th>核存比</th>
+                        <th>PCIe</th>
+                        <th>制程</th>
+                        <th>发布时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Intel 7th Gen - Clearwater Forest (预发布) -->
+<tr class="intel-gen6 pre-release">
+                        <td class="model-name spec-highlight">Xeon 7980V<sup class="pre-release-badge">预发布*</sup></td>
+                        <td><strong>7th Gen</strong><br>Clearwater Forest</td>
+                        <td class="spec-highlight">144/288</td>
+                        <td class="freq-base">1.9 GHz</td>
+                        <td class="freq-boost">3.8 GHz</td>
+                        <td class="cache-detail cache-l1">64+64 KB</td>
+                        <td class="cache-detail cache-l2">2 MB/核<br>共288MB</td>
+                        <td class="cache-detail cache-l3">576 MB</td>
+                        <td class="tdp-value">500W</td>
+                        <td>DDR5-7200</td>
+                        <td>12</td>
+                        <td>12 TB</td>
+                        <td class="bandwidth-value">691 GB/s</td>
+                        <td class="ratio-value">4.80 GB/核</td>
+                        <td>5.0 x96</td>
+                        <td>Intel 18A</td>
+                        <td>2025 Q4*</td>
+                    </tr>
+                    <tr class="intel-gen6 pre-release">
+                        <td class="model-name">Xeon 7960V<sup class="pre-release-badge">预发布*</sup></td>
+                        <td><strong>7th Gen</strong><br>Clearwater Forest</td>
+                        <td>96/192</td>
+                        <td class="freq-base">2.0 GHz</td>
+                        <td class="freq-boost">3.9 GHz</td>
+                        <td class="cache-detail cache-l1">64+64 KB</td>
+                        <td class="cache-detail cache-l2">2 MB/核<br>共192MB</td>
+                        <td class="cache-detail cache-l3">384 MB</td>
+                        <td class="tdp-value">400W</td>
+                        <td>DDR5-7200</td>
+                        <td>12</td>
+                        <td>12 TB</td>
+                        <td class="bandwidth-value">691 GB/s</td>
+                        <td class="ratio-value">7.20 GB/核</td>
+                        <td>5.0 x96</td>
+                        <td>Intel 18A</td>
+                        <td>2025 Q4*</td>
+                    </tr>
+                    <!-- Intel 6th Gen - Granite Rapids -->
+                    <tr class="intel-gen6">
+                        <td class="model-name">Xeon 6980P</td>
+                        <td><strong>6th Gen</strong><br>Granite Rapids</td>
+                        <td class="spec-highlight">128/256</td>
+                        <td class="freq-base">2.0 GHz</td>
+                        <td class="freq-boost">3.9 GHz</td>
+                        <td class="cache-detail cache-l1">64+64 KB<br>(128KB/核)</td>
+                        <td class="cache-detail cache-l2">2 MB/核<br>共256MB</td>
+                        <td class="cache-detail cache-l3">504 MB</td>
+                        <td class="tdp-value spec-highlight">500W</td>
+                        <td>DDR5-6400</td>
+                        <td>12</td>
+                        <td>6 TB</td>
+                        <td class="bandwidth-value">614 GB/s</td>
+                        <td class="ratio-value">1:48.0</td>
+                        <td>5.0 x96</td>
+                        <td>Intel 3</td>
+                        <td>2024 Q3</td>
+                    </tr>
+                    <tr class="intel-gen6">
+                        <td class="model-name">Xeon 6972P</td>
+                        <td><strong>6th Gen</strong><br>Granite Rapids</td>
+                        <td>120/240</td>
+                        <td class="freq-base">2.1 GHz</td>
+                        <td class="freq-boost">3.9 GHz</td>
+                        <td class="cache-detail cache-l1">64+64 KB</td>
+                        <td class="cache-detail cache-l2">2 MB/核<br>共240MB</td>
+                        <td class="cache-detail cache-l3">480 MB</td>
+                        <td class="tdp-value spec-highlight">500W</td>
+                        <td>DDR5-6400</td>
+                        <td>12</td>
+                        <td>6 TB</td>
+                        <td class="bandwidth-value">614 GB/s</td>
+                        <td class="ratio-value">1:51.2</td>
+                        <td>5.0 x96</td>
+                        <td>Intel 3</td>
+                        <td>2024 Q3</td>
+                    </tr>
+                    <tr class="intel-gen6">
+                        <td class="model-name">Xeon 6960P</td>
+                        <td><strong>6th Gen</strong><br>Granite Rapids</td>
+                        <td>96/192</td>
+                        <td class="freq-base">2.1 GHz</td>
+                        <td class="freq-boost">3.9 GHz</td>
+                        <td class="cache-detail cache-l1">64+64 KB</td>
+                        <td class="cache-detail cache-l2">2 MB/核<br>共192MB</td>
+                        <td class="cache-detail cache-l3">384 MB</td>
+                        <td class="tdp-value">400W</td>
+                        <td>DDR5-6400</td>
+                        <td>12</td>
+                        <td>6 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:64.0</td>
+                        <td>5.0 x96</td>
+                        <td>Intel 3</td>
+                        <td>2024 Q3</td>
+                    </tr>
+                    <tr class="intel-gen6">
+                        <td class="model-name">Xeon 6952P</td>
+                        <td><strong>6th Gen</strong><br>Granite Rapids</td>
+                        <td>64/128</td>
+                        <td class="freq-base">2.3 GHz</td>
+                        <td class="freq-boost">3.9 GHz</td>
+                        <td class="cache-detail cache-l1">64+64 KB</td>
+                        <td class="cache-detail cache-l2">2 MB/核<br>共128MB</td>
+                        <td class="cache-detail cache-l3">256 MB</td>
+                        <td class="tdp-value">350W</td>
+                        <td>DDR5-6400</td>
+                        <td>12</td>
+                        <td>4 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:64.0</td>
+                        <td>5.0 x96</td>
+                        <td>Intel 3</td>
+                        <td>2024 Q3</td>
+                    </tr>
+                    <tr class="intel-gen6">
+                        <td class="model-name">Xeon 6740E</td>
+                        <td><strong>6th Gen</strong><br>Granite Rapids-D</td>
+                        <td>48/96</td>
+                        <td class="freq-base">2.4 GHz</td>
+                        <td class="freq-boost">3.8 GHz</td>
+                        <td class="cache-detail cache-l1">64+64 KB</td>
+                        <td class="cache-detail cache-l2">2 MB/核<br>共96MB</td>
+                        <td class="cache-detail cache-l3">192 MB</td>
+                        <td class="tdp-value">250W</td>
+                        <td>DDR5-5600</td>
+                        <td>8</td>
+                        <td>3 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:64.0</td>
+                        <td>5.0 x80</td>
+                        <td>Intel 3</td>
+                        <td>2024 Q4</td>
+                    </tr>
+                    <tr class="intel-gen6">
+                        <td class="model-name">Xeon 6730E</td>
+                        <td><strong>6th Gen</strong><br>Granite Rapids-D</td>
+                        <td>40/80</td>
+                        <td class="freq-base">2.5 GHz</td>
+                        <td class="freq-boost">3.8 GHz</td>
+                        <td class="cache-detail cache-l1">64+64 KB</td>
+                        <td class="cache-detail cache-l2">2 MB/核<br>共80MB</td>
+                        <td class="cache-detail cache-l3">160 MB</td>
+                        <td class="tdp-value">220W</td>
+                        <td>DDR5-5600</td>
+                        <td>8</td>
+                        <td>3 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:76.8</td>
+                        <td>5.0 x80</td>
+                        <td>Intel 3</td>
+                        <td>2024 Q4</td>
+                    </tr>
+                    <tr class="intel-gen6">
+                        <td class="model-name">Xeon 6720E</td>
+                        <td><strong>6th Gen</strong><br>Granite Rapids-D</td>
+                        <td>32/64</td>
+                        <td class="freq-base">2.6 GHz</td>
+                        <td class="freq-boost">3.7 GHz</td>
+                        <td class="cache-detail cache-l1">64+64 KB</td>
+                        <td class="cache-detail cache-l2">2 MB/核<br>共64MB</td>
+                        <td class="cache-detail cache-l3">128 MB</td>
+                        <td class="tdp-value">205W</td>
+                        <td>DDR5-5600</td>
+                        <td>8</td>
+                        <td>3 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:96.0</td>
+                        <td>5.0 x80</td>
+                        <td>Intel 3</td>
+                        <td>2024 Q4</td>
+                    </tr>
+                    
+                    <!-- Intel 5th Gen - Emerald Rapids -->
+                    <tr class="intel-gen5">
+                        <td class="model-name">Xeon 8592+</td>
+                        <td><strong>5th Gen</strong><br>Emerald Rapids</td>
+                        <td class="spec-highlight">64/128</td>
+                        <td class="freq-base">1.9 GHz</td>
+                        <td class="freq-boost">3.9 GHz</td>
+                        <td class="cache-detail cache-l1">48+32 KB</td>
+                        <td class="cache-detail cache-l2">2 MB/核<br>共128MB</td>
+                        <td class="cache-detail cache-l3">320 MB</td>
+                        <td class="tdp-value">350W</td>
+                        <td>DDR5-5600</td>
+                        <td>8</td>
+                        <td>4 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">-</td>
+                        <td>5.0 x80</td>
+                        <td>Intel 7</td>
+                        <td>2023 Q4</td>
+                    </tr>
+                    <tr class="intel-gen5">
+                        <td class="model-name">Xeon 8580</td>
+                        <td><strong>5th Gen</strong><br>Emerald Rapids</td>
+                        <td>60/120</td>
+                        <td class="freq-base">2.0 GHz</td>
+                        <td class="freq-boost">4.0 GHz</td>
+                        <td class="cache-detail cache-l1">48+32 KB</td>
+                        <td class="cache-detail cache-l2">2 MB/核<br>共120MB</td>
+                        <td class="cache-detail cache-l3">300 MB</td>
+                        <td class="tdp-value">350W</td>
+                        <td>DDR5-5600</td>
+                        <td>8</td>
+                        <td>4 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:68.3</td>
+                        <td>5.0 x80</td>
+                        <td>Intel 7</td>
+                        <td>2023 Q4</td>
+                    </tr>
+                    <tr class="intel-gen5">
+                        <td class="model-name">Xeon 8568Y+</td>
+                        <td><strong>5th Gen</strong><br>Emerald Rapids</td>
+                        <td>48/96</td>
+                        <td class="freq-base">2.3 GHz</td>
+                        <td class="freq-boost">3.9 GHz</td>
+                        <td class="cache-detail cache-l1">48+32 KB</td>
+                        <td class="cache-detail cache-l2">2 MB/核<br>共96MB</td>
+                        <td class="cache-detail cache-l3">260 MB</td>
+                        <td class="tdp-value">270W</td>
+                        <td>DDR5-5600</td>
+                        <td>8</td>
+                        <td>4 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:85.3</td>
+                        <td>5.0 x80</td>
+                        <td>Intel 7</td>
+                        <td>2023 Q4</td>
+                    </tr>
+                    <tr class="intel-gen5">
+                        <td class="model-name">Xeon 8558</td>
+                        <td><strong>5th Gen</strong><br>Emerald Rapids</td>
+                        <td>48/96</td>
+                        <td class="freq-base">2.1 GHz</td>
+                        <td class="freq-boost">3.9 GHz</td>
+                        <td class="cache-detail cache-l1">48+32 KB</td>
+                        <td class="cache-detail cache-l2">2 MB/核<br>共96MB</td>
+                        <td class="cache-detail cache-l3">240 MB</td>
+                        <td class="tdp-value">250W</td>
+                        <td>DDR5-4800</td>
+                        <td>8</td>
+                        <td>4 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:85.3</td>
+                        <td>5.0 x80</td>
+                        <td>Intel 7</td>
+                        <td>2023 Q4</td>
+                    </tr>
+                    <tr class="intel-gen5">
+                        <td class="model-name">Xeon 6548Y+</td>
+                        <td><strong>5th Gen</strong><br>Emerald Rapids</td>
+                        <td>32/64</td>
+                        <td class="freq-base">2.6 GHz</td>
+                        <td class="freq-boost">4.1 GHz</td>
+                        <td class="cache-detail cache-l1">48+32 KB</td>
+                        <td class="cache-detail cache-l2">2 MB/核<br>共64MB</td>
+                        <td class="cache-detail cache-l3">180 MB</td>
+                        <td class="tdp-value">250W</td>
+                        <td>DDR5-5200</td>
+                        <td>8</td>
+                        <td>4 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:128.0</td>
+                        <td>5.0 x80</td>
+                        <td>Intel 7</td>
+                        <td>2023 Q4</td>
+                    </tr>
+                    <tr class="intel-gen5">
+                        <td class="model-name">Xeon 6542Y</td>
+                        <td><strong>5th Gen</strong><br>Emerald Rapids</td>
+                        <td>24/48</td>
+                        <td class="freq-base">2.9 GHz</td>
+                        <td class="freq-boost">4.1 GHz</td>
+                        <td class="cache-detail cache-l1">48+32 KB</td>
+                        <td class="cache-detail cache-l2">2 MB/核<br>共48MB</td>
+                        <td class="cache-detail cache-l3">150 MB</td>
+                        <td class="tdp-value">225W</td>
+                        <td>DDR5-4800</td>
+                        <td>8</td>
+                        <td>4 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:170.7</td>
+                        <td>5.0 x80</td>
+                        <td>Intel 7</td>
+                        <td>2023 Q4</td>
+                    </tr>
+                    <tr class="intel-gen5">
+                        <td class="model-name">Xeon 6526Y</td>
+                        <td><strong>5th Gen</strong><br>Emerald Rapids</td>
+                        <td>16/32</td>
+                        <td class="freq-base">2.9 GHz</td>
+                        <td class="freq-boost">4.3 GHz</td>
+                        <td class="cache-detail cache-l1">48+32 KB</td>
+                        <td class="cache-detail cache-l2">2 MB/核<br>共32MB</td>
+                        <td class="cache-detail cache-l3">105 MB</td>
+                        <td class="tdp-value">195W</td>
+                        <td>DDR5-4800</td>
+                        <td>8</td>
+                        <td>4 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:256.0</td>
+                        <td>5.0 x80</td>
+                        <td>Intel 7</td>
+                        <td>2023 Q4</td>
+                    </tr>
+                    <tr class="intel-gen5">
+                        <td class="model-name">Xeon 4510</td>
+                        <td><strong>5th Gen</strong><br>Emerald Rapids</td>
+                        <td>12/24</td>
+                        <td class="freq-base">2.4 GHz</td>
+                        <td class="freq-boost">4.1 GHz</td>
+                        <td class="cache-detail cache-l1">48+32 KB</td>
+                        <td class="cache-detail cache-l2">2 MB/核<br>共24MB</td>
+                        <td class="cache-detail cache-l3">45 MB</td>
+                        <td class="tdp-value">150W</td>
+                        <td>DDR5-4400</td>
+                        <td>4</td>
+                        <td>1 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:85.3</td>
+                        <td>5.0 x48</td>
+                        <td>Intel 7</td>
+                        <td>2024 Q1</td>
+                    </tr>
+                    
+                    <!-- Intel 4th Gen - Sapphire Rapids -->
+                    <tr class="intel-gen4">
+                        <td class="model-name">Xeon 8490H</td>
+                        <td><strong>4th Gen</strong><br>Sapphire Rapids</td>
+                        <td>60/120</td>
+                        <td class="freq-base">1.9 GHz</td>
+                        <td class="freq-boost">3.5 GHz</td>
+                        <td class="cache-detail cache-l1">48+32 KB</td>
+                        <td class="cache-detail cache-l2">2 MB/核<br>共120MB</td>
+                        <td class="cache-detail cache-l3">112.5 MB</td>
+                        <td class="tdp-value">350W</td>
+                        <td>DDR5-4800</td>
+                        <td>8</td>
+                        <td>4 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:68.3</td>
+                        <td>5.0 x80</td>
+                        <td>Intel 7</td>
+                        <td>2023 Q1</td>
+                    </tr>
+                    <tr class="intel-gen4">
+                        <td class="model-name">Xeon 8470</td>
+                        <td><strong>4th Gen</strong><br>Sapphire Rapids</td>
+                        <td>52/104</td>
+                        <td class="freq-base">2.0 GHz</td>
+                        <td class="freq-boost">3.8 GHz</td>
+                        <td class="cache-detail cache-l1">48+32 KB</td>
+                        <td class="cache-detail cache-l2">2 MB/核<br>共104MB</td>
+                        <td class="cache-detail cache-l3">105 MB</td>
+                        <td class="tdp-value">350W</td>
+                        <td>DDR5-4800</td>
+                        <td>8</td>
+                        <td>4 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:78.8</td>
+                        <td>5.0 x80</td>
+                        <td>Intel 7</td>
+                        <td>2023 Q1</td>
+                    </tr>
+                    <tr class="intel-gen4">
+                        <td class="model-name">Xeon 6448Y</td>
+                        <td><strong>4th Gen</strong><br>Sapphire Rapids</td>
+                        <td>32/64</td>
+                        <td class="freq-base">2.1 GHz</td>
+                        <td class="freq-boost">4.1 GHz</td>
+                        <td class="cache-detail cache-l1">48+32 KB</td>
+                        <td class="cache-detail cache-l2">2 MB/核<br>共64MB</td>
+                        <td class="cache-detail cache-l3">60 MB</td>
+                        <td class="tdp-value">225W</td>
+                        <td>DDR5-4800</td>
+                        <td>8</td>
+                        <td>4 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:128.0</td>
+                        <td>5.0 x80</td>
+                        <td>Intel 7</td>
+                        <td>2023 Q1</td>
+                    </tr>
+                    <tr class="intel-gen4">
+                        <td class="model-name">Xeon 6438Y+</td>
+                        <td><strong>4th Gen</strong><br>Sapphire Rapids</td>
+                        <td>32/64</td>
+                        <td class="freq-base">2.0 GHz</td>
+                        <td class="freq-boost">3.9 GHz</td>
+                        <td class="cache-detail cache-l1">48+32 KB</td>
+                        <td class="cache-detail cache-l2">2 MB/核<br>共64MB</td>
+                        <td class="cache-detail cache-l3">60 MB</td>
+                        <td class="tdp-value">205W</td>
+                        <td>DDR5-4800</td>
+                        <td>8</td>
+                        <td>4 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:128.0</td>
+                        <td>5.0 x80</td>
+                        <td>Intel 7</td>
+                        <td>2023 Q1</td>
+                    </tr>
+                    <tr class="intel-gen4">
+                        <td class="model-name">Xeon 4410Y</td>
+                        <td><strong>4th Gen</strong><br>Sapphire Rapids</td>
+                        <td>12/24</td>
+                        <td class="freq-base">2.0 GHz</td>
+                        <td class="freq-boost">3.9 GHz</td>
+                        <td class="cache-detail cache-l1">48+32 KB</td>
+                        <td class="cache-detail cache-l2">2 MB/核<br>共24MB</td>
+                        <td class="cache-detail cache-l3">30 MB</td>
+                        <td class="tdp-value">150W</td>
+                        <td>DDR5-4000</td>
+                        <td>4</td>
+                        <td>768 GB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:64.0</td>
+                        <td>5.0 x48</td>
+                        <td>Intel 7</td>
+                        <td>2023 Q1</td>
+                    </tr>
+                    <tr class="intel-gen4">
+                        <td class="model-name">Xeon 4416+</td>
+                        <td><strong>4th Gen</strong><br>Sapphire Rapids</td>
+                        <td>20/40</td>
+                        <td class="freq-base">2.0 GHz</td>
+                        <td class="freq-boost">3.9 GHz</td>
+                        <td class="cache-detail cache-l1">48+32 KB</td>
+                        <td class="cache-detail cache-l2">2 MB/核<br>共40MB</td>
+                        <td class="cache-detail cache-l3">37.5 MB</td>
+                        <td class="tdp-value">165W</td>
+                        <td>DDR5-4000</td>
+                        <td>4</td>
+                        <td>768 GB</td>
+                        <td class="bandwidth-value">102 GB/s</td>
+                        <td class="ratio-value">5.10 GB/核</td>
+                        <td>5.0 x48</td>
+                        <td>Intel 7</td>
+                        <td>2023 Q1</td>
+                    </tr>                    <!-- Intel 7th Gen - Clearwater Forest (预发布) -->
+                    
+                </tbody>
+            </table>
+        </div>
+
+        <!-- AMD EPYC Table -->
+        <div class="section">
+            <h2 class="section-title amd-title">AMD EPYC 详细规格表</h2>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>型号</th>
+                        <th>代次/架构</th>
+                        <th>核心/<br>线程</th>
+                        <th>基础频率</th>
+                        <th>加速频率</th>
+                        <th>L1缓存<br>(数据+指令)</th>
+                        <th>L2缓存<br>(每核心)</th>
+                        <th>L3缓存<br>(共享)</th>
+                        <th>TDP</th>
+                        <th>内存类型</th>
+                        <th>内存通道</th>
+                        <th>最大内存</th>
+                        <th>内存带宽</th>
+                        <th>核存比</th>
+                        <th>PCIe</th>
+                        <th>制程</th>
+                        <th>发布时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- AMD EPYC 9005 - Turin -->
+                    <tr class="amd-gen5">
+                        <td class="model-name spec-highlight">EPYC 9965</td>
+                        <td><strong>9005</strong><br>Turin (Zen 5)</td>
+                        <td class="spec-highlight">192/384</td>
+                        <td class="freq-base">2.25 GHz</td>
+                        <td class="freq-boost">3.7 GHz</td>
+                        <td class="cache-detail cache-l1">32+32 KB<br>(64KB/核)</td>
+                        <td class="cache-detail cache-l2">1 MB/核<br>共192MB</td>
+                        <td class="cache-detail cache-l3 spec-highlight">768 MB</td>
+                        <td class="tdp-value">400W</td>
+                        <td>DDR5-6400</td>
+                        <td>12</td>
+                        <td>6 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">-</td>
+                        <td>5.0 x128</td>
+                        <td>TSMC 4nm</td>
+                        <td>2024 Q4</td>
+                    </tr>
+                    <tr class="amd-gen5">
+                        <td class="model-name">EPYC 9945</td>
+                        <td><strong>9005</strong><br>Turin (Zen 5)</td>
+                        <td class="spec-highlight">180/360</td>
+                        <td class="freq-base">2.3 GHz</td>
+                        <td class="freq-boost">3.7 GHz</td>
+                        <td class="cache-detail cache-l1">32+32 KB</td>
+                        <td class="cache-detail cache-l2">1 MB/核<br>共180MB</td>
+                        <td class="cache-detail cache-l3">720 MB</td>
+                        <td class="tdp-value">400W</td>
+                        <td>DDR5-6400</td>
+                        <td>12</td>
+                        <td>6 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">-</td>
+                        <td>5.0 x128</td>
+                        <td>TSMC 4nm</td>
+                        <td>2024 Q4</td>
+                    </tr>
+                    <tr class="amd-gen5">
+                        <td class="model-name">EPYC 9845</td>
+                        <td><strong>9005</strong><br>Turin (Zen 5)</td>
+                        <td>160/320</td>
+                        <td class="freq-base">2.3 GHz</td>
+                        <td class="freq-boost">3.8 GHz</td>
+                        <td class="cache-detail cache-l1">32+32 KB</td>
+                        <td class="cache-detail cache-l2">1 MB/核<br>共160MB</td>
+                        <td class="cache-detail cache-l3">640 MB</td>
+                        <td class="tdp-value">390W</td>
+                        <td>DDR5-6400</td>
+                        <td>12</td>
+                        <td>6 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:38.4</td>
+                        <td>5.0 x128</td>
+                        <td>TSMC 4nm</td>
+                        <td>2024 Q4</td>
+                    </tr>
+                    <tr class="amd-gen5">
+                        <td class="model-name">EPYC 9655</td>
+                        <td><strong>9005</strong><br>Turin (Zen 5)</td>
+                        <td>96/192</td>
+                        <td class="freq-base">2.4 GHz</td>
+                        <td class="freq-boost">4.0 GHz</td>
+                        <td class="cache-detail cache-l1">32+32 KB</td>
+                        <td class="cache-detail cache-l2">1 MB/核<br>共96MB</td>
+                        <td class="cache-detail cache-l3">384 MB</td>
+                        <td class="tdp-value">400W</td>
+                        <td>DDR5-6400</td>
+                        <td>12</td>
+                        <td>6 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:64.0</td>
+                        <td>5.0 x128</td>
+                        <td>TSMC 4nm</td>
+                        <td>2024 Q4</td>
+                    </tr>
+                    <tr class="amd-gen5">
+                        <td class="model-name">EPYC 9535</td>
+                        <td><strong>9005</strong><br>Turin (Zen 5)</td>
+                        <td>64/128</td>
+                        <td class="freq-base">2.55 GHz</td>
+                        <td class="freq-boost">4.4 GHz</td>
+                        <td class="cache-detail cache-l1">32+32 KB</td>
+                        <td class="cache-detail cache-l2">1 MB/核<br>共64MB</td>
+                        <td class="cache-detail cache-l3">256 MB</td>
+                        <td class="tdp-value">280W</td>
+                        <td>DDR5-6400</td>
+                        <td>12</td>
+                        <td>6 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:96.0</td>
+                        <td>5.0 x128</td>
+                        <td>TSMC 4nm</td>
+                        <td>2024 Q4</td>
+                    </tr>
+                    <tr class="amd-gen5">
+                        <td class="model-name">EPYC 9475F</td>
+                        <td><strong>9005</strong><br>Turin (Zen 5)</td>
+                        <td>48/96</td>
+                        <td class="freq-base">3.2 GHz</td>
+                        <td class="freq-boost">4.6 GHz</td>
+                        <td class="cache-detail cache-l1">32+32 KB</td>
+                        <td class="cache-detail cache-l2">1 MB/核<br>共48MB</td>
+                        <td class="cache-detail cache-l3">256 MB</td>
+                        <td class="tdp-value">400W</td>
+                        <td>DDR5-6400</td>
+                        <td>12</td>
+                        <td>6 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:128.0</td>
+                        <td>5.0 x128</td>
+                        <td>TSMC 4nm</td>
+                        <td>2024 Q4</td>
+                    </tr>
+                    <tr class="amd-gen5">
+                        <td class="model-name">EPYC 9355</td>
+                        <td><strong>9005</strong><br>Turin (Zen 5)</td>
+                        <td>32/64</td>
+                        <td class="freq-base">3.0 GHz</td>
+                        <td class="freq-boost">4.5 GHz</td>
+                        <td class="cache-detail cache-l1">32+32 KB</td>
+                        <td class="cache-detail cache-l2">1 MB/核<br>共32MB</td>
+                        <td class="cache-detail cache-l3">128 MB</td>
+                        <td class="tdp-value">200W</td>
+                        <td>DDR5-6400</td>
+                        <td>12</td>
+                        <td>6 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:192.0</td>
+                        <td>5.0 x128</td>
+                        <td>TSMC 4nm</td>
+                        <td>2024 Q4</td>
+                    </tr>
+                    <tr class="amd-gen5">
+                        <td class="model-name">EPYC 9255</td>
+                        <td><strong>9005</strong><br>Turin (Zen 5)</td>
+                        <td>24/48</td>
+                        <td class="freq-base">3.2 GHz</td>
+                        <td class="freq-boost">4.6 GHz</td>
+                        <td class="cache-detail cache-l1">32+32 KB</td>
+                        <td class="cache-detail cache-l2">1 MB/核<br>共24MB</td>
+                        <td class="cache-detail cache-l3">96 MB</td>
+                        <td class="tdp-value">155W</td>
+                        <td>DDR5-6400</td>
+                        <td>12</td>
+                        <td>6 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:256.0</td>
+                        <td>5.0 x128</td>
+                        <td>TSMC 4nm</td>
+                        <td>2024 Q4</td>
+                    </tr>
+                    <tr class="amd-gen5">
+                        <td class="model-name">EPYC 9125</td>
+                        <td><strong>9005</strong><br>Turin (Zen 5)</td>
+                        <td>16/32</td>
+                        <td class="freq-base">3.1 GHz</td>
+                        <td class="freq-boost">4.5 GHz</td>
+                        <td class="cache-detail cache-l1">32+32 KB</td>
+                        <td class="cache-detail cache-l2">1 MB/核<br>共16MB</td>
+                        <td class="cache-detail cache-l3">64 MB</td>
+                        <td class="tdp-value">120W</td>
+                        <td>DDR5-5600</td>
+                        <td>12</td>
+                        <td>6 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:384.0</td>
+                        <td>5.0 x128</td>
+                        <td>TSMC 4nm</td>
+                        <td>2024 Q4</td>
+                    </tr>
+                    
+                    <!-- AMD EPYC 9004 Bergamo -->
+                    <tr class="amd-bergamo">
+                        <td class="model-name">EPYC 9754</td>
+                        <td><strong>9004</strong><br>Bergamo (Zen 4c)</td>
+                        <td class="spec-highlight">128/256</td>
+                        <td class="freq-base">2.25 GHz</td>
+                        <td class="freq-boost">3.1 GHz</td>
+                        <td class="cache-detail cache-l1">32+32 KB</td>
+                        <td class="cache-detail cache-l2">1 MB/核<br>共128MB</td>
+                        <td class="cache-detail cache-l3">256 MB</td>
+                        <td class="tdp-value">360W</td>
+                        <td>DDR5-4800</td>
+                        <td>12</td>
+                        <td>6 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">-</td>
+                        <td>5.0 x128</td>
+                        <td>TSMC 5nm</td>
+                        <td>2023 Q2</td>
+                    </tr>
+                    <tr class="amd-bergamo">
+                        <td class="model-name">EPYC 9734</td>
+                        <td><strong>9004</strong><br>Bergamo (Zen 4c)</td>
+                        <td>112/224</td>
+                        <td class="freq-base">2.2 GHz</td>
+                        <td class="freq-boost">3.0 GHz</td>
+                        <td class="cache-detail cache-l1">32+32 KB</td>
+                        <td class="cache-detail cache-l2">1 MB/核<br>共112MB</td>
+                        <td class="cache-detail cache-l3">224 MB</td>
+                        <td class="tdp-value">340W</td>
+                        <td>DDR5-4800</td>
+                        <td>12</td>
+                        <td>6 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:54.9</td>
+                        <td>5.0 x128</td>
+                        <td>TSMC 5nm</td>
+                        <td>2023 Q2</td>
+                    </tr>
+                    
+                    <!-- AMD EPYC 9004 Genoa -->
+                    <tr class="amd-gen4">
+                        <td class="model-name">EPYC 9654</td>
+                        <td><strong>9004</strong><br>Genoa (Zen 4)</td>
+                        <td>96/192</td>
+                        <td class="freq-base">2.4 GHz</td>
+                        <td class="freq-boost">3.7 GHz</td>
+                        <td class="cache-detail cache-l1">32+32 KB</td>
+                        <td class="cache-detail cache-l2">1 MB/核<br>共96MB</td>
+                        <td class="cache-detail cache-l3">384 MB</td>
+                        <td class="tdp-value">360W</td>
+                        <td>DDR5-4800</td>
+                        <td>12</td>
+                        <td>6 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:64.0</td>
+                        <td>5.0 x128</td>
+                        <td>TSMC 5nm</td>
+                        <td>2022 Q4</td>
+                    </tr>
+                    <tr class="amd-gen4">
+                        <td class="model-name">EPYC 9554</td>
+                        <td><strong>9004</strong><br>Genoa (Zen 4)</td>
+                        <td>64/128</td>
+                        <td class="freq-base">3.1 GHz</td>
+                        <td class="freq-boost">3.75 GHz</td>
+                        <td class="cache-detail cache-l1">32+32 KB</td>
+                        <td class="cache-detail cache-l2">1 MB/核<br>共64MB</td>
+                        <td class="cache-detail cache-l3">256 MB</td>
+                        <td class="tdp-value">360W</td>
+                        <td>DDR5-4800</td>
+                        <td>12</td>
+                        <td>6 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:96.0</td>
+                        <td>5.0 x128</td>
+                        <td>TSMC 5nm</td>
+                        <td>2022 Q4</td>
+                    </tr>
+                    <tr class="amd-gen4">
+                        <td class="model-name">EPYC 9454</td>
+                        <td><strong>9004</strong><br>Genoa (Zen 4)</td>
+                        <td>48/96</td>
+                        <td class="freq-base">2.75 GHz</td>
+                        <td class="freq-boost">3.8 GHz</td>
+                        <td class="cache-detail cache-l1">32+32 KB</td>
+                        <td class="cache-detail cache-l2">1 MB/核<br>共48MB</td>
+                        <td class="cache-detail cache-l3">256 MB</td>
+                        <td class="tdp-value">290W</td>
+                        <td>DDR5-4800</td>
+                        <td>12</td>
+                        <td>6 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:128.0</td>
+                        <td>5.0 x128</td>
+                        <td>TSMC 5nm</td>
+                        <td>2022 Q4</td>
+                    </tr>
+                    <tr class="amd-gen4">
+                        <td class="model-name">EPYC 9374F</td>
+                        <td><strong>9004</strong><br>Genoa (Zen 4)</td>
+                        <td>32/64</td>
+                        <td class="freq-base">3.4 GHz</td>
+                        <td class="freq-boost">4.3 GHz</td>
+                        <td class="cache-detail cache-l1">32+32 KB</td>
+                        <td class="cache-detail cache-l2">1 MB/核<br>共32MB</td>
+                        <td class="cache-detail cache-l3">256 MB</td>
+                        <td class="tdp-value">320W</td>
+                        <td>DDR5-4800</td>
+                        <td>12</td>
+                        <td>6 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:192.0</td>
+                        <td>5.0 x128</td>
+                        <td>TSMC 5nm</td>
+                        <td>2022 Q4</td>
+                    </tr>
+                    <tr class="amd-gen4">
+                        <td class="model-name">EPYC 9354</td>
+                        <td><strong>9004</strong><br>Genoa (Zen 4)</td>
+                        <td>32/64</td>
+                        <td class="freq-base">3.25 GHz</td>
+                        <td class="freq-boost">3.8 GHz</td>
+                        <td class="cache-detail cache-l1">32+32 KB</td>
+                        <td class="cache-detail cache-l2">1 MB/核<br>共32MB</td>
+                        <td class="cache-detail cache-l3">256 MB</td>
+                        <td class="tdp-value">280W</td>
+                        <td>DDR5-4800</td>
+                        <td>12</td>
+                        <td>6 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:192.0</td>
+                        <td>5.0 x128</td>
+                        <td>TSMC 5nm</td>
+                        <td>2022 Q4</td>
+                    </tr>
+                    <tr class="amd-gen4">
+                        <td class="model-name">EPYC 9254</td>
+                        <td><strong>9004</strong><br>Genoa (Zen 4)</td>
+                        <td>24/48</td>
+                        <td class="freq-base">2.9 GHz</td>
+                        <td class="freq-boost">3.6 GHz</td>
+                        <td class="cache-detail cache-l1">32+32 KB</td>
+                        <td class="cache-detail cache-l2">1 MB/核<br>共24MB</td>
+                        <td class="cache-detail cache-l3">128 MB</td>
+                        <td class="tdp-value">200W</td>
+                        <td>DDR5-4800</td>
+                        <td>12</td>
+                        <td>6 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:256.0</td>
+                        <td>5.0 x128</td>
+                        <td>TSMC 5nm</td>
+                        <td>2022 Q4</td>
+                    </tr>
+                    <tr class="amd-gen4">
+                        <td class="model-name">EPYC 9124</td>
+                        <td><strong>9004</strong><br>Genoa (Zen 4)</td>
+                        <td>16/32</td>
+                        <td class="freq-base">3.0 GHz</td>
+                        <td class="freq-boost">3.7 GHz</td>
+                        <td class="cache-detail cache-l1">32+32 KB</td>
+                        <td class="cache-detail cache-l2">1 MB/核<br>共16MB</td>
+                        <td class="cache-detail cache-l3">64 MB</td>
+                        <td class="tdp-value">200W</td>
+                        <td>DDR5-4800</td>
+                        <td>12</td>
+                        <td>6 TB</td>
+                        <td class="bandwidth-value">460 GB/s</td>
+                        <td class="ratio-value">28.75 GB/核</td>
+                        <td>5.0 x128</td>
+                        <td>TSMC 5nm</td>
+                        <td>2022 Q4</td>
+                    </tr>                    <!-- AMD EPYC 10000 (Zen 6) - 预发布 -->
+                    
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 华为鲲鹏 Table -->
+        <div class="section">
+            <h2 class="section-title" style="color: #ff6b35; border-color: #ff6b35;">华为鲲鹏 (Kunpeng) 详细规格表</h2>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>型号</th>
+                        <th>代次/架构</th>
+                        <th>核心/<br>线程</th>
+                        <th>基础频率</th>
+                        <th>加速频率</th>
+                        <th>L1缓存</th>
+                        <th>L2缓存</th>
+                        <th>L3缓存</th>
+                        <th>TDP</th>
+                        <th>内存类型</th>
+                        <th>内存通道</th>
+                        <th>最大内存</th>
+                        <th>内存带宽</th>
+                        <th>核存比</th>
+                        <th>PCIe</th>
+                        <th>制程</th>
+                        <th>发布时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background-color: #fff5f0;">
+                        <td class="model-name spec-highlight">鲲鹏 920-7260</td>
+                        <td><strong>鲲鹏 920</strong><br>TaiShan V110</td>
+                        <td class="spec-highlight">64/64</td>
+                        <td class="freq-base">2.6 GHz</td>
+                        <td class="freq-boost">3.0 GHz</td>
+                        <td class="cache-detail cache-l1">64+64 KB</td>
+                        <td class="cache-detail cache-l2">512 KB/核</td>
+                        <td class="cache-detail cache-l3">64 MB</td>
+                        <td class="tdp-value">180W</td>
+                        <td>DDR4-2933</td>
+                        <td>8</td>
+                        <td>4 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">-</td>
+                        <td>4.0 x40</td>
+                        <td>TSMC 7nm</td>
+                        <td>2019</td>
+                    </tr>
+                    <tr style="background-color: #fff5f0;">
+                        <td class="model-name">鲲鹏 920-5250</td>
+                        <td><strong>鲲鹏 920</strong><br>TaiShan V110</td>
+                        <td>48/48</td>
+                        <td class="freq-base">2.6 GHz</td>
+                        <td class="freq-boost">3.0 GHz</td>
+                        <td class="cache-detail cache-l1">64+64 KB</td>
+                        <td class="cache-detail cache-l2">512 KB/核</td>
+                        <td class="cache-detail cache-l3">48 MB</td>
+                        <td class="tdp-value">150W</td>
+                        <td>DDR4-2933</td>
+                        <td>8</td>
+                        <td>4 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:85.3</td>
+                        <td>4.0 x40</td>
+                        <td>TSMC 7nm</td>
+                        <td>2019</td>
+                    </tr>
+                    <tr style="background-color: #fff5f0;">
+                        <td class="model-name">鲲鹏 920-3230</td>
+                        <td><strong>鲲鹏 920</strong><br>TaiShan V110</td>
+                        <td>32/32</td>
+                        <td class="freq-base">2.6 GHz</td>
+                        <td class="freq-boost">3.0 GHz</td>
+                        <td class="cache-detail cache-l1">64+64 KB</td>
+                        <td class="cache-detail cache-l2">512 KB/核</td>
+                        <td class="cache-detail cache-l3">32 MB</td>
+                        <td class="tdp-value">120W</td>
+                        <td>DDR4-2933</td>
+                        <td>8</td>
+                        <td>4 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:128.0</td>
+                        <td>4.0 x40</td>
+                        <td>TSMC 7nm</td>
+                        <td>2019</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 海光 Table -->
+        <div class="section">
+            <h2 class="section-title" style="color: #722ed1; border-color: #722ed1;">海光 (Hygon) 详细规格表</h2>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>型号</th>
+                        <th>代次/架构</th>
+                        <th>核心/<br>线程</th>
+                        <th>基础频率</th>
+                        <th>加速频率</th>
+                        <th>L1缓存</th>
+                        <th>L2缓存</th>
+                        <th>L3缓存</th>
+                        <th>TDP</th>
+                        <th>内存类型</th>
+                        <th>内存通道</th>
+                        <th>最大内存</th>
+                        <th>内存带宽</th>
+                        <th>核存比</th>
+                        <th>PCIe</th>
+                        <th>制程</th>
+                        <th>发布时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background-color: #f9f0ff;">
+                        <td class="model-name spec-highlight">C86-7490</td>
+                        <td><strong>海光 7系</strong><br>x86 兼容</td>
+                        <td class="spec-highlight">64/128</td>
+                        <td class="freq-base">2.2 GHz</td>
+                        <td class="freq-boost">3.0 GHz</td>
+                        <td class="cache-detail cache-l1">32+32 KB</td>
+                        <td class="cache-detail cache-l2">512 KB/核</td>
+                        <td class="cache-detail cache-l3">256 MB</td>
+                        <td class="tdp-value">280W</td>
+                        <td>DDR4-3200</td>
+                        <td>8</td>
+                        <td>4 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">-</td>
+                        <td>4.0 x128</td>
+                        <td>-</td>
+                        <td>2023</td>
+                    </tr>
+                    <tr style="background-color: #f9f0ff;">
+                        <td class="model-name">C86-5480</td>
+                        <td><strong>海光 5系</strong><br>x86 兼容</td>
+                        <td>32/64</td>
+                        <td class="freq-base">2.5 GHz</td>
+                        <td class="freq-boost">3.2 GHz</td>
+                        <td class="cache-detail cache-l1">32+32 KB</td>
+                        <td class="cache-detail cache-l2">512 KB/核</td>
+                        <td class="cache-detail cache-l3">128 MB</td>
+                        <td class="tdp-value">180W</td>
+                        <td>DDR4-3200</td>
+                        <td>8</td>
+                        <td>4 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:128.0</td>
+                        <td>4.0 x128</td>
+                        <td>-</td>
+                        <td>2022</td>
+                    </tr>
+                    <tr style="background-color: #f9f0ff;">
+                        <td class="model-name">C86-3380</td>
+                        <td><strong>海光 3系</strong><br>x86 兼容</td>
+                        <td>24/48</td>
+                        <td class="freq-base">2.3 GHz</td>
+                        <td class="freq-boost">3.0 GHz</td>
+                        <td class="cache-detail cache-l1">32+32 KB</td>
+                        <td class="cache-detail cache-l2">512 KB/核</td>
+                        <td class="cache-detail cache-l3">64 MB</td>
+                        <td class="tdp-value">135W</td>
+                        <td>DDR4-2666</td>
+                        <td>8</td>
+                        <td>2 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:85.3</td>
+                        <td>3.0 x64</td>
+                        <td>-</td>
+                        <td>2021</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 飞腾 Table -->
+        <div class="section">
+            <h2 class="section-title" style="color: #52c41a; border-color: #52c41a;">飞腾 (Phytium) 详细规格表</h2>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>型号</th>
+                        <th>代次/架构</th>
+                        <th>核心/<br>线程</th>
+                        <th>基础频率</th>
+                        <th>加速频率</th>
+                        <th>L1缓存</th>
+                        <th>L2缓存</th>
+                        <th>L3缓存</th>
+                        <th>TDP</th>
+                        <th>内存类型</th>
+                        <th>内存通道</th>
+                        <th>最大内存</th>
+                        <th>内存带宽</th>
+                        <th>核存比</th>
+                        <th>PCIe</th>
+                        <th>制程</th>
+                        <th>发布时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background-color: #f6ffed;">
+                        <td class="model-name spec-highlight">腾云 S5000C</td>
+                        <td><strong>腾云 S系列</strong><br>ARMv8</td>
+                        <td class="spec-highlight">80/80</td>
+                        <td class="freq-base">2.1 GHz</td>
+                        <td class="freq-boost">2.5 GHz</td>
+                        <td class="cache-detail cache-l1">64+64 KB</td>
+                        <td class="cache-detail cache-l2">512 KB/核</td>
+                        <td class="cache-detail cache-l3">64 MB</td>
+                        <td class="tdp-value">150W</td>
+                        <td>DDR4-3200</td>
+                        <td>8</td>
+                        <td>4 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">-</td>
+                        <td>4.0 x64</td>
+                        <td>-</td>
+                        <td>2023</td>
+                    </tr>
+                    <tr style="background-color: #f6ffed;">
+                        <td class="model-name">腾云 S2500</td>
+                        <td><strong>腾云 S系列</strong><br>ARMv8</td>
+                        <td>64/64</td>
+                        <td class="freq-base">2.0 GHz</td>
+                        <td class="freq-boost">2.3 GHz</td>
+                        <td class="cache-detail cache-l1">32+32 KB</td>
+                        <td class="cache-detail cache-l2">256 KB/核</td>
+                        <td class="cache-detail cache-l3">32 MB</td>
+                        <td class="tdp-value">120W</td>
+                        <td>DDR4-2933</td>
+                        <td>8</td>
+                        <td>2 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:32.0</td>
+                        <td>3.0 x48</td>
+                        <td>16nm</td>
+                        <td>2020</td>
+                    </tr>
+                    <tr style="background-color: #f6ffed;">
+                        <td class="model-name">腾云 FT-2000+/64</td>
+                        <td><strong>FT-2000系列</strong><br>ARMv8</td>
+                        <td>64/64</td>
+                        <td class="freq-base">2.2 GHz</td>
+                        <td class="freq-boost">-</td>
+                        <td class="cache-detail cache-l1">32+32 KB</td>
+                        <td class="cache-detail cache-l2">256 KB/核</td>
+                        <td class="cache-detail cache-l3">32 MB</td>
+                        <td class="tdp-value">100W</td>
+                        <td>DDR4-2666</td>
+                        <td>8</td>
+                        <td>1 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:16.0</td>
+                        <td>3.0 x32</td>
+                        <td>16nm</td>
+                        <td>2019</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 龙芯 Table -->
+        <div class="section">
+            <h2 class="section-title" style="color: #faad14; border-color: #faad14;">龙芯 (Loongson) 详细规格表</h2>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>型号</th>
+                        <th>代次/架构</th>
+                        <th>核心/<br>线程</th>
+                        <th>基础频率</th>
+                        <th>加速频率</th>
+                        <th>L1缓存</th>
+                        <th>L2缓存</th>
+                        <th>L3缓存</th>
+                        <th>TDP</th>
+                        <th>内存类型</th>
+                        <th>内存通道</th>
+                        <th>最大内存</th>
+                        <th>内存带宽</th>
+                        <th>核存比</th>
+                        <th>PCIe</th>
+                        <th>制程</th>
+                        <th>发布时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background-color: #fffbe6;">
+                        <td class="model-name spec-highlight">3D5000</td>
+                        <td><strong>龙芯 3号</strong><br>LoongArch</td>
+                        <td class="spec-highlight">32/32</td>
+                        <td class="freq-base">2.0 GHz</td>
+                        <td class="freq-boost">2.3 GHz</td>
+                        <td class="cache-detail cache-l1">64+64 KB</td>
+                        <td class="cache-detail cache-l2">256 KB/核</td>
+                        <td class="cache-detail cache-l3">64 MB</td>
+                        <td class="tdp-value">160W</td>
+                        <td>DDR4-3200</td>
+                        <td>4</td>
+                        <td>1 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">-</td>
+                        <td>4.0 x32</td>
+                        <td>12nm</td>
+                        <td>2023</td>
+                    </tr>
+                    <tr style="background-color: #fffbe6;">
+                        <td class="model-name">3C5000</td>
+                        <td><strong>龙芯 3号</strong><br>LoongArch</td>
+                        <td>16/16</td>
+                        <td class="freq-base">2.2 GHz</td>
+                        <td class="freq-boost">2.5 GHz</td>
+                        <td class="cache-detail cache-l1">64+64 KB</td>
+                        <td class="cache-detail cache-l2">256 KB/核</td>
+                        <td class="cache-detail cache-l3">32 MB</td>
+                        <td class="tdp-value">120W</td>
+                        <td>DDR4-3200</td>
+                        <td>4</td>
+                        <td>1 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:64.0</td>
+                        <td>4.0 x32</td>
+                        <td>12nm</td>
+                        <td>2022</td>
+                    </tr>
+                    <tr style="background-color: #fffbe6;">
+                        <td class="model-name">3C5000L</td>
+                        <td><strong>龙芯 3号</strong><br>LoongArch</td>
+                        <td>16/16</td>
+                        <td class="freq-base">2.0 GHz</td>
+                        <td class="freq-boost">2.2 GHz</td>
+                        <td class="cache-detail cache-l1">64+64 KB</td>
+                        <td class="cache-detail cache-l2">256 KB/核</td>
+                        <td class="cache-detail cache-l3">32 MB</td>
+                        <td class="tdp-value">95W</td>
+                        <td>DDR4-2666</td>
+                        <td>4</td>
+                        <td>512 GB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:32.0</td>
+                        <td>3.0 x32</td>
+                        <td>12nm</td>
+                        <td>2022</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 兆芯 Table -->
+        <div class="section">
+            <h2 class="section-title" style="color: #13c2c2; border-color: #13c2c2;">兆芯 (Zhaoxin) 详细规格表</h2>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>型号</th>
+                        <th>代次/架构</th>
+                        <th>核心/<br>线程</th>
+                        <th>基础频率</th>
+                        <th>加速频率</th>
+                        <th>L1缓存</th>
+                        <th>L2缓存</th>
+                        <th>L3缓存</th>
+                        <th>TDP</th>
+                        <th>内存类型</th>
+                        <th>内存通道</th>
+                        <th>最大内存</th>
+                        <th>内存带宽</th>
+                        <th>核存比</th>
+                        <th>PCIe</th>
+                        <th>制程</th>
+                        <th>发布时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background-color: #e6fffb;">
+                        <td class="model-name spec-highlight">KH-40000/32</td>
+                        <td><strong>开胜 KH-40000</strong><br>x86 兼容</td>
+                        <td class="spec-highlight">32/32</td>
+                        <td class="freq-base">2.0 GHz</td>
+                        <td class="freq-boost">2.5 GHz</td>
+                        <td class="cache-detail cache-l1">32+32 KB</td>
+                        <td class="cache-detail cache-l2">512 KB/核</td>
+                        <td class="cache-detail cache-l3">32 MB</td>
+                        <td class="tdp-value">120W</td>
+                        <td>DDR4-3200</td>
+                        <td>8</td>
+                        <td>2 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">-</td>
+                        <td>3.0 x32</td>
+                        <td>16nm</td>
+                        <td>2022</td>
+                    </tr>
+                    <tr style="background-color: #e6fffb;">
+                        <td class="model-name">KH-40000/16</td>
+                        <td><strong>开胜 KH-40000</strong><br>x86 兼容</td>
+                        <td>16/16</td>
+                        <td class="freq-base">2.2 GHz</td>
+                        <td class="freq-boost">2.7 GHz</td>
+                        <td class="cache-detail cache-l1">32+32 KB</td>
+                        <td class="cache-detail cache-l2">512 KB/核</td>
+                        <td class="cache-detail cache-l3">16 MB</td>
+                        <td class="tdp-value">80W</td>
+                        <td>DDR4-3200</td>
+                        <td>4</td>
+                        <td>1 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:64.0</td>
+                        <td>3.0 x24</td>
+                        <td>16nm</td>
+                        <td>2022</td>
+                    </tr>
+                    <tr style="background-color: #e6fffb;">
+                        <td class="model-name">KH-30000/16</td>
+                        <td><strong>开胜 KH-30000</strong><br>x86 兼容</td>
+                        <td>16/16</td>
+                        <td class="freq-base">2.0 GHz</td>
+                        <td class="freq-boost">2.4 GHz</td>
+                        <td class="cache-detail cache-l1">32+32 KB</td>
+                        <td class="cache-detail cache-l2">256 KB/核</td>
+                        <td class="cache-detail cache-l3">16 MB</td>
+                        <td class="tdp-value">70W</td>
+                        <td>DDR4-2666</td>
+                        <td>4</td>
+                        <td>512 GB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:32.0</td>
+                        <td>3.0 x16</td>
+                        <td>16nm</td>
+                        <td>2020</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- AWS Graviton Table -->
+        <div class="section">
+            <h2 class="section-title" style="color: #ff9900; border-color: #ff9900;">AWS Graviton 详细规格表</h2>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>型号</th>
+                        <th>代次/架构</th>
+                        <th>核心/<br>线程</th>
+                        <th>基础频率</th>
+                        <th>加速频率</th>
+                        <th>L1缓存</th>
+                        <th>L2缓存</th>
+                        <th>L3缓存</th>
+                        <th>TDP</th>
+                        <th>内存类型</th>
+                        <th>内存通道</th>
+                        <th>最大内存</th>
+                        <th>内存带宽</th>
+                        <th>核存比</th>
+                        <th>PCIe</th>
+                        <th>制程</th>
+                        <th>发布时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background-color: #fff7e6;">
+                        <td class="model-name spec-highlight">Graviton4</td>
+                        <td><strong>Graviton4</strong><br>Neoverse V2</td>
+                        <td class="spec-highlight">96/96</td>
+                        <td class="freq-base">2.8 GHz</td>
+                        <td class="freq-boost">3.0 GHz</td>
+                        <td class="cache-detail cache-l1">64+64 KB</td>
+                        <td class="cache-detail cache-l2">1 MB/核</td>
+                        <td class="cache-detail cache-l3 spec-highlight">96 MB</td>
+                        <td class="tdp-value">-</td>
+                        <td>DDR5-4800</td>
+                        <td>12</td>
+                        <td>-</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">-</td>
+                        <td>5.0 x128</td>
+                        <td>TSMC 4nm</td>
+                        <td>2024</td>
+                    </tr>
+                    <tr style="background-color: #fff7e6;">
+                        <td class="model-name">Graviton3</td>
+                        <td><strong>Graviton3</strong><br>Neoverse V1</td>
+                        <td>64/64</td>
+                        <td class="freq-base">2.6 GHz</td>
+                        <td class="freq-boost">2.9 GHz</td>
+                        <td class="cache-detail cache-l1">64+64 KB</td>
+                        <td class="cache-detail cache-l2">1 MB/核</td>
+                        <td class="cache-detail cache-l3">64 MB</td>
+                        <td class="tdp-value">-</td>
+                        <td>DDR5-4800</td>
+                        <td>8</td>
+                        <td>-</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">-</td>
+                        <td>5.0 x64</td>
+                        <td>TSMC 5nm</td>
+                        <td>2022</td>
+                    </tr>
+                    <tr style="background-color: #fff7e6;">
+                        <td class="model-name">Graviton3E</td>
+                        <td><strong>Graviton3E</strong><br>Neoverse V1</td>
+                        <td>64/64</td>
+                        <td class="freq-base">2.6 GHz</td>
+                        <td class="freq-boost">2.9 GHz</td>
+                        <td class="cache-detail cache-l1">64+64 KB</td>
+                        <td class="cache-detail cache-l2">1 MB/核</td>
+                        <td class="cache-detail cache-l3">64 MB</td>
+                        <td class="tdp-value">-</td>
+                        <td>DDR5-4800</td>
+                        <td>8</td>
+                        <td>-</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">-</td>
+                        <td>5.0 x64</td>
+                        <td>TSMC 5nm</td>
+                        <td>2023</td>
+                    </tr>
+                    <tr style="background-color: #fff7e6;">
+                        <td class="model-name">Graviton2</td>
+                        <td><strong>Graviton2</strong><br>Neoverse N1</td>
+                        <td>64/64</td>
+                        <td class="freq-base">2.5 GHz</td>
+                        <td class="freq-boost">2.5 GHz</td>
+                        <td class="cache-detail cache-l1">64+64 KB</td>
+                        <td class="cache-detail cache-l2">512 KB/核</td>
+                        <td class="cache-detail cache-l3">32 MB</td>
+                        <td class="tdp-value">-</td>
+                        <td>DDR4-3200</td>
+                        <td>8</td>
+                        <td>-</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">-</td>
+                        <td>4.0 x64</td>
+                        <td>TSMC 7nm</td>
+                        <td>2020</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Ampere Altra Table -->
+        <div class="section">
+            <h2 class="section-title" style="color: #0091bd; border-color: #0091bd;">Ampere Altra 详细规格表</h2>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>型号</th>
+                        <th>代次/架构</th>
+                        <th>核心/<br>线程</th>
+                        <th>基础频率</th>
+                        <th>加速频率</th>
+                        <th>L1缓存</th>
+                        <th>L2缓存</th>
+                        <th>L3缓存</th>
+                        <th>TDP</th>
+                        <th>内存类型</th>
+                        <th>内存通道</th>
+                        <th>最大内存</th>
+                        <th>内存带宽</th>
+                        <th>核存比</th>
+                        <th>PCIe</th>
+                        <th>制程</th>
+                        <th>发布时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background-color: #e6f7ff;">
+                        <td class="model-name spec-highlight">Altra Max M128-30</td>
+                        <td><strong>Altra Max</strong><br>Neoverse N1</td>
+                        <td class="spec-highlight">128/128</td>
+                        <td class="freq-base">3.0 GHz</td>
+                        <td class="freq-boost">3.0 GHz</td>
+                        <td class="cache-detail cache-l1">64+64 KB</td>
+                        <td class="cache-detail cache-l2">1 MB/核</td>
+                        <td class="cache-detail cache-l3 spec-highlight">128 MB</td>
+                        <td class="tdp-value spec-highlight">250W</td>
+                        <td>DDR4-3200</td>
+                        <td>8</td>
+                        <td>4 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">-</td>
+                        <td>4.0 x128</td>
+                        <td>TSMC 5nm</td>
+                        <td>2021</td>
+                    </tr>
+                    <tr style="background-color: #e6f7ff;">
+                        <td class="model-name">Altra Max M96-28</td>
+                        <td><strong>Altra Max</strong><br>Neoverse N1</td>
+                        <td>96/96</td>
+                        <td class="freq-base">2.8 GHz</td>
+                        <td class="freq-boost">2.8 GHz</td>
+                        <td class="cache-detail cache-l1">64+64 KB</td>
+                        <td class="cache-detail cache-l2">1 MB/核</td>
+                        <td class="cache-detail cache-l3">96 MB</td>
+                        <td class="tdp-value">220W</td>
+                        <td>DDR4-3200</td>
+                        <td>8</td>
+                        <td>4 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:42.7</td>
+                        <td>4.0 x128</td>
+                        <td>TSMC 5nm</td>
+                        <td>2021</td>
+                    </tr>
+                    <tr style="background-color: #e6f7ff;">
+                        <td class="model-name">Altra Q80-33</td>
+                        <td><strong>Altra</strong><br>Neoverse N1</td>
+                        <td>80/80</td>
+                        <td class="freq-base">3.3 GHz</td>
+                        <td class="freq-boost">3.3 GHz</td>
+                        <td class="cache-detail cache-l1">64+64 KB</td>
+                        <td class="cache-detail cache-l2">1 MB/核</td>
+                        <td class="cache-detail cache-l3">80 MB</td>
+                        <td class="tdp-value">210W</td>
+                        <td>DDR4-3200</td>
+                        <td>8</td>
+                        <td>4 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:51.2</td>
+                        <td>4.0 x128</td>
+                        <td>TSMC 7nm</td>
+                        <td>2020</td>
+                    </tr>
+                    <tr style="background-color: #e6f7ff;">
+                        <td class="model-name">Altra Q64-33</td>
+                        <td><strong>Altra</strong><br>Neoverse N1</td>
+                        <td>64/64</td>
+                        <td class="freq-base">3.3 GHz</td>
+                        <td class="freq-boost">3.3 GHz</td>
+                        <td class="cache-detail cache-l1">64+64 KB</td>
+                        <td class="cache-detail cache-l2">1 MB/核</td>
+                        <td class="cache-detail cache-l3">64 MB</td>
+                        <td class="tdp-value">180W</td>
+                        <td>DDR4-3200</td>
+                        <td>8</td>
+                        <td>4 TB</td>
+                        <td class="bandwidth-value">0 GB/s</td>
+                        <td class="ratio-value">1:64.0</td>
+                        <td>4.0 x128</td>
+                        <td>TSMC 7nm</td>
+                        <td>2020</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Arm AGI CPU Table -->
+        <div class="section">
+            <h2 class="section-title" style="color: #2e7d32; border-color: #2e7d32;">Arm AGI CPU 详细规格表</h2>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>型号</th>
+                        <th>代次/架构</th>
+                        <th>核心/<br>线程</th>
+                        <th>基础频率</th>
+                        <th>加速频率</th>
+                        <th>L1缓存</th>
+                        <th>L2缓存</th>
+                        <th>L3缓存</th>
+                        <th>TDP</th>
+                        <th>内存类型</th>
+                        <th>内存通道</th>
+                        <th>最大内存</th>
+                        <th>内存带宽</th>
+                        <th>核存比</th>
+                        <th>PCIe</th>
+                        <th>制程</th>
+                        <th>发布时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background-color: #e8f5e9;" class="pre-release">
+                        <td class="model-name spec-highlight">Arm AGI CPU<sup class="pre-release-badge">预发布*</sup></td>
+                        <td><strong>Arm AGI</strong><br>Neoverse V3</td>
+                        <td class="spec-highlight">136/136</td>
+                        <td class="freq-base">-</td>
+                        <td class="freq-boost">-</td>
+                        <td class="cache-detail cache-l1">64+64 KB</td>
+                        <td class="cache-detail cache-l2">2 MB/核<br>共272MB</td>
+                        <td class="cache-detail cache-l3">-</td>
+                        <td class="tdp-value">-</td>
+                        <td>DDR5-8800</td>
+                        <td>12</td>
+                        <td>-</td>
+                        <td class="bandwidth-value">-</td>
+                        <td class="ratio-value">-</td>
+                        <td>6.0 x96<br>CXL支持</td>
+                        <td>TSMC 3nm</td>
+                        <td>2026 Q2*</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="notes">
+            <h3>缓存架构说明</h3>
+            <div class="notes-grid">
+                <div class="notes-item"><strong>Intel L1:</strong> 48KB数据 + 32KB指令 (Golden Cove/Raptor Cove)</div>
+                <div class="notes-item"><strong>Intel L2:</strong> 每核心2MB，从6th Gen开始采用 Redwood Cove 架构，增大L2</div>
+                <div class="notes-item"><strong>Intel L3:</strong> 共享 LLC，每核心约4-5MB，6th Gen大幅提升至3.9MB/核</div>
+                <div class="notes-item"><strong>AMD L1:</strong> 32KB数据 + 32KB指令 (Zen 4/5架构)</div>
+                <div class="notes-item"><strong>AMD L2:</strong> 每核心1MB，总计随核心数变化</div>
+                <div class="notes-item"><strong>AMD L3:</strong> 每CCX共享32MB，Zen 5最高可达768MB</div>
+                <div class="notes-item"><strong>Bergamo区别:</strong> Zen 4c核心面积减半，L3减半(2MB/核)，适合高密度云原生</div>
+                <div class="notes-item"><strong>F后缀:</strong> 频率优化版，基础频率更高，TDP也更高</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>⚠️ 重要声明:</strong> 本页面所有内容均由 AI 生成，基于公开资料整理。包含已发布和预发布产品信息，预发布产品规格可能存在变动。</p>
+            <p><strong>数据来源:</strong> Intel ARK, AMD 官方规格表, 华为鲲鹏官网, 海光官网, 飞腾官网, 龙芯官网, 兆芯官网, AWS, Ampere, 以及 AnandTech, Tom's Hardware 等技术媒体报道</p>
+            <p>红色加粗 = 该类别最高规格 | 标注*的为预发布产品 | 更新时间: 2025年</p>
+        </div>
+    </div>
+</body>
+</html>

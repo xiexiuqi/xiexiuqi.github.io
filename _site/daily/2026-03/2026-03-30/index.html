@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Linux性能日报 - 2026-03-30 - Linux内核与系统性能优化</title>
+  <meta name="description" content="Linux 内核与系统性能优化技术分享">
+  
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Linux性能日报 - 2026-03-30 | Linux内核与系统性能优化</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="Linux性能日报 - 2026-03-30" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Linux 内核与系统性能优化技术分享" />
+<meta property="og:description" content="Linux 内核与系统性能优化技术分享" />
+<link rel="canonical" href="https://xiexiuqi.github.io/daily/2026-03/2026-03-30/" />
+<meta property="og:url" content="https://xiexiuqi.github.io/daily/2026-03/2026-03-30/" />
+<meta property="og:site_name" content="Linux内核与系统性能优化" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2026-03-30T06:00:00+08:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Linux性能日报 - 2026-03-30" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2026-03-30T06:00:00+08:00","datePublished":"2026-03-30T06:00:00+08:00","description":"Linux 内核与系统性能优化技术分享","headline":"Linux性能日报 - 2026-03-30","mainEntityOfPage":{"@type":"WebPage","@id":"https://xiexiuqi.github.io/daily/2026-03/2026-03-30/"},"url":"https://xiexiuqi.github.io/daily/2026-03/2026-03-30/"}</script>
+<!-- End Jekyll SEO tag -->
+
+  
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <link type="application/atom+xml" rel="alternate" href="https://xiexiuqi.github.io/feed.xml" title="Linux内核与系统性能优化" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrapper">
+      <a class="site-title" href="/">Linux内核与系统性能优化</a>
+      <nav class="site-nav">
+        <a href="/">首页</a>
+        <a href="/reports/">性能报告</a>
+        <a href="/daily/">日报</a>
+        <a href="/features/">特性分析</a>
+        <a href="/openeuler/">openEuler Kernel</a>
+        <a href="/search/">🔍</a>
+        <a href="/about/">关于</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-content">
+    <div class="wrapper">
+      <h1 id="-linux性能日报---2026-03-30">📅 Linux性能日报 - 2026-03-30</h1>
+
+<h2 id="-今日概览">📊 今日概览</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>类型</th>
+      <th>数量</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>🚀 新特性</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>🐛 Bug修复</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <td>⚡ 性能优化</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>📚 其他</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <td><strong>总计</strong></td>
+      <td><strong>11</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="-重点推荐">🎯 重点推荐</h2>
+
+<h3 id="-新特性">🚀 新特性</h3>
+
+<h4 id="1-selftestssched_ext-add-cyclic-scx_kick_wait-stress-test">1. selftests/sched_ext: Add cyclic SCX_KICK_WAIT stress test</h4>
+<p><strong>作者</strong>: Tejun Heo<br />
+<strong>来源</strong>: Git Mainline<br />
+<strong>链接</strong>: <a href="https://github.com/torvalds/linux/commit/090d34f0f0285124452373225bcc520a31e305e4">查看详情</a></p>
+
+<p><strong>AI摘要</strong>: selftests/sched_ext: Add cyclic SCX_KICK_WAIT stress test</p>
+
+<p>Add a test that creates a 3-CPU kick_wait cycle (A-&gt;B-&gt;C-&gt;A). A BPF
+scheduler kicks the next CPU in the ring with SCX_KICK_WAIT on every
+enqu</p>
+
+<p><strong>标签</strong>: <code class="language-plaintext highlighter-rouge">feature</code></p>
+
+<hr />
+
+<h3 id="-bug修复">🐛 Bug修复</h3>
+
+<h4 id="1-merge-tag-sched_ext-for-70-rc6-fixes-of-gitgitkernelorgpubscmlinuxkernelgittjsched_ext">1. Merge tag ‘sched_ext-for-7.0-rc6-fixes’ of git://git.kernel.org/pub/scm/linux/kernel/git/tj/sched_ext</h4>
+<p><strong>作者</strong>: Linus Torvalds<br />
+<strong>来源</strong>: Git Mainline<br />
+<strong>链接</strong>: <a href="https://github.com/torvalds/linux/commit/9147566d801602c9e7fc7f85e989735735bf38ba">查看详情</a></p>
+
+<p><strong>AI摘要</strong>: Merge tag ‘sched_ext-for-7.0-rc6-fixes’ of git://git.kernel.org/pub/scm/linux/kernel/git/tj/sched_ext</p>
+
+<p>Pull sched_ext fixes from Tejun Heo:</p>
+
+<ul>
+  <li>Fix SCX_KICK_WAIT deadlock where multiple CPUs waiting f</li>
+</ul>
+
+<p><strong>标签</strong>: <code class="language-plaintext highlighter-rouge">bugfix</code></p>
+
+<hr />
+
+<h4 id="2-merge-tag-wq-for-70-rc6-fixes-of-gitgitkernelorgpubscmlinuxkernelgittjwq">2. Merge tag ‘wq-for-7.0-rc6-fixes’ of git://git.kernel.org/pub/scm/linux/kernel/git/tj/wq</h4>
+<p><strong>作者</strong>: Linus Torvalds<br />
+<strong>来源</strong>: Git Mainline<br />
+<strong>链接</strong>: <a href="https://github.com/torvalds/linux/commit/0958d657b4bc28c5cdc313b9953cbcc0667c864f">查看详情</a></p>
+
+<p><strong>AI摘要</strong>: Merge tag ‘wq-for-7.0-rc6-fixes’ of git://git.kernel.org/pub/scm/linux/kernel/git/tj/wq</p>
+
+<p>Pull workqueue fix from Tejun Heo:</p>
+
+<ul>
+  <li>Fix false positive stall reports on weakly ordered architectures
+wher</li>
+</ul>
+
+<p><strong>标签</strong>: <code class="language-plaintext highlighter-rouge">bugfix</code></p>
+
+<hr />
+
+<h4 id="3-merge-tag-cgroup-for-70-rc6-fixes-of-gitgitkernelorgpubscmlinuxkernelgittjcgroup">3. Merge tag ‘cgroup-for-7.0-rc6-fixes’ of git://git.kernel.org/pub/scm/linux/kernel/git/tj/cgroup</h4>
+<p><strong>作者</strong>: Linus Torvalds<br />
+<strong>来源</strong>: Git Mainline<br />
+<strong>链接</strong>: <a href="https://github.com/torvalds/linux/commit/53d85a205644036d914a1408a3a301f7068f320b">查看详情</a></p>
+
+<p><strong>AI摘要</strong>: Merge tag ‘cgroup-for-7.0-rc6-fixes’ of git://git.kernel.org/pub/scm/linux/kernel/git/tj/cgroup</p>
+
+<p>Pull cgroup fixes from Tejun Heo:</p>
+
+<ul>
+  <li>
+    <p>Fix cgroup rmdir racing with dying tasks.</p>
+
+    <p>Deferred task cgrou</p>
+  </li>
+</ul>
+
+<p><strong>标签</strong>: <code class="language-plaintext highlighter-rouge">bugfix</code></p>
+
+<hr />
+
+<h4 id="4-sched_ext-fix-scx_kick_wait-deadlock-by-deferring-wait-to-balance-callback">4. sched_ext: Fix SCX_KICK_WAIT deadlock by deferring wait to balance callback</h4>
+<p><strong>作者</strong>: Tejun Heo<br />
+<strong>来源</strong>: Git Mainline<br />
+<strong>链接</strong>: <a href="https://github.com/torvalds/linux/commit/415cb193bb9736f0e830286c72a6fa8eb2a9cc5c">查看详情</a></p>
+
+<p><strong>AI摘要</strong>: sched_ext: Fix SCX_KICK_WAIT deadlock by deferring wait to balance callback</p>
+
+<p>SCX_KICK_WAIT busy-waits in kick_cpus_irq_workfn() using
+smp_cond_load_acquire() until the target CPU’s kick_sync advances.</p>
+
+<p><strong>标签</strong>: <code class="language-plaintext highlighter-rouge">bugfix</code></p>
+
+<hr />
+
+<h4 id="5-rtla-fix-build-without-libbpf-header">5. rtla: Fix build without libbpf header</h4>
+<p><strong>作者</strong>: Tomas Glozar<br />
+<strong>来源</strong>: Git Mainline<br />
+<strong>链接</strong>: <a href="https://github.com/torvalds/linux/commit/2e8b1a1d12ae3338efeb1c3de3eb4e9324b87a28">查看详情</a></p>
+
+<p><strong>AI摘要</strong>: rtla: Fix build without libbpf header</p>
+
+<p>rtla supports building without libbpf. However, BPF actions
+patchset [1] adds an include of bpf/libbpf.h into timerlat_bpf.h,
+which breaks build on systems that</p>
+
+<p><strong>标签</strong>: <code class="language-plaintext highlighter-rouge">bugfix</code></p>
+
+<hr />
+
+<h3 id="-其他更新">📚 其他更新</h3>
+
+<ul>
+  <li>
+    <p><strong>cgroup/cpuset: Skip security check for hotplug induced v1 task migration</strong> - Waiman Long (<a href="https://github.com/torvalds/linux/commit/089f3fcd690c71cb3d8ca09f34027764e28920a0">链接</a>)</p>
+  </li>
+  <li>
+    <p><strong>cgroup/cpuset: Simplify setsched decision check in task iteration loop of cpuset_can_attach()</strong> - Waiman Long (<a href="https://github.com/torvalds/linux/commit/bbe5ab8191a33572c11be8628c55b79246307125">链接</a>)</p>
+  </li>
+  <li>
+    <p><strong>Merge tag ‘fs_for_v7.0-rc7’ of git://git.kernel.org/pub/scm/linux/kernel/git/jack/linux-fs</strong> - Linus Torvalds (<a href="https://github.com/torvalds/linux/commit/dbf00d8d23b43a7a1d717e704c50651731d01d71">链接</a>)</p>
+  </li>
+</ul>
+
+<hr />
+
+<p><em>本报告由 Linux Performance Insights 自动生成</em><br />
+<em>生成时间: 2026-04-02 16:39:44</em></p>
+
+      
+      <!-- AI Disclaimer -->
+      <div class="ai-disclaimer">
+        <strong>⚠️ 免责声明</strong>
+        <p>本网站内容由 AI 工具辅助生成，仅供参考和学习使用。作者不对内容的准确性、完整性和适用性做任何保证。使用本站信息所造成的任何损失，作者不承担任何责任。请在生产环境使用前进行充分测试和验证。</p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrapper">
+      <p>专注于 Linux 内核与系统性能优化技术分享</p>
+      <p>&copy; 2026 All rights reserved.</p>
+      <p><a href="/about/">查看免责声明</a></p>
+    </div>
+  </footer>
+</body>
+</html>
