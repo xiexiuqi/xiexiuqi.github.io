@@ -63,4 +63,11 @@ Linux 核心子系统的深度技术剖析。
     <span class="tag" style="background-color: var(--color-accent-orange);">🆕 深度报告</span>
     <a href="/reports/features/wave/" style="display: block; margin-top: 1rem;">查看详情 →</a>
   </div>
+
+  <div class="card">
+    <h3>🗄️ Linux内核 × 数据库性能洞察</h3>
+    <p>深度解析 io_uring、MGLRU、BOLT、FUSE-over-io_uring 四大特性如何驱动数据库性能飞跃，覆盖 MariaDB +25%、PostgreSQL +14% 等关键数据。</p>
+    <span class="tag" style="background-color: var(--color-accent-orange);">🆕 深度报告</span>
+    <a href="/reports/features/linux-kernel-db-performance-insights/" style="display: block; margin-top: 1rem;">查看详情 →</a>
+  </div>
 </div>
