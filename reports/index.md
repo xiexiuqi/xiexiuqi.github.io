@@ -122,10 +122,11 @@ Linux 内核核心子系统的实现原理与优化策略。
 按 Linux 内核版本整理的完整分析报告。
 
 <div class="grid">
-  <div class="card">
+  <div class="card" style="border: 2px solid var(--color-accent-orange);">
     <h3>🚀 Linux 7.x</h3>
-    <p>最新 Linux 7.0 内核完整技术报告，深入分析调度器、内存管理等核心子系统优化。</p>
-    <a href="/reports/7.x/">查看报告 →</a>
+    <p><strong>🆕 最新：</strong>2026-04-22 发布的 Linux 7.0 性能洞察报告，涵盖 lazy preemption、Sheaves、XFS 自愈、CAKE_MQ、ACC ECN 等，含 PostgreSQL ±49%、Redis +20%、游戏 +40% 等全面实测数据。</p>
+    <span class="tag" style="background-color: var(--color-accent-orange);">🆕 新增</span>
+    <a href="/reports/7.x/" style="display: block; margin-top: 1rem;">查看 7.x 报告 →</a>
   </div>
   
   <div class="card">
